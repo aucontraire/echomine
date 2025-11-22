@@ -6,7 +6,7 @@ by keywords with BM25 relevance ranking.
 Constitution Compliance:
     - Principle I: Library-first (delegates to OpenAIAdapter.search)
     - CHK031: Data on stdout, progress/errors on stderr
-    - CHK032: Exit codes 0 (success), 1 (user error), 2 (invalid arguments)
+    - CHK032: Exit codes 0 (success), 1 (error), 2 (invalid args), 130 (interrupt)
     - FR-291-292: stdout/stderr separation
     - FR-296-299: Exit code specification
 
@@ -29,6 +29,7 @@ Command Contract:
         0: Success (including zero results)
         1: File not found, permission denied, parse error
         2: Invalid arguments (no filters, invalid date range, etc.)
+        130: User interrupt (Ctrl+C)
 
     Output Streams:
         stdout: Search results (formatted as table or JSON)
@@ -179,10 +180,11 @@ def search_conversations(
         0: Success (including zero results)
         1: File not found, permission denied, parse error
         2: Invalid arguments
+        130: User interrupt (Ctrl+C)
 
     Requirements:
         - FR-291-292: stdout for results, stderr for progress/errors
-        - FR-296-299: Exit codes 0/1/2
+        - FR-296-299: Exit codes 0/1/2/130
         - FR-301-306: JSON output schema
         - FR-310: --quiet flag suppresses progress
         - CHK031: stdout/stderr separation
@@ -354,6 +356,14 @@ def search_conversations(
             err=True,
         )
         raise typer.Exit(code=1)
+
+    except KeyboardInterrupt:
+        # User interrupted with Ctrl+C (FR-299)
+        typer.echo(
+            "\nInterrupted by user",
+            err=True,
+        )
+        raise typer.Exit(code=130)
 
     except typer.Exit:
         # Re-raise typer.Exit to preserve exit code

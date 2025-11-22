@@ -65,10 +65,14 @@ class Conversation(BaseModel):
     Attributes:
         id: Unique conversation identifier (non-empty string)
         title: Conversation title (non-empty, any UTF-8)
-        created_at: Conversation creation timestamp (timezone-aware UTC)
-        updated_at: Last modification timestamp (timezone-aware UTC)
+        created_at: Conversation creation timestamp (timezone-aware UTC, REQUIRED)
+        updated_at: Last modification timestamp (timezone-aware UTC, None if never updated)
         messages: All messages in conversation (non-empty list)
         metadata: Provider-specific fields (e.g., moderation_results, plugin_ids)
+
+    Computed Properties:
+        updated_at_or_created: Returns updated_at if set, else created_at (never None)
+        message_count: Number of messages in conversation
     """
 
     # Pydantic Configuration (per FR-222, FR-226, FR-227)
@@ -93,11 +97,11 @@ class Conversation(BaseModel):
     )
     created_at: datetime = Field(
         ...,
-        description="Conversation creation timestamp (timezone-aware UTC)",
+        description="Conversation creation timestamp (timezone-aware UTC, REQUIRED)",
     )
-    updated_at: datetime = Field(
-        ...,
-        description="Last modification timestamp (timezone-aware UTC)",
+    updated_at: Optional[datetime] = Field(
+        default=None,
+        description="Last modification timestamp (timezone-aware UTC, defaults to created_at if null)",
     )
     messages: list[Message] = Field(
         ...,
@@ -112,10 +116,10 @@ class Conversation(BaseModel):
     )
 
     # Timestamp Validators (per FR-244, FR-245, FR-246, FR-273)
-    @field_validator("created_at", "updated_at")
+    @field_validator("created_at")
     @classmethod
-    def validate_timezone_aware(cls, v: datetime) -> datetime:
-        """Ensure timestamps are timezone-aware and normalized to UTC.
+    def validate_created_at_timezone_aware(cls, v: datetime) -> datetime:
+        """Ensure created_at is timezone-aware and normalized to UTC.
 
         Args:
             v: Timestamp value to validate
@@ -132,35 +136,81 @@ class Conversation(BaseModel):
             - FR-246: Validation enforced at parse time
         """
         if v.tzinfo is None or v.tzinfo.utcoffset(v) is None:
-            msg = f"Timestamp must be timezone-aware: {v}"
+            msg = f"created_at must be timezone-aware: {v}"
             raise ValueError(msg)
         return v.astimezone(UTC)  # Normalize to UTC
 
     @field_validator("updated_at")
     @classmethod
-    def validate_updated_after_created(cls, v: datetime, info: Any) -> datetime:
-        """Ensure updated_at >= created_at.
+    def validate_updated_at_timezone_aware(cls, v: Optional[datetime], info: Any) -> Optional[datetime]:
+        """Ensure updated_at is timezone-aware and >= created_at (if provided).
 
         Args:
-            v: updated_at value to validate
+            v: updated_at value to validate (may be None)
             info: Field validation info containing created_at
 
         Returns:
-            Validated updated_at timestamp
+            Timezone-aware datetime normalized to UTC, or None if not provided
 
         Raises:
-            ValueError: If updated_at < created_at
+            ValueError: If timestamp is timezone-naive or < created_at
 
         Requirements:
-            - FR-273: updated_at must be >= created_at
+            - FR-244: Timestamps must be timezone-aware (when provided)
+            - FR-245: Timestamps normalized to UTC
+            - FR-246: Validation enforced at parse time
+            - FR-273: updated_at must be >= created_at (when provided)
         """
-        created_at = info.data.get("created_at")
-        if created_at and v < created_at:
-            msg = f"updated_at ({v}) must be >= created_at ({created_at})"
+        # Handle None (optional field)
+        if v is None:
+            return None
+
+        # Validate timezone-aware
+        if v.tzinfo is None or v.tzinfo.utcoffset(v) is None:
+            msg = f"updated_at must be timezone-aware: {v}"
             raise ValueError(msg)
-        return v
+
+        # Normalize to UTC
+        v_utc = v.astimezone(UTC)
+
+        # Validate updated_at >= created_at
+        created_at = info.data.get("created_at")
+        if created_at and v_utc < created_at:
+            msg = f"updated_at ({v_utc}) must be >= created_at ({created_at})"
+            raise ValueError(msg)
+
+        return v_utc
 
     # Computed Properties
+
+    @property
+    def updated_at_or_created(self) -> datetime:
+        """Get the last update timestamp, falling back to created_at if not set.
+
+        This property ensures downstream code always has a valid "last modified"
+        timestamp without needing to handle Optional[datetime]. If the conversation
+        has never been updated (updated_at is None), returns created_at.
+
+        Returns:
+            Last update timestamp (updated_at if set, else created_at)
+
+        Example:
+            ```python
+            # Conversation never updated
+            conv = Conversation(..., created_at=ts1, updated_at=None)
+            assert conv.updated_at_or_created == ts1
+
+            # Conversation updated
+            conv2 = Conversation(..., created_at=ts1, updated_at=ts2)
+            assert conv2.updated_at_or_created == ts2
+            ```
+
+        Usage Notes:
+            - Prefer this property over direct `updated_at` access for display/sorting
+            - Use direct `updated_at` field when you need to distinguish null vs. set
+            - Guaranteed non-null return value (mypy --strict compliant)
+        """
+        return self.updated_at if self.updated_at is not None else self.created_at
 
     @property
     def message_count(self) -> int:

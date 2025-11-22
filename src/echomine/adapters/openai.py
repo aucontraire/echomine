@@ -337,13 +337,13 @@ class OpenAIAdapter:
         # Sort by relevance (descending)
         scored_conversations.sort(key=lambda x: x[1], reverse=True)
 
-        # Normalize scores to [0.0, 1.0] range
-        if scored_conversations and scored_conversations[0][1] > 0:
-            max_score = scored_conversations[0][1]
-            scored_conversations = [
-                (conv, score / max_score, msg_ids)
-                for conv, score, msg_ids in scored_conversations
-            ]
+        # Normalize scores to [0.0, 1.0] range using BM25 normalization formula (FR-319)
+        # Formula: score_normalized = score_raw / (score_raw + 1)
+        # This ensures consistent score interpretation across queries
+        scored_conversations = [
+            (conv, score / (score + 1.0) if score > 0 else 0.0, msg_ids)
+            for conv, score, msg_ids in scored_conversations
+        ]
 
         # Apply limit if specified
         if query.limit:
@@ -464,16 +464,33 @@ class OpenAIAdapter:
         # Convert Unix timestamps to UTC datetime
         # OpenAI uses float timestamps (seconds since epoch)
         # ijson returns Decimal objects - convert to float first
-        # Handle None timestamps (can occur in real exports) - use Unix epoch as fallback
-        created_at = (
-            datetime.fromtimestamp(float(create_time), tz=UTC)
-            if create_time is not None
-            else datetime.fromtimestamp(0, tz=UTC)  # Unix epoch: 1970-01-01
-        )
-        updated_at = (
+        #
+        # Timestamp Handling Strategy:
+        # - created_at: REQUIRED - if null, raise ValidationError (malformed data)
+        # - updated_at: OPTIONAL - if null, set to None (Conversation model handles fallback)
+        #
+        # Rationale: Every conversation MUST have creation time (data integrity).
+        # Updates are optional - None means "never modified" (semantically correct).
+        if create_time is None:
+            # Missing creation timestamp = malformed data, fail validation
+            raise PydanticValidationError.from_exception_data(
+                "Conversation",
+                [
+                    {
+                        "type": "missing",
+                        "loc": ("create_time",),
+                        "input": raw_data,
+                    }
+                ],
+            )
+
+        created_at = datetime.fromtimestamp(float(create_time), tz=UTC)
+
+        # Handle optional updated_at - None is valid (conversation never updated)
+        updated_at: Optional[datetime] = (
             datetime.fromtimestamp(float(update_time), tz=UTC)
             if update_time is not None
-            else datetime.fromtimestamp(0, tz=UTC)  # Unix epoch: 1970-01-01
+            else None
         )
 
         # Build Conversation model (Pydantic validation automatic)

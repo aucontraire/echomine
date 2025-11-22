@@ -109,11 +109,17 @@ def format_json(conversations: list[Conversation]) -> str:
     Each conversation is serialized as an object with key fields:
     - id: Conversation identifier
     - title: Conversation title
-    - created_at: ISO 8601 timestamp
+    - created_at: ISO 8601 timestamp (always present)
+    - updated_at: ISO 8601 timestamp (uses created_at if never updated)
     - message_count: Number of messages
 
     The output is valid JSON that can be parsed with `jq` or other
     JSON processing tools.
+
+    Timestamp Handling:
+        - created_at: Always present (required field)
+        - updated_at: Uses updated_at_or_created property (never null in output)
+        - This ensures JSON consumers always get valid timestamps
 
     Args:
         conversations: List of Conversation objects to format
@@ -124,11 +130,12 @@ def format_json(conversations: list[Conversation]) -> str:
     Example:
         >>> convs = [conversation1, conversation2]
         >>> print(format_json(convs))
-        [{"id": "a1b2...", "title": "Test", "created_at": "2024-03-15T14:23:11", "message_count": 47}]
+        [{"id": "a1b2...", "title": "Test", "created_at": "2024-03-15T14:23:11", "updated_at": "2024-03-15T14:23:11", "message_count": 47}]
 
     Requirements:
         - FR-018: Alternative JSON format for programmatic use
         - FR-019: Pipeline-friendly (valid JSON for jq)
+        - FR-301-306: JSON output schema with created_at/updated_at
         - CLI spec: --format json flag
     """
     # Build list of conversation dicts
@@ -138,6 +145,7 @@ def format_json(conversations: list[Conversation]) -> str:
             "id": conv.id,
             "title": conv.title,
             "created_at": conv.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            "updated_at": conv.updated_at_or_created.strftime("%Y-%m-%dT%H:%M:%S"),
             "message_count": conv.message_count,
         }
         conv_dicts.append(conv_dict)
@@ -234,11 +242,17 @@ def format_search_results_json(results: list[SearchResult[Conversation]]) -> str
                     "id": "conv-123",
                     "title": "Python best practices",
                     "created_at": "2024-03-15T14:23:11",
+                    "updated_at": "2024-03-15T14:23:11",
                     "message_count": 47
                 },
                 "matched_message_ids": ["msg-1", "msg-5"]
             }
         ]
+
+    Timestamp Handling:
+        - created_at: Always present (required field)
+        - updated_at: Uses updated_at_or_created property (never null in output)
+        - This ensures JSON consumers always get valid timestamps
 
     Args:
         results: List of SearchResult objects
@@ -247,7 +261,7 @@ def format_search_results_json(results: list[SearchResult[Conversation]]) -> str
         JSON array string
 
     Requirements:
-        - FR-301-306: JSON output schema
+        - FR-301-306: JSON output schema with created_at/updated_at
         - FR-019: Pipeline-friendly (valid JSON for jq)
         - CHK031: Output to stdout (caller responsibility)
     """
@@ -260,6 +274,7 @@ def format_search_results_json(results: list[SearchResult[Conversation]]) -> str
                 "id": conv.id,
                 "title": conv.title,
                 "created_at": conv.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
+                "updated_at": conv.updated_at_or_created.strftime("%Y-%m-%dT%H:%M:%S"),
                 "message_count": conv.message_count,
             },
             "matched_message_ids": result.matched_message_ids,

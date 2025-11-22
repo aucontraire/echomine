@@ -163,6 +163,14 @@ def list_conversations(
         )
         raise typer.Exit(code=1)
 
+    except KeyboardInterrupt:
+        # User interrupted with Ctrl+C (FR-299)
+        typer.echo(
+            "\nInterrupted by user",
+            err=True,
+        )
+        raise typer.Exit(code=130)
+
     except Exception as e:
         # Unexpected error (catch-all for safety)
         typer.echo(

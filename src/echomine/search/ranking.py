@@ -42,7 +42,7 @@ class BM25Scorer:
         - k1 = 1.5 (term frequency saturation)
         - b = 0.75 (length normalization)
         - IDF: log((N - df + 0.5) / (df + 0.5) + 1)
-        - Score normalization: min-max normalization to [0.0, 1.0]
+        - Score normalization: score_normalized = score_raw / (score_raw + 1) per FR-319
 
     Example:
         ```python
