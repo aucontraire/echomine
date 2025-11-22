@@ -1,8 +1,28 @@
 # Remaining Gap Prioritization Analysis
 
-**Total Remaining Gaps**: 112 items
+**Total Remaining Gaps**: 112 items (103 remaining, 9 resolved)
 **Analysis Date**: 2025-11-22
+**Last Updated**: 2025-11-22
 **Feature**: 001-ai-chat-parser
+
+---
+
+## ✅ Resolved Gaps (9 items)
+
+**Resolved in Phase 4 Implementation (2025-11-22):**
+
+### CLI Interface Contract (5 items) - commits: 996160e, 44271fa, 387f603
+- ✅ **CHK031** - stdout/stderr separation (FR-291-295) - Implemented in Phase 3/4
+- ✅ **CHK032** - Exit codes 0/1/2/130 (FR-296-299) - Added exit code 130 for SIGINT
+- ✅ **CHK033** - JSON output schema (FR-301-306) - Full metadata wrapper implemented
+- ✅ **CHK036** - CLI composability - Verified with jq pipelines
+- ✅ **CHK141** - Exit code consistency - Consolidated in CHK032 resolution
+
+### Search & Filtering Semantics (4 items)
+- ✅ **CHK037** - BM25 relevance scoring (FR-317-318) - k1=1.5, b=0.75, score/(score+1) normalization
+- ✅ **CHK039** - Keyword frequency at conversation level (FR-322-326)
+- ✅ **CHK044** - Case-insensitive substring title matching (FR-327-331)
+- ✅ **CHK136** - Limit applied after relevance ranking (FR-332-336)
 
 ---
 
@@ -48,24 +68,24 @@
 
 ---
 
-## Priority 2: High - Should Resolve Early in Implementation (28 items)
+## Priority 2: High - Should Resolve Early in Implementation (28 items, 9 resolved)
 
 **Impact**: Needed for core workflows, CLI contract, and cognivault integration. Can be resolved during early implementation phases.
 
-### CLI Interface Contract (Risk Area E)
-- **CHK031** - stdout/stderr separation requirements [Clarity, Spec §FR-019, FR-022]
-- **CHK032** - Exit code requirements for all failure modes [Completeness, Spec §FR-022]
-- **CHK033** - JSON output schema requirements (--json flag) [Gap]
-- **CHK036** - CLI composability requirements (pipeline, jq integration) [Constitution Principle II]
-- **CHK141** - CLI exit codes consistent with FR-022 and FR-033 [Consistency]
+### CLI Interface Contract (Risk Area E) - 5/5 RESOLVED ✅
+- ✅ ~~**CHK031** - stdout/stderr separation requirements~~ [RESOLVED: FR-291-295]
+- ✅ ~~**CHK032** - Exit code requirements for all failure modes~~ [RESOLVED: FR-296-299, exit 130 added]
+- ✅ ~~**CHK033** - JSON output schema requirements (--json flag)~~ [RESOLVED: FR-301-306]
+- ✅ ~~**CHK036** - CLI composability requirements (pipeline, jq integration)~~ [RESOLVED: Verified working]
+- ✅ ~~**CHK141** - CLI exit codes consistent with FR-022 and FR-033~~ [RESOLVED: Consolidated]
 
 **Rationale**: CLI contract must be defined early since it's user-facing and hard to change after release.
 
-### Search & Filtering Semantics
-- **CHK037** - "Relevance score" quantified with algorithm (TF-IDF formula) [Ambiguity, Spec §FR-008]
-- **CHK039** - "Keyword frequency and position" clarified [Ambiguity, Spec §FR-008]
-- **CHK044** - "Partial match" requirements for title filtering [Clarity, Spec §FR-011]
-- **CHK136** - Interaction between --limit and relevance ranking [Ambiguity]
+### Search & Filtering Semantics - 4/4 RESOLVED ✅
+- ✅ ~~**CHK037** - "Relevance score" quantified with algorithm (TF-IDF formula)~~ [RESOLVED: BM25 FR-317-318]
+- ✅ ~~**CHK039** - "Keyword frequency and position" clarified~~ [RESOLVED: FR-322-326]
+- ✅ ~~**CHK044** - "Partial match" requirements for title filtering~~ [RESOLVED: FR-327-331]
+- ✅ ~~**CHK136** - Interaction between --limit and relevance ranking~~ [RESOLVED: FR-332-336]
 
 **Rationale**: Search semantics affect user expectations and test design.
 
@@ -248,13 +268,15 @@
 
 ## Summary by Priority
 
-| Priority | Count | Focus | When to Resolve |
-|----------|-------|-------|----------------|
-| **P1: Critical** | 17 | API contracts, type safety, conflicts | Before implementation starts |
-| **P2: High** | 28 | CLI contract, cognivault integration, core workflows | Early implementation phases |
-| **P3: Medium** | 37 | Performance, testing, edge cases, dependencies | During implementation |
-| **P4: Low** | 30 | Rare edge cases, future features, polish | Post-v1.0 or as discovered |
-| **TOTAL** | 112 | | |
+| Priority | Count | Resolved | Remaining | Focus | When to Resolve |
+|----------|-------|----------|-----------|-------|----------------|
+| **P1: Critical** | 17 | 0 | 17 | API contracts, type safety, conflicts | Before implementation starts |
+| **P2: High** | 28 | 9 ✅ | 19 | CLI contract, cognivault integration, core workflows | Early implementation phases |
+| **P3: Medium** | 37 | 0 | 37 | Performance, testing, edge cases, dependencies | During implementation |
+| **P4: Low** | 30 | 0 | 30 | Rare edge cases, future features, polish | Post-v1.0 or as discovered |
+| **TOTAL** | 112 | **9** | **103** | | |
+
+**Progress**: 8% of gaps resolved (9/112)
 
 ---
 
