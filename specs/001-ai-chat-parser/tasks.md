@@ -26,15 +26,15 @@ Single project structure:
 
 **Purpose**: Project initialization and basic structure per plan.md
 
-- [ ] T001 Create project structure with src/echomine/ and tests/ directories
-- [ ] T002 Initialize Python 3.12+ project with pyproject.toml (poetry/setuptools)
-- [ ] T003 [P] Add core dependencies: pydantic v2, ijson, typer, rich, structlog, python-slugify, python-dateutil
-- [ ] T004 [P] Add development dependencies: pytest, pytest-cov, pytest-mock, pytest-benchmark, mypy, ruff
-- [ ] T005 [P] Configure mypy for strict type checking in pyproject.toml
-- [ ] T006 [P] Configure ruff for linting and formatting in pyproject.toml
-- [ ] T007 [P] Setup pre-commit hooks for mypy --strict and ruff
-- [ ] T008 Create src/echomine/__init__.py with public API exports
-- [ ] T009 Create tests/conftest.py with shared pytest fixtures
+- [X] T001 Create project structure with src/echomine/ and tests/ directories
+- [X] T002 Initialize Python 3.12+ project with pyproject.toml (poetry/setuptools)
+- [X] T003 [P] Add core dependencies: pydantic v2, ijson, typer, rich, structlog, python-slugify, python-dateutil
+- [X] T004 [P] Add development dependencies: pytest, pytest-cov, pytest-mock, pytest-benchmark, mypy, ruff
+- [X] T005 [P] Configure mypy for strict type checking in pyproject.toml
+- [X] T006 [P] Configure ruff for linting and formatting in pyproject.toml
+- [X] T007 [P] Setup pre-commit hooks for mypy --strict and ruff
+- [X] T008 Create src/echomine/__init__.py with public API exports
+- [X] T009 Create tests/conftest.py with shared pytest fixtures
 
 **Checkpoint**: Project structure ready for implementation
 

@@ -1,0 +1,71 @@
+"""Echomine: Library-first tool for parsing AI conversation exports.
+
+This package provides tools for parsing, searching, and exporting AI chat conversation
+exports (initially ChatGPT) with memory-efficient streaming, strict type safety, and
+both programmatic (library) and command-line (CLI) interfaces.
+
+Core Features:
+- Stream-based parsing for memory efficiency (handles 1GB+ files)
+- Full-text search with BM25 relevance ranking
+- Date range filtering
+- Markdown export with preserved conversation threading
+- Multi-provider adapter pattern (OpenAI ChatGPT initially)
+
+Library-First Architecture:
+The CLI is built on top of the library. All capabilities available via command-line
+are also available programmatically.
+
+Example Usage (Library):
+    ```python
+    from echomine import OpenAIAdapter
+    from pathlib import Path
+
+    # List conversations
+    adapter = OpenAIAdapter()
+    for conversation in adapter.stream_conversations(Path("export.json")):
+        print(f"{conversation.title}: {len(conversation.messages)} messages")
+
+    # Search conversations
+    results = adapter.search(
+        Path("export.json"),
+        keywords=["algorithm", "design"],
+        limit=10
+    )
+    for result in results:
+        print(f"{result.conversation.title} (score: {result.relevance_score})")
+    ```
+
+Example Usage (CLI):
+    ```bash
+    # List all conversations
+    echomine list export.json
+
+    # Search with keywords
+    echomine search export.json --keywords "algorithm,design" --limit 10
+
+    # Export to markdown
+    echomine export export.json --title "Project" --output project.md
+    ```
+
+Type Safety:
+All public APIs are strictly typed with Pydantic models and mypy --strict compliance.
+
+License:
+    MIT License - See LICENSE file for details
+"""
+
+__version__ = "1.0.0"
+__author__ = "Echomine Contributors"
+__all__: list[str] = [
+    "__version__",
+    # Public API will be exported here as implemented:
+    # "OpenAIAdapter",
+    # "Conversation",
+    # "Message",
+    # "SearchQuery",
+    # "SearchResult",
+    # "ConversationProvider",
+]
+
+# Public API exports will be added as implementation progresses
+# Following library-first architecture (Constitution Principle I)

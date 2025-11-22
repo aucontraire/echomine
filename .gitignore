@@ -35,8 +35,22 @@ env/
 htmlcov/
 .tox/
 
+# Type checking & linting cache
+.mypy_cache/
+.ruff_cache/
+
+# Logs
+*.log
+logs/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
 # PyCharm sample files
 main.py
 
 # OS
 .DS_Store
+Thumbs.db
