@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from echomine.models.conversation import Conversation
+    from echomine.models.search import SearchResult
 
 
 def format_text_table(conversations: list[Conversation]) -> str:
@@ -147,3 +148,122 @@ def format_json(conversations: list[Conversation]) -> str:
 
     # Return with trailing newline (Unix convention)
     return json_output + "\n"
+
+
+def format_search_results(results: list[SearchResult[Conversation]]) -> str:
+    """Format search results as human-readable text table.
+
+    Shows:
+    - Score (0.00-1.00, higher = more relevant)
+    - ID (conversation UUID, truncated to 36 chars)
+    - Title (truncated to 30 chars)
+    - Created date
+    - Message count
+
+    Args:
+        results: List of SearchResult objects with scores
+
+    Returns:
+        Formatted text table
+
+    Example Output:
+        Score  ID                                    Title                          Created              Messages
+        ─────────────────────────────────────────────────────────────────────────────────────────────────────────
+        1.00   a1b2c3d4-e5f6-7890-abcd-ef1234567890  Python async best practices    2024-03-15 14:23:11        47
+        0.85   b2c3d4e5-f6a7-8901-bcde-f12345678901  Intro to Python for beginners  2024-03-14 09:15:42        12
+
+    Requirements:
+        - FR-018: Human-readable format
+        - FR-019: Pipeline-friendly output
+        - CHK031: Output to stdout (caller responsibility)
+    """
+    if not results:
+        return "No matching conversations found.\n"
+
+    # Column widths (consistent with list command format)
+    score_width = 6
+    id_width = 36
+    title_width = 30
+    created_width = 20
+    messages_width = 8
+
+    # Header
+    header = f"{'Score':<{score_width}} {'ID':<{id_width}}  {'Title':<{title_width}}  {'Created':<{created_width}}  {'Messages':>{messages_width}}"
+
+    # Separator
+    separator = "─" * len(header)
+
+    # Build data rows
+    rows = []
+    for result in results:
+        conv = result.conversation
+        score_str = f"{result.score:.2f}"
+
+        # Format ID (truncate if needed, but UUIDs are exactly 36 chars)
+        conv_id = conv.id[:id_width]
+
+        # Truncate title
+        title = conv.title
+        if len(title) > title_width:
+            title = title[:title_width - 3] + "..."
+
+        # Format created date
+        created = conv.created_at.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Message count
+        msg_count = conv.message_count
+
+        row = f"{score_str:<{score_width}} {conv_id:<{id_width}}  {title:<{title_width}}  {created:<{created_width}}  {msg_count:>{messages_width}}"
+        rows.append(row)
+
+    # Combine all parts
+    lines = [header, separator] + rows
+
+    # Return with trailing newline
+    return "\n".join(lines) + "\n"
+
+
+def format_search_results_json(results: list[SearchResult[Conversation]]) -> str:
+    """Format search results as JSON array.
+
+    JSON Schema:
+        [
+            {
+                "score": 1.0,
+                "conversation": {
+                    "id": "conv-123",
+                    "title": "Python best practices",
+                    "created_at": "2024-03-15T14:23:11",
+                    "message_count": 47
+                },
+                "matched_message_ids": ["msg-1", "msg-5"]
+            }
+        ]
+
+    Args:
+        results: List of SearchResult objects
+
+    Returns:
+        JSON array string
+
+    Requirements:
+        - FR-301-306: JSON output schema
+        - FR-019: Pipeline-friendly (valid JSON for jq)
+        - CHK031: Output to stdout (caller responsibility)
+    """
+    output = []
+    for result in results:
+        conv = result.conversation
+        output.append({
+            "score": result.score,
+            "conversation": {
+                "id": conv.id,
+                "title": conv.title,
+                "created_at": conv.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
+                "message_count": conv.message_count,
+            },
+            "matched_message_ids": result.matched_message_ids,
+        })
+
+    # Return formatted JSON with trailing newline
+    return json.dumps(output, indent=2) + "\n"

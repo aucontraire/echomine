@@ -91,38 +91,38 @@ Single project structure:
 
 > **CRITICAL: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T026 [P] [US0] Integration test for list workflow in tests/integration/test_list_flow.py (end-to-end: file → parse → list → verify output)
-- [ ] T027 [P] [US0] CLI contract test for list command in tests/contract/test_cli_contract.py (verify stdout format, exit codes)
-- [ ] T028 [P] [US0] Performance test for listing 10K conversations in tests/performance/test_list_benchmark.py (verify <5s per FR-444, callback frequency ≥100 items per FR-069)
+- [X] T026 [P] [US0] Integration test for list workflow in tests/integration/test_list_flow.py (end-to-end: file → parse → list → verify output)
+- [X] T027 [P] [US0] CLI contract test for list command in tests/contract/test_cli_contract.py (verify stdout format, exit codes)
+- [X] T028 [P] [US0] Performance test for listing 10K conversations in tests/performance/test_list_benchmark.py (verify <5s per FR-444, callback frequency ≥100 items per FR-069)
 
 ### Implementation for [US0]
 
 #### Streaming Parser (Foundation for all commands)
 
-- [ ] T029 [P] [US0] Implement ijson streaming parser in src/echomine/parsers/streaming.py (parse conversations one-at-a-time, O(1) memory)
-- [ ] T030 [P] [US0] Add schema version detection in src/echomine/parsers/streaming.py (detect OpenAI export format per FR-080 to FR-084)
-- [ ] T031 [US0] Add graceful degradation for malformed entries in src/echomine/parsers/streaming.py (skip with WARNING, invoke on_skip callback per FR-281 to FR-285)
+- [X] T029 [P] [US0] Implement ijson streaming parser in src/echomine/parsers/streaming.py (parse conversations one-at-a-time, O(1) memory)
+- [X] T030 [P] [US0] Add schema version detection in src/echomine/parsers/streaming.py (detect OpenAI export format per FR-080 to FR-084)
+- [X] T031 [US0] Add graceful degradation for malformed entries in src/echomine/parsers/streaming.py (skip with WARNING, invoke on_skip callback per FR-281 to FR-285)
 
 #### OpenAI Adapter - Stream Method
 
-- [ ] T032 [US0] Implement OpenAIAdapter.stream_conversations in src/echomine/adapters/openai.py (use streaming parser, yield Conversation objects)
-- [ ] T033 [US0] Add progress_callback support in OpenAIAdapter.stream_conversations per FR-076, FR-077
-- [ ] T034 [US0] Add on_skip callback support in OpenAIAdapter.stream_conversations per FR-106, FR-107
+- [X] T032 [US0] Implement OpenAIAdapter.stream_conversations in src/echomine/adapters/openai.py (use streaming parser, yield Conversation objects)
+- [X] T033 [US0] Add progress_callback support in OpenAIAdapter.stream_conversations per FR-076, FR-077
+- [X] T034 [US0] Add on_skip callback support in OpenAIAdapter.stream_conversations per FR-106, FR-107
 
 #### List Command Implementation
 
-- [ ] T035 [US0] Create typer CLI app in src/echomine/cli/app.py with --help, --version outputs per FR-294, FR-432
-- [ ] T036 [US0] Implement `list` command in src/echomine/cli/list_cmd.py with --limit, --json flags per FR-438, FR-443
-- [ ] T037 [US0] Add conversation sorting by created_at descending in list_cmd.py per FR-440
-- [ ] T038 [US0] Implement human-readable formatter in src/echomine/cli/formatters.py (date, title, message count per FR-441)
-- [ ] T039 [US0] Implement JSON formatter for list in list_cmd.py (array of conversation metadata per FR-442)
-- [ ] T040 [US0] Add stdout routing for list results in list_cmd.py per FR-446
-- [ ] T041 [US0] Add "No conversations found" handling in list_cmd.py per FR-445
+- [X] T035 [US0] Create typer CLI app in src/echomine/cli/app.py with --help, --version outputs per FR-294, FR-432
+- [X] T036 [US0] Implement `list` command in src/echomine/cli/list_cmd.py with --limit, --json flags per FR-438, FR-443
+- [X] T037 [US0] Add conversation sorting by created_at descending in list_cmd.py per FR-440
+- [X] T038 [US0] Implement human-readable formatter in src/echomine/cli/formatters.py (date, title, message count per FR-441)
+- [X] T039 [US0] Implement JSON formatter for list in list_cmd.py (array of conversation metadata per FR-442)
+- [X] T040 [US0] Add stdout routing for list results in list_cmd.py per FR-446
+- [X] T041 [US0] Add "No conversations found" handling in list_cmd.py per FR-445
 
 #### CLI Entry Point
 
-- [ ] T042 [US0] Create CLI entry point script in src/echomine/__main__.py
-- [ ] T043 [US0] Configure setuptools/poetry console_scripts entry point: `echomine = echomine.cli.app:main`
+- [X] T042 [US0] Create CLI entry point script in src/echomine/__main__.py
+- [X] T043 [US0] Configure setuptools/poetry console_scripts entry point: `echomine = echomine.cli.app:main`
 
 **Checkpoint**: US0 complete - basic list functionality enables discovery workflow
 
@@ -140,31 +140,31 @@ Single project structure:
 
 > **CRITICAL: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T044 [P] [US1] Contract test for ConversationProvider.search in tests/contract/test_provider_protocol.py (verify signature, relevance ranking, limit semantics)
-- [ ] T045 [P] [US1] Integration test for keyword search workflow in tests/integration/test_search_flow.py (end-to-end: file → parse → search → results)
-- [ ] T046 [P] [US1] CLI contract test for search stdout/stderr separation in tests/contract/test_cli_contract.py (verify results to stdout, progress to stderr per FR-291, FR-292)
-- [ ] T047 [P] [US1] Performance test for 1GB file search in tests/performance/test_search_benchmark.py (verify <30s per SC-001, callback frequency ≥100 items per FR-069)
+- [X] T044 [P] [US1] Contract test for ConversationProvider.search in tests/contract/test_provider_protocol.py (verify signature, relevance ranking, limit semantics)
+- [X] T045 [P] [US1] Integration test for keyword search workflow in tests/integration/test_search_flow.py (end-to-end: file → parse → search → results)
+- [X] T046 [P] [US1] CLI contract test for search stdout/stderr separation in tests/contract/test_cli_contract.py (verify results to stdout, progress to stderr per FR-291, FR-292)
+- [X] T047 [P] [US1] Performance test for 1GB file search in tests/performance/test_search_benchmark.py (verify <30s per SC-001, callback frequency ≥100 items per FR-069)
 
 ### Implementation for [US1]
 
 #### BM25 Search Engine (per FR-317 to FR-326)
 
-- [ ] T048 [P] [US1] Implement BM25Scorer in src/echomine/search/ranking.py with k1=1.5, b=0.75 parameters
-- [ ] T049 [P] [US1] Implement keyword search in src/echomine/search/keyword.py (case-insensitive matching, multi-keyword OR logic)
-- [ ] T050 [P] [US1] Implement title filtering in src/echomine/search/title.py (case-insensitive substring matching per FR-327 to FR-331)
-- [ ] T051 [US1] Implement OpenAIAdapter.search in src/echomine/adapters/openai.py (stream, score, rank, apply limit per FR-332 to FR-336)
+- [X] T048 [P] [US1] Implement BM25Scorer in src/echomine/search/ranking.py with k1=1.5, b=0.75 parameters
+- [X] T049 [P] [US1] Implement keyword search in src/echomine/search/keyword.py (case-insensitive matching, multi-keyword OR logic)
+- [X] T050 [P] [US1] Implement title filtering in src/echomine/search/title.py (case-insensitive substring matching per FR-327 to FR-331)
+- [X] T051 [US1] Implement OpenAIAdapter.search in src/echomine/adapters/openai.py (stream, score, rank, apply limit per FR-332 to FR-336)
 
 #### CLI Search Command
 
-- [ ] T052 [US1] Implement `search` command in src/echomine/cli/search_cmd.py with --keywords, --title, --limit, --json, --quiet flags
-- [ ] T053 [US1] Add stdout/stderr routing in search_cmd.py (results to stdout, progress/errors to stderr per FR-291, FR-292, FR-293)
-- [ ] T054 [US1] Add JSON output format in search_cmd.py with schema {results, metadata} per FR-301 to FR-306
-- [ ] T055 [US1] Add exit code handling in search_cmd.py (0, 1, 2, 130 per FR-296 to FR-299)
-- [ ] T056 [US1] Add rich progress indicators in search_cmd.py (suppress with --quiet per FR-310)
+- [X] T052 [US1] Implement `search` command in src/echomine/cli/search_cmd.py with --keywords, --title, --limit, --json, --quiet flags
+- [X] T053 [US1] Add stdout/stderr routing in search_cmd.py (results to stdout, progress/errors to stderr per FR-291, FR-292, FR-293)
+- [X] T054 [US1] Add JSON output format in search_cmd.py with schema {results, metadata} per FR-301 to FR-306
+- [X] T055 [US1] Add exit code handling in search_cmd.py (0, 1, 2, 130 per FR-296 to FR-299)
+- [X] T056 [US1] Add rich progress indicators in search_cmd.py (suppress with --quiet per FR-310)
 
 #### Human-Readable Output (per FR-019)
 
-- [ ] T057 [P] [US1] Implement human-readable search results formatter in src/echomine/cli/formatters.py (table layout with title, date, score, excerpt)
+- [X] T057 [P] [US1] Implement human-readable search results formatter in src/echomine/cli/formatters.py (table layout with title, date, score, excerpt)
 
 **Checkpoint**: US1 complete - keyword search functional via CLI and library API
 

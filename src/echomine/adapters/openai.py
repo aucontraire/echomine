@@ -49,7 +49,7 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator, Literal
+from typing import TYPE_CHECKING, Any, Iterator, Literal, Optional
 
 import ijson
 from pydantic import ValidationError as PydanticValidationError
@@ -57,6 +57,9 @@ from pydantic import ValidationError as PydanticValidationError
 from echomine.exceptions import ParseError, ValidationError
 from echomine.models.conversation import Conversation
 from echomine.models.message import Message
+from echomine.models.protocols import OnSkipCallback, ProgressCallback
+from echomine.models.search import SearchQuery, SearchResult
+from echomine.search.ranking import BM25Scorer
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -191,6 +194,222 @@ class OpenAIAdapter:
             # Re-raise FileNotFoundError without wrapping
             # This is a standard Python exception, no conversion needed
             raise
+
+    def search(
+        self,
+        file_path: Path,
+        query: SearchQuery,
+        *,
+        progress_callback: Optional[ProgressCallback] = None,
+        on_skip: Optional[OnSkipCallback] = None,
+    ) -> Iterator[SearchResult[Conversation]]:
+        """Search conversations with BM25 relevance ranking.
+
+        Algorithm:
+        1. Stream all conversations (O(1) memory per conversation)
+        2. Apply title filter if specified (metadata-only, fast)
+        3. Apply date range filter if specified
+        4. Build corpus and calculate BM25 scores
+        5. Rank by relevance (descending)
+        6. Apply limit if specified
+        7. Yield SearchResult objects one at a time
+
+        Args:
+            file_path: Path to OpenAI export file
+            query: SearchQuery with keywords, title_filter, limit
+            progress_callback: Optional callback invoked per conversation processed
+            on_skip: Optional callback for malformed entries
+
+        Yields:
+            SearchResult[Conversation] with ranked results and scores
+
+        Raises:
+            FileNotFoundError: If file doesn't exist
+            ParseError: If JSON is malformed
+
+        Performance:
+            - Memory: O(N) where N = matching conversations
+            - Time: O(M) where M = total conversations in file
+            - Early termination: Not implemented (stream all for BM25)
+
+        Example:
+            ```python
+            adapter = OpenAIAdapter()
+            query = SearchQuery(keywords=["python"], limit=10)
+
+            for result in adapter.search(Path("export.json"), query):
+                print(f"{result.score:.2f}: {result.conversation.title}")
+            ```
+        """
+        # Stream conversations and apply filters
+        conversations: list[Conversation] = []
+        corpus_texts: list[str] = []
+
+        count = 0
+        for conv in self.stream_conversations(file_path):
+            count += 1
+
+            # Progress callback (every 100 items per FR-069)
+            if progress_callback and count % 100 == 0:
+                progress_callback(count)
+
+            # Title filter (fast metadata check)
+            if query.has_title_filter():
+                assert query.title_filter is not None  # Type narrowing
+                if query.title_filter.lower() not in conv.title.lower():
+                    continue  # Skip non-matching titles
+
+            # Date range filter
+            if query.has_date_filter():
+                conv_date = conv.created_at.date()
+
+                # Check from_date (inclusive)
+                if query.from_date is not None and conv_date < query.from_date:
+                    continue
+
+                # Check to_date (inclusive)
+                if query.to_date is not None and conv_date > query.to_date:
+                    continue
+
+            # Build corpus text (title + all message content)
+            conv_text = f"{conv.title} " + " ".join(
+                m.content for m in conv.messages
+            )
+
+            conversations.append(conv)
+            corpus_texts.append(conv_text)
+
+        # Final progress callback
+        if progress_callback:
+            progress_callback(count)
+
+        # Handle empty results
+        if not conversations:
+            return  # Empty iterator
+
+        # Calculate average document length for BM25
+        # Use regex tokenization to match BM25Scorer's tokenization
+        import re
+
+        def tokenize_for_length(text: str) -> int:
+            """Count tokens using same method as BM25Scorer."""
+            text_lower = text.lower()
+            count = len(re.findall(r'[a-z0-9]+', text_lower))
+            count += len(re.findall(r'[^\W\d_a-z]', text_lower))
+            return count
+
+        avg_doc_length = (
+            sum(tokenize_for_length(text) for text in corpus_texts)
+            / len(corpus_texts)
+        )
+
+        # Initialize BM25 scorer
+        scorer = BM25Scorer(corpus=corpus_texts, avg_doc_length=avg_doc_length)
+
+        # Score all conversations
+        scored_conversations: list[tuple[Conversation, float, list[str]]] = []
+
+        for conv, conv_text in zip(conversations, corpus_texts):
+            if query.has_keyword_search():
+                assert query.keywords is not None  # Type narrowing
+                # Calculate BM25 score for keywords
+                score = scorer.score(conv_text, query.keywords)
+
+                # Track which messages contain keyword matches
+                matched_message_ids = self._find_matched_messages(
+                    conv, query.keywords
+                )
+
+                # Skip conversations with no matches (score = 0)
+                if score == 0.0:
+                    continue
+            else:
+                # No keywords - all have score 1.0 (title/date filter only)
+                score = 1.0
+                matched_message_ids = []
+
+            scored_conversations.append((conv, score, matched_message_ids))
+
+        # Handle no results after filtering
+        if not scored_conversations:
+            return  # Empty iterator
+
+        # Sort by relevance (descending)
+        scored_conversations.sort(key=lambda x: x[1], reverse=True)
+
+        # Normalize scores to [0.0, 1.0] range
+        if scored_conversations and scored_conversations[0][1] > 0:
+            max_score = scored_conversations[0][1]
+            scored_conversations = [
+                (conv, score / max_score, msg_ids)
+                for conv, score, msg_ids in scored_conversations
+            ]
+
+        # Apply limit if specified
+        if query.limit:
+            scored_conversations = scored_conversations[: query.limit]
+
+        # Yield SearchResult objects
+        for conv, score, matched_message_ids in scored_conversations:
+            yield SearchResult[Conversation](
+                conversation=conv,
+                score=score,
+                matched_message_ids=matched_message_ids,
+            )
+
+    def _find_matched_messages(
+        self, conversation: Conversation, keywords: list[str]
+    ) -> list[str]:
+        """Find message IDs containing any of the keywords.
+
+        Uses word-boundary matching to find keywords as complete tokens,
+        not just substrings. This matches the BM25 tokenization approach.
+
+        Tokenizes keywords the same way as BM25Scorer to handle multi-character
+        keywords (e.g., Chinese "编程" -> ["编", "程"]).
+
+        Args:
+            conversation: Conversation to search
+            keywords: List of keywords to match (will be tokenized)
+
+        Returns:
+            List of message IDs containing keyword matches
+
+        Example:
+            ```python
+            conv = Conversation(...)
+            matched_ids = self._find_matched_messages(conv, ["python", "java"])
+            # Returns IDs of messages containing "python" OR "java"
+            ```
+        """
+        import re
+
+        matched_ids: list[str] = []
+
+        # Tokenize keywords (same as BM25Scorer)
+        keyword_tokens: list[str] = []
+        for keyword in keywords:
+            kw_lower = keyword.lower()
+            # Latin tokens
+            keyword_tokens.extend(re.findall(r'[a-z0-9]+', kw_lower))
+            # Non-Latin tokens (CJK characters)
+            keyword_tokens.extend(re.findall(r'[^\W\d_a-z]', kw_lower))
+
+        for message in conversation.messages:
+            # Tokenize message content using same method as BM25Scorer
+            content_lower = message.content.lower()
+            message_tokens: list[str] = []
+
+            # Latin tokens
+            message_tokens.extend(re.findall(r'[a-z0-9]+', content_lower))
+            # Non-Latin tokens (CJK characters)
+            message_tokens.extend(re.findall(r'[^\W\d_a-z]', content_lower))
+
+            # Check if any keyword token is in the message tokens
+            if any(kw_token in message_tokens for kw_token in keyword_tokens):
+                matched_ids.append(message.id)
+
+        return matched_ids
 
     def _parse_conversation(self, raw_data: dict[str, Any]) -> Conversation:
         """Parse raw OpenAI conversation dict to Conversation model.

@@ -670,3 +670,548 @@ class TestCLIContractEdgeCases:
         finally:
             # Restore permissions for cleanup
             no_read_file.chmod(stat.S_IRUSR | stat.S_IWUSR)
+
+
+# =============================================================================
+# T046: CLI Contract Tests - Search Command (RED Phase)
+# =============================================================================
+
+
+@pytest.mark.contract
+class TestCLISearchCommandContract:
+    """Contract tests for 'echomine search' command.
+
+    Task: T046 - CLI Contract Test - Search Command
+    Phase: RED (tests designed to FAIL initially)
+
+    These tests validate the CLI search command contract per cli_spec.md.
+    They are BLACK BOX tests - we only test external observable behavior.
+
+    Expected Failure Reasons (RED phase):
+    - search command not implemented
+    - Argument parsing for search not implemented
+    - Search output formatting not implemented
+    - --keywords and --title flags not implemented
+    """
+
+    def test_search_command_with_keywords_flag(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test search command with --keywords flag.
+
+        Validates:
+        - FR-332: search command accepts --keywords argument
+        - CHK031: stdout/stderr separation
+        - FR-018: Human-readable output
+
+        Expected to FAIL: search command not implemented.
+        """
+        # Act: Run 'echomine search <file> --keywords "alpha"'
+        result = subprocess.run(
+            [*cli_command, "search", str(sample_cli_export), "--keywords", "alpha"],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Exit code 0 for success
+        assert result.returncode == 0, (
+            f"Search command should succeed. Got exit code {result.returncode}. "
+            f"stderr: {result.stderr}"
+        )
+
+        # Assert: stdout contains search results
+        stdout = result.stdout
+        assert len(stdout) > 0, "stdout should contain search results"
+        assert "Alpha" in stdout or "alpha" in stdout, (
+            "Search results should include matched conversation title"
+        )
+
+    def test_search_command_with_multiple_keywords(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test search command with multiple keywords (OR logic).
+
+        Validates:
+        - FR-320: Multi-keyword OR logic
+        - CLI accepts comma-separated or multiple --keywords flags
+
+        Expected to FAIL: Multi-keyword parsing not implemented.
+        """
+        # Act: Search with multiple keywords
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(sample_cli_export),
+                "--keywords",
+                "alpha,beta",
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Success
+        assert result.returncode == 0
+
+        # Assert: Results include conversations matching ANY keyword
+        stdout = result.stdout
+        assert "Alpha" in stdout or "Beta" in stdout, (
+            "Multi-keyword search should match ANY keyword (OR logic)"
+        )
+
+    def test_search_command_with_title_filter_flag(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test search command with --title flag.
+
+        Validates:
+        - FR-327-331: Title filtering support
+        - CLI accepts --title argument
+
+        Expected to FAIL: --title flag not implemented.
+        """
+        # Act: Run 'echomine search <file> --title "Alpha"'
+        result = subprocess.run(
+            [*cli_command, "search", str(sample_cli_export), "--title", "Alpha"],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Success
+        assert result.returncode == 0
+
+        # Assert: Results include conversation with "Alpha" in title
+        stdout = result.stdout
+        assert "Alpha" in stdout, "Title filter should match conversation title"
+
+    def test_search_command_with_combined_filters(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test search command with both --keywords and --title flags.
+
+        Validates:
+        - FR-332: Combined filters (AND logic)
+        - CLI accepts multiple filter flags
+
+        Expected to FAIL: Combined filter parsing not implemented.
+        """
+        # Act: Search with both keywords AND title filter
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(sample_cli_export),
+                "--keywords",
+                "Question",
+                "--title",
+                "Alpha",
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Success
+        assert result.returncode == 0
+
+        # Assert: Results match BOTH filters
+        stdout = result.stdout
+        assert "Alpha" in stdout, "Should include conversation matching both filters"
+
+    def test_search_command_with_limit_flag(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test search command with --limit flag.
+
+        Validates:
+        - FR-336: Limit parameter controls max results
+        - CLI accepts --limit N argument
+
+        Expected to FAIL: --limit flag not implemented.
+        """
+        # Act: Search with limit=1
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(sample_cli_export),
+                "--keywords",
+                "Test",
+                "--limit",
+                "1",
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Success
+        assert result.returncode == 0
+
+        # Assert: Output indicates limited results
+        # (Exact validation depends on output format)
+        stdout = result.stdout
+        assert len(stdout) > 0, "Should have output with limited results"
+
+    def test_search_command_json_output_format(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test search command with --json flag for JSON output.
+
+        Validates:
+        - FR-301-306: JSON output schema for search results
+        - CLI --json flag works with search command
+
+        Expected to FAIL: --json output for search not implemented.
+        """
+        # Act: Search with JSON output
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(sample_cli_export),
+                "--keywords",
+                "alpha",
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Success
+        assert result.returncode == 0
+
+        # Assert: Valid JSON output
+        stdout = result.stdout
+        try:
+            data = json.loads(stdout)
+        except json.JSONDecodeError as e:
+            pytest.fail(f"Search --json output is not valid JSON: {e}\n{stdout}")
+
+        # Assert: JSON structure for search results
+        assert isinstance(data, list), "JSON output should be array of search results"
+
+        if len(data) > 0:
+            first_result = data[0]
+            assert "conversation" in first_result, "Result should have conversation"
+            assert "score" in first_result, "Result should have relevance score"
+            assert "id" in first_result["conversation"], (
+                "Conversation should have id field"
+            )
+            assert "title" in first_result["conversation"], (
+                "Conversation should have title field"
+            )
+
+    def test_search_command_with_quiet_flag(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test search command with --quiet flag (suppress progress).
+
+        Validates:
+        - FR-310: --quiet flag suppresses progress indicators
+        - stdout still contains results, stderr empty
+
+        Expected to FAIL: --quiet flag not implemented.
+        """
+        # Act: Search with --quiet
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(sample_cli_export),
+                "--keywords",
+                "alpha",
+                "--quiet",
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Success
+        assert result.returncode == 0
+
+        # Assert: stdout contains results (not suppressed)
+        assert len(result.stdout) > 0, "Results should still be on stdout"
+
+        # Assert: stderr should be empty or minimal (no progress indicators)
+        stderr = result.stderr
+        progress_keywords = ["parsing", "searching", "processing"]
+        for keyword in progress_keywords:
+            assert keyword.lower() not in stderr.lower(), (
+                f"--quiet should suppress progress indicator '{keyword}'"
+            )
+
+    def test_search_command_stdout_stderr_separation(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test that search results go to stdout, progress to stderr.
+
+        Validates:
+        - FR-291, FR-292: stdout/stderr separation
+        - CHK031: Data on stdout, progress on stderr
+
+        Expected to FAIL: stdout/stderr separation not implemented.
+        """
+        # Act: Run search command
+        result = subprocess.run(
+            [*cli_command, "search", str(sample_cli_export), "--keywords", "alpha"],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: stdout contains ONLY data (no progress indicators)
+        stdout = result.stdout
+        progress_keywords = ["parsing", "searching", "processing"]
+        for keyword in progress_keywords:
+            assert keyword.lower() not in stdout.lower(), (
+                f"Progress indicator '{keyword}' found in stdout. "
+                "Progress MUST go to stderr per CHK031"
+            )
+
+    def test_search_command_exit_code_0_on_success(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test that successful search returns exit code 0.
+
+        Validates:
+        - FR-296: Exit code 0 for success
+
+        Expected to FAIL: search command not implemented.
+        """
+        result = subprocess.run(
+            [*cli_command, "search", str(sample_cli_export), "--keywords", "alpha"],
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 0, (
+            f"Successful search should exit with code 0. "
+            f"Got {result.returncode}. stderr: {result.stderr}"
+        )
+
+    def test_search_command_exit_code_0_on_zero_results(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test that search with zero matches returns exit code 0 (not error).
+
+        Validates:
+        - FR-296: Zero results is success, not error
+        - Exit code 0 even when no matches found
+
+        Expected to FAIL: Zero results handling not implemented.
+        """
+        # Act: Search for non-existent keyword
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(sample_cli_export),
+                "--keywords",
+                "zzzzznonexistent",
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Exit code 0 (success, even with zero results)
+        assert result.returncode == 0, (
+            "Zero search results should be exit code 0 (success), not error"
+        )
+
+        # Assert: Output indicates zero results
+        stdout = result.stdout
+        assert (
+            "0" in stdout or "no results" in stdout.lower() or len(stdout) < 100
+        ), "Should indicate zero results"
+
+    def test_search_command_exit_code_1_on_file_not_found(
+        self, cli_command: list[str]
+    ) -> None:
+        """Test that missing file returns exit code 1.
+
+        Validates:
+        - FR-297: Exit code 1 for errors (file not found)
+
+        Expected to FAIL: Error handling not implemented.
+        """
+        non_existent_file = "/tmp/search_missing_file_12345.json"
+
+        result = subprocess.run(
+            [*cli_command, "search", non_existent_file, "--keywords", "test"],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Exit code 1
+        assert result.returncode == 1, f"Expected exit code 1, got {result.returncode}"
+
+        # Assert: Error message on stderr
+        stderr = result.stderr
+        assert len(stderr) > 0, "Error message should be on stderr"
+        assert "not found" in stderr.lower() or "no such file" in stderr.lower(), (
+            f"Error should mention file not found. Got: {stderr}"
+        )
+
+    def test_search_command_exit_code_2_on_missing_keywords_and_title(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test that search without filters returns exit code 2.
+
+        Validates:
+        - FR-298: Exit code 2 for invalid arguments
+        - At least one filter required (--keywords or --title)
+
+        Expected to FAIL: Argument validation not implemented.
+        """
+        # Act: Search without any filter flags
+        result = subprocess.run(
+            [*cli_command, "search", str(sample_cli_export)],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Exit code 2 (invalid arguments)
+        assert result.returncode == 2, (
+            f"Search without filters should be exit code 2. Got {result.returncode}"
+        )
+
+        # Assert: Error message on stderr
+        stderr = result.stderr
+        assert len(stderr) > 0, "Error message should be on stderr"
+
+    def test_search_command_exit_code_130_on_interrupt(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test that Ctrl+C (SIGINT) returns exit code 130.
+
+        Validates:
+        - FR-299: Exit code 130 for interrupted operations
+
+        Expected to FAIL: Signal handling not implemented.
+
+        Note: This test is complex to implement reliably in pytest.
+        Marked as skip for now - manual verification required.
+        """
+        pytest.skip("Signal handling test requires manual verification")
+
+        # Implementation note:
+        # Would need to spawn subprocess and send SIGINT signal
+        # Complex to test reliably in automated tests
+
+    def test_search_command_help_flag(self, cli_command: list[str]) -> None:
+        """Test that 'echomine search --help' displays usage.
+
+        Validates:
+        - CLI spec: --help flag
+        - Exit code 0 for help
+
+        Expected to FAIL: --help not implemented.
+        """
+        result = subprocess.run(
+            [*cli_command, "search", "--help"],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Exit code 0
+        assert result.returncode == 0
+
+        # Assert: Help text on stdout
+        stdout = result.stdout
+        assert len(stdout) > 0, "Help text should be on stdout"
+        assert "search" in stdout.lower()
+        assert "keywords" in stdout.lower() or "--keywords" in stdout
+        assert "title" in stdout.lower() or "--title" in stdout
+
+    def test_search_command_pipeline_friendly_output(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test that search output works with Unix pipelines.
+
+        Validates:
+        - FR-019: Pipeline-friendly output
+        - Works with grep, awk, head, etc.
+
+        Expected to FAIL: Output format not pipeline-friendly.
+        """
+        # Test 1: Pipe search output to grep
+        grep_proc = subprocess.run(
+            f"{' '.join(cli_command)} search {sample_cli_export} "
+            f"--keywords 'alpha' | grep 'Alpha'",
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        assert grep_proc.returncode == 0, "Search output should work with grep"
+        assert "Alpha" in grep_proc.stdout
+
+        # Test 2: Pipe to head
+        head_proc = subprocess.run(
+            f"{' '.join(cli_command)} search {sample_cli_export} "
+            f"--keywords 'test' | head -n 3",
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        assert head_proc.returncode == 0, "Search output should work with head"
+
+    def test_search_command_human_readable_output_format(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test that default search output is human-readable table.
+
+        Validates:
+        - FR-018: Human-readable output
+        - Table format with headers (Score, ID, Title, etc.)
+
+        Expected to FAIL: Output formatting not implemented.
+        """
+        result = subprocess.run(
+            [*cli_command, "search", str(sample_cli_export), "--keywords", "alpha"],
+            capture_output=True,
+            text=True,
+        )
+
+        stdout = result.stdout
+
+        # Assert: Table headers present
+        # Expected headers: Score, ID, Title, Messages, etc.
+        assert "score" in stdout.lower() or "relevance" in stdout.lower(), (
+            "Output should include relevance score"
+        )
+        assert "id" in stdout.lower(), "Output should include conversation ID"
+        assert "title" in stdout.lower(), "Output should include title"
+
+        # Assert: Conversation data present
+        assert "Alpha" in stdout, "Output should show matched conversation"
+
+    def test_search_command_accepts_absolute_and_relative_paths(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test that search works with both absolute and relative paths.
+
+        Validates:
+        - Path handling (pathlib compatibility)
+
+        Expected to FAIL: Path handling not implemented.
+        """
+        # Test 1: Absolute path
+        result_abs = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(sample_cli_export.absolute()),
+                "--keywords",
+                "alpha",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert result_abs.returncode == 0
+
+        # Test 2: Relative path
+        result_rel = subprocess.run(
+            [*cli_command, "search", str(sample_cli_export), "--keywords", "alpha"],
+            capture_output=True,
+            text=True,
+            cwd=sample_cli_export.parent,
+        )
+        assert result_rel.returncode == 0

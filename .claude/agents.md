@@ -407,7 +407,6 @@ Detailed documentation for all Echomine sub-agents and their coordination patter
 
 <body>
 
-🤖 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 **Types**: feat, fix, docs, style, refactor, test, perf, chore, ci, build

@@ -32,6 +32,7 @@ import sys
 import typer
 
 from echomine.cli.commands.list import list_conversations
+from echomine.cli.commands.search import search_conversations
 
 # Create Typer application
 app = typer.Typer(
@@ -54,6 +55,7 @@ def callback() -> None:
 
 # Register commands
 app.command(name="list", help="List all conversations from export file")(list_conversations)
+app.command(name="search", help="Search conversations by keywords")(search_conversations)
 
 
 def main() -> None:

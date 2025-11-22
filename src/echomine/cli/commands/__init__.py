@@ -9,4 +9,7 @@ Constitution Compliance:
     - CHK032: Consistent exit codes (0/1/2)
 """
 
-__all__: list[str] = []
+from echomine.cli.commands.list import list_conversations
+from echomine.cli.commands.search import search_conversations
+
+__all__ = ["list_conversations", "search_conversations"]
