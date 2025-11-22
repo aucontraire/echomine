@@ -886,19 +886,42 @@ class TestCLISearchCommandContract:
         except json.JSONDecodeError as e:
             pytest.fail(f"Search --json output is not valid JSON: {e}\n{stdout}")
 
-        # Assert: JSON structure for search results
-        assert isinstance(data, list), "JSON output should be array of search results"
+        # Assert: JSON structure matches FR-301 schema
+        assert isinstance(data, dict), "JSON output should be object with results and metadata"
+        assert "results" in data, "JSON should have 'results' field (FR-301)"
+        assert "metadata" in data, "JSON should have 'metadata' field (FR-301)"
 
-        if len(data) > 0:
-            first_result = data[0]
-            assert "conversation" in first_result, "Result should have conversation"
+        # Assert: Results array structure (FR-302)
+        assert isinstance(data["results"], list), "results should be array"
+        if len(data["results"]) > 0:
+            first_result = data["results"][0]
+            # FR-302: Flattened structure with conversation_id
+            assert "conversation_id" in first_result, "Result should have conversation_id (FR-302)"
+            assert "title" in first_result, "Result should have title field"
+            assert "created_at" in first_result, "Result should have created_at field"
+            assert "updated_at" in first_result, "Result should have updated_at field"
             assert "score" in first_result, "Result should have relevance score"
-            assert "id" in first_result["conversation"], (
-                "Conversation should have id field"
-            )
-            assert "title" in first_result["conversation"], (
-                "Conversation should have title field"
-            )
+            assert "matched_message_ids" in first_result, "Result should have matched_message_ids"
+            assert "message_count" in first_result, "Result should have message_count"
+
+            # FR-304: ISO 8601 timestamps with UTC (YYYY-MM-DDTHH:MM:SSZ)
+            assert first_result["created_at"].endswith("Z"), "Timestamp should end with Z (UTC)"
+            assert "T" in first_result["created_at"], "Timestamp should use ISO 8601 format"
+
+        # Assert: Metadata structure (FR-303)
+        metadata = data["metadata"]
+        assert "query" in metadata, "Metadata should have query field (FR-303)"
+        assert "total_results" in metadata, "Metadata should have total_results (FR-303)"
+        assert "skipped_conversations" in metadata, "Metadata should have skipped_conversations (FR-303)"
+        assert "elapsed_seconds" in metadata, "Metadata should have elapsed_seconds (FR-303)"
+
+        # Assert: Query metadata structure
+        query_meta = metadata["query"]
+        assert "keywords" in query_meta, "Query should have keywords field"
+        assert "title_filter" in query_meta, "Query should have title_filter field"
+        assert "date_from" in query_meta, "Query should have date_from field"
+        assert "date_to" in query_meta, "Query should have date_to field"
+        assert "limit" in query_meta, "Query should have limit field"
 
     def test_search_command_with_quiet_flag(
         self, cli_command: list[str], sample_cli_export: Path

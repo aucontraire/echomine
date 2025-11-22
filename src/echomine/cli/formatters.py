@@ -231,54 +231,112 @@ def format_search_results(results: list[SearchResult[Conversation]]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def format_search_results_json(results: list[SearchResult[Conversation]]) -> str:
-    """Format search results as JSON array.
+def format_search_results_json(
+    results: list[SearchResult[Conversation]],
+    query_keywords: list[str] | None = None,
+    query_title_filter: str | None = None,
+    query_from_date: str | None = None,
+    query_to_date: str | None = None,
+    query_limit: int = 10,
+    total_results: int | None = None,
+    skipped_conversations: int = 0,
+    elapsed_seconds: float = 0.0,
+) -> str:
+    """Format search results as JSON with metadata wrapper (FR-301-306).
 
-    JSON Schema:
-        [
+    JSON Schema (FR-301):
+        {
+          "results": [
             {
-                "score": 1.0,
-                "conversation": {
-                    "id": "conv-123",
-                    "title": "Python best practices",
-                    "created_at": "2024-03-15T14:23:11",
-                    "updated_at": "2024-03-15T14:23:11",
-                    "message_count": 47
-                },
-                "matched_message_ids": ["msg-1", "msg-5"]
+              "conversation_id": "uuid",
+              "title": "string",
+              "created_at": "ISO 8601 UTC",
+              "updated_at": "ISO 8601 UTC",
+              "score": 0.85,
+              "matched_message_ids": ["msg-1", "msg-2"],
+              "message_count": 42
             }
-        ]
+          ],
+          "metadata": {
+            "query": {
+              "keywords": ["algorithm", "python"],
+              "title_filter": null,
+              "date_from": null,
+              "date_to": null,
+              "limit": 10
+            },
+            "total_results": 5,
+            "skipped_conversations": 2,
+            "elapsed_seconds": 1.234
+          }
+        }
 
     Timestamp Handling:
         - created_at: Always present (required field)
         - updated_at: Uses updated_at_or_created property (never null in output)
+        - Format: ISO 8601 with UTC timezone (FR-304): YYYY-MM-DDTHH:MM:SSZ
         - This ensures JSON consumers always get valid timestamps
 
     Args:
         results: List of SearchResult objects
+        query_keywords: Keywords used in search query
+        query_title_filter: Title filter used in search query
+        query_from_date: From date used in search query (ISO 8601 format)
+        query_to_date: To date used in search query (ISO 8601 format)
+        query_limit: Limit parameter used in search query
+        total_results: Total number of results returned (defaults to len(results))
+        skipped_conversations: Number of conversations skipped due to errors
+        elapsed_seconds: Query execution time in seconds
 
     Returns:
-        JSON array string
+        JSON string with results and metadata (FR-305: pretty-printed with 2-space indent)
 
     Requirements:
-        - FR-301-306: JSON output schema with created_at/updated_at
+        - FR-301: Wrapper schema with results and metadata
+        - FR-302: Flattened conversation fields (conversation_id, not nested)
+        - FR-303: Metadata includes query, total_results, skipped_conversations, elapsed_seconds
+        - FR-304: ISO 8601 timestamps with UTC (YYYY-MM-DDTHH:MM:SSZ)
+        - FR-305: Valid JSON, pretty-printed with 2-space indentation
         - FR-019: Pipeline-friendly (valid JSON for jq)
         - CHK031: Output to stdout (caller responsibility)
     """
-    output = []
+    # Build results array with flattened structure (FR-302)
+    results_array = []
     for result in results:
         conv = result.conversation
-        output.append({
+        # FR-304: ISO 8601 with UTC timezone (append 'Z' for UTC)
+        created_at = conv.created_at.strftime("%Y-%m-%dT%H:%M:%SZ")
+        updated_at = conv.updated_at_or_created.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        results_array.append({
+            "conversation_id": conv.id,  # FR-302: Use conversation_id not nested id
+            "title": conv.title,
+            "created_at": created_at,
+            "updated_at": updated_at,
             "score": result.score,
-            "conversation": {
-                "id": conv.id,
-                "title": conv.title,
-                "created_at": conv.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-                "updated_at": conv.updated_at_or_created.strftime("%Y-%m-%dT%H:%M:%S"),
-                "message_count": conv.message_count,
-            },
             "matched_message_ids": result.matched_message_ids,
+            "message_count": conv.message_count,
         })
 
-    # Return formatted JSON with trailing newline
-    return json.dumps(output, indent=2) + "\n"
+    # Build metadata object (FR-303)
+    metadata = {
+        "query": {
+            "keywords": query_keywords,
+            "title_filter": query_title_filter,
+            "date_from": query_from_date,
+            "date_to": query_to_date,
+            "limit": query_limit,
+        },
+        "total_results": total_results if total_results is not None else len(results),
+        "skipped_conversations": skipped_conversations,
+        "elapsed_seconds": round(elapsed_seconds, 3),  # Round to millisecond precision
+    }
+
+    # Build final output with wrapper (FR-301)
+    output = {
+        "results": results_array,
+        "metadata": metadata,
+    }
+
+    # FR-305: Pretty-print with 2-space indentation
+    return json.dumps(output, indent=2, ensure_ascii=False) + "\n"

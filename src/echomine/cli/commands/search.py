@@ -38,6 +38,7 @@ Command Contract:
 
 from __future__ import annotations
 
+import time
 from datetime import date, datetime
 from pathlib import Path
 from typing import Annotated, Optional
@@ -298,6 +299,9 @@ def search_conversations(
                     err=True,
                 )
 
+        # Track execution time (FR-303)
+        start_time = time.time()
+
         # Search conversations
         adapter = OpenAIAdapter()
         results = list(
@@ -308,13 +312,31 @@ def search_conversations(
             )
         )
 
+        # Calculate elapsed time
+        elapsed_seconds = time.time() - start_time
+
         # Apply actual limit if specified and different from query limit
         if limit is not None:
             results = results[:limit]
 
         # Format output based on requested format
         if format_lower == "json":
-            output = format_search_results_json(results)
+            # FR-301-306: Pass metadata to JSON formatter
+            # Convert dates to ISO 8601 format for metadata
+            query_from_date_str = parsed_from_date.strftime("%Y-%m-%d") if parsed_from_date else None
+            query_to_date_str = parsed_to_date.strftime("%Y-%m-%d") if parsed_to_date else None
+
+            output = format_search_results_json(
+                results,
+                query_keywords=processed_keywords,
+                query_title_filter=title,
+                query_from_date=query_from_date_str,
+                query_to_date=query_to_date_str,
+                query_limit=limit if limit is not None else query_limit,
+                total_results=len(results),
+                skipped_conversations=0,  # TODO: Track skipped conversations in adapter
+                elapsed_seconds=elapsed_seconds,
+            )
         else:
             output = format_search_results(results)
 
