@@ -31,6 +31,89 @@ This document specifies the command-line interface contract per Constitution Pri
 
 ## Commands
 
+### `echomine list`
+
+List all conversations in an export file with metadata (foundational discovery operation).
+
+#### Synopsis
+```bash
+echomine list <file> [OPTIONS]
+```
+
+#### Arguments
+- `file`: Path to export file (required, positional)
+
+#### Options
+- `--limit N`: Limit output to N most recent conversations (default: unlimited)
+- `--json`: Output JSON array instead of human-readable format
+- `--help`: Show command help
+
+#### Output (Human-Readable)
+
+Default format shows conversations sorted by created_at descending (newest first):
+
+```
+Conversations in export.json (1,234 total)
+
+[2024-03-15 10:30] Python AsyncIO Tutorial (12 messages)
+[2024-03-10 14:20] Algorithm Design Patterns (8 messages)
+[2024-03-05 09:15] React State Management (15 messages)
+...
+```
+
+**Format**: `[created_at] title (message_count messages)`
+
+#### Output (JSON)
+
+```json
+[
+  {
+    "id": "conv-abc-123",
+    "title": "Python AsyncIO Tutorial",
+    "created_at": "2024-03-15T10:30:00Z",
+    "updated_at": "2024-03-15T11:45:00Z",
+    "message_count": 12
+  },
+  {
+    "id": "conv-xyz-789",
+    "title": "Algorithm Design Patterns",
+    "created_at": "2024-03-10T14:20:00Z",
+    "updated_at": "2024-03-10T15:30:00Z",
+    "message_count": 8
+  }
+]
+```
+
+#### Exit Codes
+- **0**: Success (including empty file)
+- **1**: File not found, permission denied, parse error
+- **2**: Invalid arguments (missing file path)
+
+#### Examples
+
+```bash
+# List all conversations (human-readable)
+echomine list conversations.json
+
+# List 10 most recent
+echomine list conversations.json --limit 10
+
+# JSON output for piping
+echomine list conversations.json --json | jq '.[].title'
+
+# Count total conversations
+echomine list conversations.json --json | jq 'length'
+
+# Get conversation IDs
+echomine list conversations.json --json | jq -r '.[].id'
+```
+
+#### Performance
+- **MUST** complete in <5 seconds for 10,000 conversations (per FR-444)
+- **MUST** use streaming (not load entire file into memory)
+
+---
+
 ### `echomine search`
 
 Search conversations by keywords, title, or date range.

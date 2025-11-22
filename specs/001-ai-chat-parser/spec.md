@@ -201,6 +201,26 @@ echomine 1.0.0
 Python library for parsing AI conversation exports
 ```
 
+### User Story 0 - List All Conversations (Priority: P0)
+
+As a user with an AI chat export file, I need to see a list of all conversations in the file, so I can browse what's available before searching or exporting.
+
+**Why this priority**: This is a foundational discovery operation - users need to know what's in their export file before they can effectively search or export. Like `ls` for files, this enables basic file exploration and verification. Without this, users must search blindly or guess conversation IDs.
+
+**Independent Test**: Load export file with known conversations, run list command, verify all conversations displayed with title, date, and message count in chronological order.
+
+**Acceptance Scenarios**:
+
+1. **Given** an export file with 100 conversations, **When** I run `echomine list conversations.json`, **Then** I see all 100 conversations with title, created date, and message count
+2. **Given** a large export file, **When** I run `echomine list conversations.json --limit 20`, **Then** I see only the 20 most recent conversations (sorted by created_at descending)
+3. **Given** I want machine-readable output, **When** I run `echomine list conversations.json --json`, **Then** I get JSON array with conversation metadata (id, title, created_at, updated_at, message_count)
+4. **Given** conversations stored in random order in export, **When** I list them, **Then** they appear sorted by created_at descending (newest first)
+5. **Given** a very large export file (1GB+), **When** I run list, **Then** I see results within 5 seconds using streaming (not full load)
+6. **Given** I want to count conversations, **When** I run `echomine list conversations.json --json | jq 'length'`, **Then** I get the total conversation count
+7. **Given** an empty export file, **When** I run list, **Then** I see "No conversations found" message with exit code 0
+
+---
+
 ### User Story 1 - Search Conversations by Keyword (Priority: P1)
 
 As a developer working with AI chat logs, I need to quickly find conversations about specific topics (e.g., "leetcode", "algorithm design") from my large ChatGPT export file, so I can reference past discussions without manually scrolling through hundreds of conversations.
@@ -943,6 +963,19 @@ As a researcher analyzing my AI usage patterns, I need to filter conversations b
 - **FR-435**: data-model.md MUST show complete field type specifications (Literal, Optional, etc.)
 - **FR-436**: data-model.md MUST include JSON serialization examples for all models
 - **FR-437**: data-model.md MUST be kept in sync with src/ Pydantic model implementations
+
+**List All Conversations (User Story 0 - P0)**
+
+- **FR-438**: CLI MUST provide `list` command with signature: `echomine list FILE [--limit N] [--json]`
+- **FR-439**: List command MUST stream conversations using ConversationProvider.stream_conversations without filters
+- **FR-440**: List output MUST sort conversations by created_at descending (newest first) by default
+- **FR-441**: List human-readable format MUST display: created_at date, title, message count per conversation
+- **FR-442**: List --json format MUST output array of objects with fields: id, title, created_at, updated_at, message_count
+- **FR-443**: List --limit flag MUST restrict output to top N conversations (after sorting)
+- **FR-444**: List MUST complete in <5 seconds for 10K conversations (streaming, not full load)
+- **FR-445**: List MUST display "No conversations found" with exit code 0 for empty export files
+- **FR-446**: List MUST write conversation list to stdout (pipeable)
+- **FR-447**: List MUST write progress/errors to stderr (consistent with search command)
 
 ### Key Entities
 

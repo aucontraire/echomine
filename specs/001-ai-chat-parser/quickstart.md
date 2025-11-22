@@ -44,7 +44,36 @@ export_file = Path("path/to/conversations.json")
 
 ## Common Workflows
 
-### 1. Stream All Conversations
+### 1. List All Conversations (Discovery)
+
+Browse what's in your export file before searching or exporting.
+
+```python
+# List all conversations with metadata
+for conversation in adapter.stream_conversations(export_file):
+    print(f"[{conversation.created_at.date()}] {conversation.title}")
+    print(f"  Messages: {len(conversation.messages)}")
+    print(f"  ID: {conversation.id}")
+    print()
+```
+
+**Use case**: Discover what conversations exist in an export file (like `ls` for files).
+
+**CLI equivalent**:
+```bash
+# Human-readable list
+echomine list conversations.json
+
+# JSON output for processing
+echomine list conversations.json --json
+
+# Limit to 10 most recent
+echomine list conversations.json --limit 10
+```
+
+---
+
+### 2. Stream All Conversations
 
 Memory-efficient iteration over all conversations (doesn't load entire file).
 
@@ -59,7 +88,7 @@ for conversation in adapter.stream_conversations(export_file):
 
 ---
 
-### 2. Search by Keywords
+### 3. Search by Keywords
 
 Find conversations matching specific topics with relevance ranking.
 
@@ -81,7 +110,7 @@ for result in adapter.search(export_file, query):
 
 ---
 
-### 3. Filter by Title (Fast Metadata Search)
+### 4. Filter by Title (Fast Metadata Search)
 
 Search conversation titles without scanning message content.
 
@@ -100,7 +129,7 @@ for result in adapter.search(export_file, query):
 
 ---
 
-### 4. Combined Filtering
+### 5. Combined Filtering
 
 Combine multiple filters for precision.
 
@@ -123,7 +152,7 @@ for result in adapter.search(export_file, query):
 
 ---
 
-### 5. Export Conversation to Markdown
+### 6. Export Conversation to Markdown
 
 Retrieve conversation by ID and export to markdown.
 
