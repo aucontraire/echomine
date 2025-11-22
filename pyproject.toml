@@ -26,8 +26,10 @@ classifiers = [
 ]
 
 dependencies = [
-    "pydantic>=2.0.0,<3.0.0",
-    "ijson>=3.2.0",
+    # CHK123: Pydantic v2.6.0+ required for frozen=True, field_validator stability
+    "pydantic>=2.6.0,<3.0.0",
+    # CHK122: ijson 3.2.0+ for streaming performance improvements (60% faster)
+    "ijson>=3.2.0,<4.0",
     "typer>=0.9.0",
     "rich>=13.0.0",
     "structlog>=23.0.0",
@@ -178,6 +180,7 @@ markers = [
     "integration: Integration tests",
     "contract: Contract tests for protocols",
     "performance: Performance benchmarks",
+    "slow: Slow-running stress tests (run explicitly with pytest -m slow)",
 ]
 
 [tool.coverage.run]

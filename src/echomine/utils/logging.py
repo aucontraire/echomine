@@ -52,7 +52,7 @@ Usage:
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import structlog
 from structlog.types import EventDict, WrappedLogger
@@ -137,8 +137,8 @@ def get_logger(name: str) -> structlog.stdlib.BoundLogger:
         - FR-029: Logger provides required fields (timestamp, level, message)
         - FR-032: Logger supports arbitrary contextual fields
     """
-    # structlog.get_logger returns Any in type stubs, but we know it returns BoundLogger
-    return structlog.get_logger(name)  # type: ignore[no-any-return]
+    # Explicit cast needed: structlog.get_logger returns Any in type stubs
+    return cast(structlog.stdlib.BoundLogger, structlog.get_logger(name))
 
 
 # ============================================================================

@@ -51,6 +51,9 @@ logs/
 # PyCharm sample files
 main.py
 
+# Local data files (real user exports - private)
+data/
+
 # OS
 .DS_Store
 Thumbs.db

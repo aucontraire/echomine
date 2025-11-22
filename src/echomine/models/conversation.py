@@ -160,6 +160,32 @@ class Conversation(BaseModel):
             raise ValueError(msg)
         return v
 
+    # Computed Properties
+
+    @property
+    def message_count(self) -> int:
+        """Get the total number of messages in the conversation.
+
+        Returns:
+            Number of messages in the conversation
+
+        Example:
+            ```python
+            conversation = Conversation(
+                id="conv-001",
+                title="Test",
+                created_at=datetime.now(UTC),
+                updated_at=datetime.now(UTC),
+                messages=[msg1, msg2, msg3]
+            )
+            assert conversation.message_count == 3
+            ```
+
+        Requirements:
+            - FR-018: Metadata includes message count
+        """
+        return len(self.messages)
+
     # Tree Navigation Methods (per FR-278, FR-280)
 
     def get_message_by_id(self, message_id: str) -> Optional[Message]:
