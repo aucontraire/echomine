@@ -9,12 +9,18 @@ Constitution Compliance:
 - FR-224, FR-227: Immutability via frozen=True
 """
 
+from __future__ import annotations
+
 from datetime import date
-from typing import Optional
+from typing import Generic, Optional, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from echomine.models.conversation import Conversation
+
+# Generic type variable for conversation types
+# Not bound to allow compatibility with all conversation implementations
+ConversationT = TypeVar("ConversationT")
 
 
 class SearchQuery(BaseModel):
@@ -139,12 +145,15 @@ class SearchQuery(BaseModel):
         return self.from_date is not None or self.to_date is not None
 
 
-class SearchResult(BaseModel):
-    """Search result with relevance scoring.
+class SearchResult(BaseModel, Generic[ConversationT]):
+    """Generic search result with relevance scoring.
 
     Represents a conversation match from a search query with relevance
     metadata. Results are typically sorted by score (descending) before
     being returned to the user.
+
+    Generic Type:
+        ConversationT: Provider-specific conversation type (e.g., Conversation for OpenAI)
 
     Immutability:
         This model is FROZEN - attempting to modify fields will raise ValidationError.
@@ -152,7 +161,9 @@ class SearchResult(BaseModel):
 
     Example:
         ```python
-        result = SearchResult(
+        from echomine.models import Conversation, SearchResult
+
+        result: SearchResult[Conversation] = SearchResult(
             conversation=conversation,
             score=0.85,
             matched_message_ids=["msg-001", "msg-005"]
@@ -180,7 +191,7 @@ class SearchResult(BaseModel):
         arbitrary_types_allowed=False,
     )
 
-    conversation: Conversation = Field(
+    conversation: ConversationT = Field(
         ...,
         description="Matched conversation object (full conversation, not just ID)",
     )
@@ -195,7 +206,7 @@ class SearchResult(BaseModel):
         description="Message IDs containing keyword matches",
     )
 
-    def __lt__(self, other: "SearchResult") -> bool:
+    def __lt__(self, other: SearchResult[ConversationT]) -> bool:
         """Enable sorting by relevance (descending).
 
         When using sorted() or .sort(), results will be ordered by

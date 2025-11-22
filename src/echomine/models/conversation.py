@@ -9,6 +9,8 @@ Constitution Compliance:
 - FR-222, FR-227: Immutability via frozen=True
 """
 
+from __future__ import annotations
+
 from datetime import UTC, datetime
 from typing import Any, Optional
 
@@ -244,7 +246,7 @@ class Conversation(BaseModel):
         Requirements:
             - FR-278: Support retrieving conversation context for a message
         """
-        thread = []
+        thread: list[Message] = []
         current = self.get_message_by_id(message_id)
 
         while current:

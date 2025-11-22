@@ -9,7 +9,9 @@ Constitution Compliance:
 - FR-223, FR-227: Immutability via frozen=True
 """
 
-from datetime import UTC, datetime, timezone
+from __future__ import annotations
+
+from datetime import UTC, datetime
 from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator

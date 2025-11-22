@@ -137,7 +137,8 @@ def get_logger(name: str) -> structlog.stdlib.BoundLogger:
         - FR-029: Logger provides required fields (timestamp, level, message)
         - FR-032: Logger supports arbitrary contextual fields
     """
-    return structlog.get_logger(name)
+    # structlog.get_logger returns Any in type stubs, but we know it returns BoundLogger
+    return structlog.get_logger(name)  # type: ignore[no-any-return]
 
 
 # ============================================================================

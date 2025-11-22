@@ -14,6 +14,8 @@ Contract per FR-215 through FR-221: All adapters must implement complete
 protocol method signatures with proper types, exceptions, and guarantees.
 """
 
+from __future__ import annotations
+
 from collections.abc import Iterator
 from datetime import datetime
 from pathlib import Path
