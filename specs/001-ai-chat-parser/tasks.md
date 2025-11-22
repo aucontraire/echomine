@@ -87,15 +87,15 @@ Single project structure:
 
 **Independent Test**: Load export file, run list command, verify all conversations displayed with metadata in chronological order
 
-### Tests for User Story 0 (TDD - Write First!) ⚠️
+### Tests for [US0] (TDD - Write First!) ⚠️
 
 > **CRITICAL: Write these tests FIRST, ensure they FAIL before implementation**
 
 - [ ] T026 [P] [US0] Integration test for list workflow in tests/integration/test_list_flow.py (end-to-end: file → parse → list → verify output)
 - [ ] T027 [P] [US0] CLI contract test for list command in tests/contract/test_cli_contract.py (verify stdout format, exit codes)
-- [ ] T028 [P] [US0] Performance test for listing 10K conversations in tests/performance/test_list_benchmark.py (verify <5s per FR-444)
+- [ ] T028 [P] [US0] Performance test for listing 10K conversations in tests/performance/test_list_benchmark.py (verify <5s per FR-444, callback frequency ≥100 items per FR-069)
 
-### Implementation for User Story 0
+### Implementation for [US0]
 
 #### Streaming Parser (Foundation for all commands)
 
@@ -136,16 +136,16 @@ Single project structure:
 
 **Independent Test**: Provide sample export file, run keyword search via CLI, verify matching conversations returned with BM25 scores
 
-### Tests for User Story 1 (TDD - Write First!) ⚠️
+### Tests for [US1] (TDD - Write First!) ⚠️
 
 > **CRITICAL: Write these tests FIRST, ensure they FAIL before implementation**
 
 - [ ] T044 [P] [US1] Contract test for ConversationProvider.search in tests/contract/test_provider_protocol.py (verify signature, relevance ranking, limit semantics)
 - [ ] T045 [P] [US1] Integration test for keyword search workflow in tests/integration/test_search_flow.py (end-to-end: file → parse → search → results)
 - [ ] T046 [P] [US1] CLI contract test for search stdout/stderr separation in tests/contract/test_cli_contract.py (verify results to stdout, progress to stderr per FR-291, FR-292)
-- [ ] T047 [P] [US1] Performance test for 1GB file search in tests/performance/test_search_benchmark.py (verify <30s per SC-001)
+- [ ] T047 [P] [US1] Performance test for 1GB file search in tests/performance/test_search_benchmark.py (verify <30s per SC-001, callback frequency ≥100 items per FR-069)
 
-### Implementation for User Story 1
+### Implementation for [US1]
 
 #### BM25 Search Engine (per FR-317 to FR-326)
 
@@ -178,13 +178,13 @@ Single project structure:
 
 **Independent Test**: Import library, create adapter, call search/list/export methods, verify type hints work in IDE
 
-### Tests for User Story 2 (TDD - Write First!) ⚠️
+### Tests for [US2] (TDD - Write First!) ⚠️
 
 - [ ] T058 [P] [US2] Library API test in tests/integration/test_library_api.py (verify import, adapter creation, method calls)
 - [ ] T059 [P] [US2] Type safety test in tests/unit/test_type_contracts.py (verify mypy --strict passes, no Any types in public API)
 - [ ] T060 [P] [US2] Immutability test in tests/unit/models/test_conversation.py (verify frozen=True, model_copy works)
 
-### Implementation for User Story 2
+### Implementation for [US2]
 
 #### Library API Exports
 
@@ -215,12 +215,12 @@ Single project structure:
 
 **Independent Test**: Select conversation by ID/title, export to markdown, verify file contains all messages with proper formatting
 
-### Tests for User Story 3 (TDD - Write First!) ⚠️
+### Tests for [US3] (TDD - Write First!) ⚠️
 
 - [ ] T069 [P] [US3] Integration test for export workflow in tests/integration/test_export_flow.py (end-to-end: file → search by ID → export → verify markdown)
 - [ ] T070 [P] [US3] Unit test for markdown formatting in tests/unit/exporters/test_markdown.py (verify tree structure, code blocks, metadata)
 
-### Implementation for User Story 3
+### Implementation for [US3]
 
 #### ID-Based Retrieval
 
@@ -255,12 +255,12 @@ Single project structure:
 
 **Independent Test**: Specify date range, run search, verify only conversations within range returned
 
-### Tests for User Story 4 (TDD - Write First!) ⚠️
+### Tests for [US4] (TDD - Write First!) ⚠️
 
 - [ ] T080 [P] [US4] Integration test for date filtering in tests/integration/test_date_filtering.py (verify date range logic)
 - [ ] T081 [P] [US4] Unit test for date parsing in tests/unit/test_date_utils.py (verify ISO 8601 parsing per FR-404 to FR-408)
 
-### Implementation for User Story 4
+### Implementation for [US4]
 
 #### Date Filtering Logic
 

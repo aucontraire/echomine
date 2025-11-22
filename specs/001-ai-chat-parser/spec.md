@@ -39,7 +39,7 @@ The CLI is built *on top of* the library - ensuring any capability available via
 
 ### CLI Search Patterns
 
-**Title-based search (fast, metadata-only)**
+**Title-based search (metadata-only, <5s for 10K conversations per FR-444)**
 ```bash
 # Find conversations by exact or partial title
 echomine search conversations.json --title "Algo Insights"
