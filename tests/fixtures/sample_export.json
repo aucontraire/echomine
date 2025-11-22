@@ -1,0 +1,388 @@
+[
+  {
+    "id": "conv-001",
+    "title": "Python AsyncIO Tutorial",
+    "create_time": 1700000000.0,
+    "update_time": 1700001000.0,
+    "mapping": {
+      "msg-001-1": {
+        "id": "msg-001-1",
+        "message": {
+          "id": "msg-001-1",
+          "author": {"role": "user"},
+          "content": {"content_type": "text", "parts": ["Explain Python asyncio"]},
+          "create_time": 1700000000.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": null,
+        "children": ["msg-001-2"]
+      },
+      "msg-001-2": {
+        "id": "msg-001-2",
+        "message": {
+          "id": "msg-001-2",
+          "author": {"role": "assistant"},
+          "content": {"content_type": "text", "parts": ["AsyncIO is Python's library for asynchronous programming using async/await syntax. It allows concurrent execution of I/O-bound operations."]},
+          "create_time": 1700000010.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-001-1",
+        "children": []
+      }
+    },
+    "moderation_results": [],
+    "current_node": "msg-001-2"
+  },
+  {
+    "id": "conv-002",
+    "title": "Algorithm Design Patterns",
+    "create_time": 1700100000.0,
+    "update_time": 1700101000.0,
+    "mapping": {
+      "msg-002-1": {
+        "id": "msg-002-1",
+        "message": {
+          "id": "msg-002-1",
+          "author": {"role": "user"},
+          "content": {"content_type": "text", "parts": ["What are common algorithm design patterns?"]},
+          "create_time": 1700100000.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": null,
+        "children": ["msg-002-2"]
+      },
+      "msg-002-2": {
+        "id": "msg-002-2",
+        "message": {
+          "id": "msg-002-2",
+          "author": {"role": "assistant"},
+          "content": {"content_type": "text", "parts": ["Common algorithm design patterns include: 1) Divide and Conquer 2) Dynamic Programming 3) Greedy Algorithms 4) Backtracking 5) Branch and Bound"]},
+          "create_time": 1700100010.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-002-1",
+        "children": ["msg-002-3"]
+      },
+      "msg-002-3": {
+        "id": "msg-002-3",
+        "message": {
+          "id": "msg-002-3",
+          "author": {"role": "user"},
+          "content": {"content_type": "text", "parts": ["Can you explain dynamic programming?"]},
+          "create_time": 1700100020.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-002-2",
+        "children": ["msg-002-4"]
+      },
+      "msg-002-4": {
+        "id": "msg-002-4",
+        "message": {
+          "id": "msg-002-4",
+          "author": {"role": "assistant"},
+          "content": {"content_type": "text", "parts": ["Dynamic programming solves problems by breaking them into overlapping subproblems, storing results to avoid recomputation. Classic example: Fibonacci sequence with memoization."]},
+          "create_time": 1700100030.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-002-3",
+        "children": []
+      }
+    },
+    "moderation_results": [],
+    "current_node": "msg-002-4"
+  },
+  {
+    "id": "conv-003",
+    "title": "React State Management",
+    "create_time": 1700200000.0,
+    "update_time": 1700201000.0,
+    "mapping": {
+      "msg-003-1": {
+        "id": "msg-003-1",
+        "message": {
+          "id": "msg-003-1",
+          "author": {"role": "user"},
+          "content": {"content_type": "text", "parts": ["Compare React state management options"]},
+          "create_time": 1700200000.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": null,
+        "children": ["msg-003-2"]
+      },
+      "msg-003-2": {
+        "id": "msg-003-2",
+        "message": {
+          "id": "msg-003-2",
+          "author": {"role": "assistant"},
+          "content": {"content_type": "text", "parts": ["React state management options: 1) useState/useReducer (built-in) 2) Context API (built-in) 3) Redux (external) 4) MobX (external) 5) Zustand (lightweight external)"]},
+          "create_time": 1700200010.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-003-1",
+        "children": []
+      }
+    },
+    "moderation_results": [],
+    "current_node": "msg-003-2"
+  },
+  {
+    "id": "conv-004",
+    "title": "Database Indexing Strategies",
+    "create_time": 1700300000.0,
+    "update_time": 1700301000.0,
+    "mapping": {
+      "msg-004-1": {
+        "id": "msg-004-1",
+        "message": {
+          "id": "msg-004-1",
+          "author": {"role": "user"},
+          "content": {"content_type": "text", "parts": ["When should I use database indexes?"]},
+          "create_time": 1700300000.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": null,
+        "children": ["msg-004-2"]
+      },
+      "msg-004-2": {
+        "id": "msg-004-2",
+        "message": {
+          "id": "msg-004-2",
+          "author": {"role": "assistant"},
+          "content": {"content_type": "text", "parts": ["Use indexes for: 1) Frequently queried columns 2) Foreign keys 3) Columns in WHERE clauses 4) JOIN conditions 5) ORDER BY columns. Avoid over-indexing as it slows writes."]},
+          "create_time": 1700300010.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-004-1",
+        "children": []
+      }
+    },
+    "moderation_results": [],
+    "current_node": "msg-004-2"
+  },
+  {
+    "id": "conv-005",
+    "title": "Docker Best Practices",
+    "create_time": 1700400000.0,
+    "update_time": 1700401000.0,
+    "mapping": {
+      "msg-005-1": {
+        "id": "msg-005-1",
+        "message": {
+          "id": "msg-005-1",
+          "author": {"role": "user"},
+          "content": {"content_type": "text", "parts": ["What are Docker best practices?"]},
+          "create_time": 1700400000.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": null,
+        "children": ["msg-005-2"]
+      },
+      "msg-005-2": {
+        "id": "msg-005-2",
+        "message": {
+          "id": "msg-005-2",
+          "author": {"role": "assistant"},
+          "content": {"content_type": "text", "parts": ["Docker best practices: 1) Use .dockerignore 2) Multi-stage builds 3) Minimize layers 4) Use specific base image tags 5) Don't run as root 6) Health checks 7) Small images"]},
+          "create_time": 1700400010.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-005-1",
+        "children": []
+      }
+    },
+    "moderation_results": [],
+    "current_node": "msg-005-2"
+  },
+  {
+    "id": "conv-006",
+    "title": "Git Workflow Strategies",
+    "create_time": 1700500000.0,
+    "update_time": 1700501000.0,
+    "mapping": {
+      "msg-006-1": {
+        "id": "msg-006-1",
+        "message": {
+          "id": "msg-006-1",
+          "author": {"role": "user"},
+          "content": {"content_type": "text", "parts": ["Compare Git branching strategies"]},
+          "create_time": 1700500000.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": null,
+        "children": ["msg-006-2"]
+      },
+      "msg-006-2": {
+        "id": "msg-006-2",
+        "message": {
+          "id": "msg-006-2",
+          "author": {"role": "assistant"},
+          "content": {"content_type": "text", "parts": ["Common Git workflows: 1) Git Flow (feature/develop/release/hotfix branches) 2) GitHub Flow (main + feature branches) 3) Trunk-Based Development (short-lived feature branches) 4) GitLab Flow (environment branches)"]},
+          "create_time": 1700500010.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-006-1",
+        "children": []
+      }
+    },
+    "moderation_results": [],
+    "current_node": "msg-006-2"
+  },
+  {
+    "id": "conv-007",
+    "title": "API Design Principles",
+    "create_time": 1700600000.0,
+    "update_time": 1700601000.0,
+    "mapping": {
+      "msg-007-1": {
+        "id": "msg-007-1",
+        "message": {
+          "id": "msg-007-1",
+          "author": {"role": "user"},
+          "content": {"content_type": "text", "parts": ["What makes a good REST API?"]},
+          "create_time": 1700600000.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": null,
+        "children": ["msg-007-2"]
+      },
+      "msg-007-2": {
+        "id": "msg-007-2",
+        "message": {
+          "id": "msg-007-2",
+          "author": {"role": "assistant"},
+          "content": {"content_type": "text", "parts": ["Good REST API principles: 1) Resource-based URLs 2) HTTP verbs (GET/POST/PUT/DELETE) 3) Stateless 4) JSON responses 5) Proper status codes 6) Versioning 7) HATEOAS 8) Rate limiting 9) Authentication"]},
+          "create_time": 1700600010.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-007-1",
+        "children": []
+      }
+    },
+    "moderation_results": [],
+    "current_node": "msg-007-2"
+  },
+  {
+    "id": "conv-008",
+    "title": "Testing Strategies",
+    "create_time": 1700700000.0,
+    "update_time": 1700701000.0,
+    "mapping": {
+      "msg-008-1": {
+        "id": "msg-008-1",
+        "message": {
+          "id": "msg-008-1",
+          "author": {"role": "user"},
+          "content": {"content_type": "text", "parts": ["Explain the testing pyramid"]},
+          "create_time": 1700700000.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": null,
+        "children": ["msg-008-2"]
+      },
+      "msg-008-2": {
+        "id": "msg-008-2",
+        "message": {
+          "id": "msg-008-2",
+          "author": {"role": "assistant"},
+          "content": {"content_type": "text", "parts": ["Testing pyramid (bottom to top): 1) Unit tests (70% - fast, isolated) 2) Integration tests (20% - component interactions) 3) E2E tests (10% - full system). More unit tests, fewer E2E tests for maintainability."]},
+          "create_time": 1700700010.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-008-1",
+        "children": []
+      }
+    },
+    "moderation_results": [],
+    "current_node": "msg-008-2"
+  },
+  {
+    "id": "conv-009",
+    "title": "Security Best Practices",
+    "create_time": 1700800000.0,
+    "update_time": 1700801000.0,
+    "mapping": {
+      "msg-009-1": {
+        "id": "msg-009-1",
+        "message": {
+          "id": "msg-009-1",
+          "author": {"role": "user"},
+          "content": {"content_type": "text", "parts": ["What are OWASP Top 10 vulnerabilities?"]},
+          "create_time": 1700800000.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": null,
+        "children": ["msg-009-2"]
+      },
+      "msg-009-2": {
+        "id": "msg-009-2",
+        "message": {
+          "id": "msg-009-2",
+          "author": {"role": "assistant"},
+          "content": {"content_type": "text", "parts": ["OWASP Top 10: 1) Injection 2) Broken Authentication 3) Sensitive Data Exposure 4) XML External Entities 5) Broken Access Control 6) Security Misconfiguration 7) XSS 8) Insecure Deserialization 9) Using Components with Known Vulnerabilities 10) Insufficient Logging"]},
+          "create_time": 1700800010.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-009-1",
+        "children": []
+      }
+    },
+    "moderation_results": [],
+    "current_node": "msg-009-2"
+  },
+  {
+    "id": "conv-010",
+    "title": "Performance Optimization",
+    "create_time": 1700900000.0,
+    "update_time": 1700901000.0,
+    "mapping": {
+      "msg-010-1": {
+        "id": "msg-010-1",
+        "message": {
+          "id": "msg-010-1",
+          "author": {"role": "user"},
+          "content": {"content_type": "text", "parts": ["How to optimize web application performance?"]},
+          "create_time": 1700900000.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": null,
+        "children": ["msg-010-2"]
+      },
+      "msg-010-2": {
+        "id": "msg-010-2",
+        "message": {
+          "id": "msg-010-2",
+          "author": {"role": "assistant"},
+          "content": {"content_type": "text", "parts": ["Web performance optimization: 1) Minimize HTTP requests 2) Enable compression 3) Optimize images 4) Use CDN 5) Browser caching 6) Minify CSS/JS 7) Lazy loading 8) Code splitting 9) Database query optimization 10) Server-side caching"]},
+          "create_time": 1700900010.0,
+          "update_time": null,
+          "metadata": {}
+        },
+        "parent": "msg-010-1",
+        "children": []
+      }
+    },
+    "moderation_results": [],
+    "current_node": "msg-010-2"
+  }
+]

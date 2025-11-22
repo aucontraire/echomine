@@ -48,34 +48,34 @@ Single project structure:
 
 ### Pydantic Models (from data-model.md)
 
-- [ ] T010 [P] Create Message model in src/echomine/models/message.py with frozen=True, strict=True, Literal role, timezone validators
-- [ ] T011 [P] Create Conversation model in src/echomine/models/conversation.py with tree navigation methods (get_all_threads, get_thread, get_children)
-- [ ] T012 [P] Create SearchQuery model in src/echomine/models/search.py with keywords, title_filter, date_from, date_to, limit fields
-- [ ] T013 [P] Create SearchResult model in src/echomine/models/search.py with conversation, relevance_score fields
-- [ ] T014 Create src/echomine/models/__init__.py exporting all models
+- [X] T010 [P] Create Message model in src/echomine/models/message.py with frozen=True, strict=True, Literal role, timezone validators
+- [X] T011 [P] Create Conversation model in src/echomine/models/conversation.py with tree navigation methods (get_all_threads, get_thread, get_children)
+- [X] T012 [P] Create SearchQuery model in src/echomine/models/search.py with keywords, title_filter, date_from, date_to, limit fields
+- [X] T013 [P] Create SearchResult model in src/echomine/models/search.py with conversation, relevance_score fields
+- [X] T014 Create src/echomine/models/__init__.py exporting all models
 
 ### Protocol Definitions (from contracts/)
 
-- [ ] T015 Create ConversationProvider protocol in src/echomine/models/protocols.py with stream_conversations, search, get_conversation_by_id signatures
-- [ ] T016 Define ProgressCallback and OnSkipCallback type aliases in src/echomine/models/protocols.py
-- [ ] T017 Define BaseConversation protocol interface in src/echomine/models/protocols.py
+- [X] T015 Create ConversationProvider protocol in src/echomine/models/protocols.py with stream_conversations, search, get_conversation_by_id signatures
+- [X] T016 Define ProgressCallback and OnSkipCallback type aliases in src/echomine/models/protocols.py
+- [X] T017 Define BaseConversation protocol interface in src/echomine/models/protocols.py
 
 ### Exception Hierarchy (per FR-286 to FR-290)
 
-- [ ] T018 [P] Create EchomineError base exception in src/echomine/exceptions.py
-- [ ] T019 [P] Create ParseError, ValidationError, SchemaVersionError in src/echomine/exceptions.py
-- [ ] T020 Create src/echomine/exceptions.py __all__ export
+- [X] T018 [P] Create EchomineError base exception in src/echomine/exceptions.py
+- [X] T019 [P] Create ParseError, ValidationError, SchemaVersionError in src/echomine/exceptions.py
+- [X] T020 Create src/echomine/exceptions.py __all__ export
 
 ### Logging Infrastructure (per FR-028 to FR-032)
 
-- [ ] T021 Configure structlog for JSON logging in src/echomine/utils/logging.py with required fields (operation, file_name, conversation_id, timestamp, level)
-- [ ] T022 Create logging helpers for progress callbacks in src/echomine/utils/logging.py
+- [X] T021 Configure structlog for JSON logging in src/echomine/utils/logging.py with required fields (operation, file_name, conversation_id, timestamp, level)
+- [X] T022 Create logging helpers for progress callbacks in src/echomine/utils/logging.py
 
 ### Test Fixtures
 
-- [ ] T023 [P] Create sample OpenAI export fixture (10 conversations, 50 messages) in tests/fixtures/sample_export.json
-- [ ] T024 [P] Create large OpenAI export fixture generator (1000+ conversations) in tests/fixtures/generate_large_export.py
-- [ ] T025 [P] Create malformed export fixtures (missing fields, invalid JSON) in tests/fixtures/
+- [X] T023 [P] Create sample OpenAI export fixture (10 conversations, 50 messages) in tests/fixtures/sample_export.json
+- [X] T024 [P] Create large OpenAI export fixture generator (1000+ conversations) in tests/fixtures/generate_large_export.py
+- [X] T025 [P] Create malformed export fixtures (missing fields, invalid JSON) in tests/fixtures/
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
