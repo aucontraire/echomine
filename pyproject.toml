@@ -43,6 +43,7 @@ dev = [
     "pytest-cov>=4.1.0",
     "pytest-mock>=3.11.0",
     "pytest-benchmark>=4.0.0",
+    "psutil>=5.9.0",  # For T068 file descriptor tracking in resource cleanup tests
     "mypy>=1.5.0",
     "ruff>=0.1.0",
     "pre-commit>=3.4.0",

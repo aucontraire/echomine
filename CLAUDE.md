@@ -109,6 +109,7 @@ All code, architecture, and design decisions MUST comply with these 8 principles
 - ✅ No `Any` types (use Protocol or TypeVar instead)
 - ✅ Pydantic models for ALL structured data
 - ✅ Protocol classes for abstractions (runtime_checkable)
+- ✅ **Data Integrity**: Model data as it exists in source (nullable fields stay Optional, not hidden with defaults)
 
 ### VII. Multi-Provider Adapter Pattern
 - ✅ OpenAIAdapter implements ConversationProvider protocol
@@ -399,6 +400,54 @@ class Message(BaseModel):
             raise ValueError("Timestamp must be timezone-aware")
         return v.astimezone(UTC)
 ```
+
+**CRITICAL v2 Patterns (Phase 5 Discoveries)**:
+
+```python
+# 1. ALWAYS use explicit default= keyword (mypy --strict requirement)
+from typing import Optional
+from pydantic import BaseModel, Field
+
+# ❌ AVOID: Positional defaults (fails mypy --strict)
+class SearchQuery(BaseModel):
+    keywords: Optional[list[str]] = Field(None, description="...")
+    limit: int = Field(10, gt=0, description="...")
+
+# ✅ REQUIRED: Explicit keyword arguments (mypy --strict compliant)
+class SearchQuery(BaseModel):
+    keywords: Optional[list[str]] = Field(default=None, description="...")
+    limit: int = Field(default=10, gt=0, description="...")
+
+# 2. Use Optional[T] when source data can be null (Constitution Principle VI: Data Integrity)
+class Conversation(BaseModel):
+    created_at: datetime = Field(...)  # Always present
+    updated_at: Optional[datetime] = Field(
+        default=None,
+        description="Null if never updated (OpenAI export reality)"
+    )
+
+    # Provide helper properties for convenience without sacrificing accuracy
+    @property
+    def updated_at_or_created(self) -> datetime:
+        """Non-null fallback for consumers who don't need null handling."""
+        return self.updated_at if self.updated_at is not None else self.created_at
+
+# ❌ AVOID: Hiding nullable data with defaults (violates Data Integrity principle)
+class Conversation(BaseModel):
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),  # Pollutes data!
+        description="Defaults to now if missing"
+    )
+
+# 3. model_copy() does shallow copy by default (Pydantic v2 frozen models)
+original = conversation.model_copy()           # Shallow (fast, safe for frozen models)
+deep_copy = conversation.model_copy(deep=True)  # Deep (explicit when needed)
+```
+
+**Why These Matter**:
+- **Explicit default=**: Pydantic v2 + mypy --strict requires keyword arguments for type safety
+- **Optional design**: Accurately represents source data, enables data quality monitoring, prevents default pollution
+- **Shallow copy**: Performance optimization for frozen models (immutability makes it safe)
 
 ### Import Conventions
 ```python

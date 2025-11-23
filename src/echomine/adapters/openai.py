@@ -113,7 +113,13 @@ class OpenAIAdapter:
         - SC-001: Memory usage <1GB for large exports
     """
 
-    def stream_conversations(self, file_path: Path) -> Iterator[Conversation]:
+    def stream_conversations(
+        self,
+        file_path: Path,
+        *,
+        progress_callback: Optional[ProgressCallback] = None,
+        on_skip: Optional[OnSkipCallback] = None,
+    ) -> Iterator[Conversation]:
         """Stream conversations from OpenAI export file with O(1) memory.
 
         This method uses ijson to incrementally parse the export file, yielding
@@ -134,6 +140,8 @@ class OpenAIAdapter:
 
         Args:
             file_path: Path to OpenAI export JSON file
+            progress_callback: Optional callback invoked every 100 conversations (FR-069)
+            on_skip: Optional callback invoked when malformed entries skipped (FR-107)
 
         Yields:
             Conversation objects parsed from export
@@ -171,19 +179,38 @@ class OpenAIAdapter:
                 # Each "item" is a complete conversation object
                 try:
                     items = ijson.items(f, "item")
+                    count = 0  # Track for progress_callback (FR-069)
 
                     for raw_conversation in items:
                         # Parse individual conversation
                         # Memory: O(N) where N = messages in this conversation
                         try:
                             conversation = self._parse_conversation(raw_conversation)
+                            count += 1
+
+                            # Invoke progress callback every 100 items (FR-069)
+                            if progress_callback and count % 100 == 0:
+                                progress_callback(count)
+
                             yield conversation
                         except PydanticValidationError as e:
-                            # Convert Pydantic ValidationError to our ValidationError
-                            # Re-raise with conversation context for debugging
+                            # Graceful degradation: skip malformed entries (FR-281)
                             conversation_id = raw_conversation.get("id", "unknown")
-                            error_msg = f"Validation error in conversation {conversation_id}: {e}"
-                            raise ValidationError(error_msg) from e
+                            reason = f"Validation error: {e}"
+
+                            # Invoke on_skip callback if provided (FR-107)
+                            if on_skip:
+                                on_skip(conversation_id, reason)
+
+                            # Log warning but continue processing (FR-281)
+                            logger.warning(
+                                "Skipped malformed conversation",
+                                extra={
+                                    "conversation_id": conversation_id,
+                                    "reason": reason,
+                                },
+                            )
+                            continue  # Skip this conversation, process next
 
                 except ijson.JSONError as e:
                     # ijson.JSONError raised for malformed JSON
@@ -356,6 +383,53 @@ class OpenAIAdapter:
                 score=score,
                 matched_message_ids=matched_message_ids,
             )
+
+    def get_conversation_by_id(
+        self,
+        file_path: Path,
+        conversation_id: str,
+    ) -> Optional[Conversation]:
+        """Retrieve specific conversation by UUID (FR-155, FR-217, FR-356).
+
+        Uses streaming search for memory efficiency - O(N) time, O(1) memory.
+        For large files with frequent ID lookups, consider building an index.
+
+        Args:
+            file_path: Path to OpenAI export JSON file
+            conversation_id: UUID of conversation to retrieve
+
+        Returns:
+            Conversation object if found, None otherwise (FR-155)
+
+        Raises:
+            FileNotFoundError: If file doesn't exist
+            ParseError: If JSON is malformed
+
+        Example:
+            ```python
+            adapter = OpenAIAdapter()
+            conv = adapter.get_conversation_by_id(
+                Path("export.json"),
+                "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            )
+            if conv:
+                print(f"Found: {conv.title}")
+            else:
+                print("Conversation not found")
+            ```
+
+        Performance:
+            - Time: O(N) where N = conversations in file (streaming search)
+            - Memory: O(1) for file size, O(M) for single conversation
+            - Early termination: Returns immediately when match found
+        """
+        # Stream conversations and return first match
+        for conversation in self.stream_conversations(file_path):
+            if conversation.id == conversation_id:
+                return conversation
+
+        # Not found - return None per FR-155
+        return None
 
     def _find_matched_messages(
         self, conversation: Conversation, keywords: list[str]

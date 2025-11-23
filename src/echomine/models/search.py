@@ -76,25 +76,25 @@ class SearchQuery(BaseModel):
 
     # Optional Search Filters
     keywords: Optional[list[str]] = Field(
-        None,
+        default=None,
         description="Keywords for full-text search (OR logic, case-insensitive)",
     )
     title_filter: Optional[str] = Field(
-        None,
+        default=None,
         description="Partial match on conversation title (metadata-only, case-insensitive)",
     )
     from_date: Optional[date] = Field(
-        None,
+        default=None,
         description="Start date for date range filter (inclusive)",
     )
     to_date: Optional[date] = Field(
-        None,
+        default=None,
         description="End date for date range filter (inclusive)",
     )
 
     # Result Limit (per FR-332)
     limit: int = Field(
-        10,
+        default=10,
         gt=0,
         le=1000,
         description="Maximum results to return (1-1000, default: 10)",

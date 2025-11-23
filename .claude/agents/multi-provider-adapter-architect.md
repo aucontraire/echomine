@@ -80,6 +80,37 @@ You **MUST** be involved in:
   ConversationT = TypeVar('ConversationT', bound=ConversationProtocol)
   ```
 
+### ✅ Pydantic Model Consistency Across Providers
+
+All provider adapters MUST use consistent Pydantic v2 patterns:
+
+- **Field API**: Use `Field(default=None, ...)` for mypy --strict compliance (explicit keyword)
+- **Optional Fields**: Model nullable source data as `Optional[T]`, provide helper properties for convenience
+- **Immutability**: All models frozen=True for thread-safety across providers
+- **See**: `pydantic-data-modeling-expert` for complete patterns and validation logic
+
+**Example Consistent Pattern**:
+```python
+class ProviderConversation(BaseModel):
+    """Provider-specific conversation model."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    id: str = Field(..., description="Conversation ID")
+    created_at: datetime = Field(..., description="Creation timestamp")
+    updated_at: Optional[datetime] = Field(
+        default=None,
+        description="Last update (null if never modified)"
+    )
+
+    @property
+    def updated_at_or_created(self) -> datetime:
+        """Helper for non-null access (Constitution Principle VI: Data Integrity)."""
+        return self.updated_at if self.updated_at is not None else self.created_at
+```
+
+**Cross-Reference**: See `pydantic-data-modeling-expert.md` and `python-strict-typing-enforcer.md` for implementation details.
+
 ## Decision-Making Framework
 
 When reviewing or designing adapters, evaluate:

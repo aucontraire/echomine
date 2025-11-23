@@ -103,6 +103,115 @@ class ExampleModel(BaseModel):
     }
 ```
 
+## Pydantic v2 Best Practices (Phase 5 Discoveries)
+
+### Critical Pattern 1: Field API - Explicit default= Keyword
+
+**MANDATORY for mypy --strict compliance**: Always use explicit `default=` keyword argument in Field()
+
+```python
+# ❌ AVOID (Pydantic v1 style - fails mypy --strict)
+field: Optional[str] = Field(None, description="...")
+limit: int = Field(10, gt=0, description="...")
+
+# ✅ CORRECT (Pydantic v2 + mypy --strict compliant)
+field: Optional[str] = Field(default=None, description="...")
+limit: int = Field(default=10, gt=0, description="...")
+```
+
+**Why This Matters**:
+- Pydantic v2 with `strict=True` + mypy --strict requires explicit keyword arguments
+- Positional defaults are ambiguous and fail type checking
+- Explicit `default=` improves code readability and maintainability
+
+**Mypy Error Without This Pattern**:
+```
+Missing named argument "field" for "Model"  [call-arg]
+```
+
+### Critical Pattern 2: Optional vs Non-Null Design Philosophy
+
+**Design Principle**: Choose Optional[T] vs T based on **data semantics**, NOT consumer convenience
+
+**See**: CLAUDE.md Constitution Principle VI: Data Integrity
+
+```python
+# ✅ CORRECT: Use Optional when source data can be null
+class Conversation(BaseModel):
+    created_at: datetime = Field(...)  # Always present in source
+    updated_at: Optional[datetime] = Field(
+        default=None,
+        description="Last modification timestamp (null if never modified)"
+    )
+
+    # Provide helper properties for common use cases
+    @property
+    def updated_at_or_created(self) -> datetime:
+        """Get last update timestamp, falling back to created_at if not set."""
+        return self.updated_at if self.updated_at is not None else self.created_at
+
+# ❌ WRONG: Force non-null when data can be null
+class Conversation(BaseModel):
+    # BAD: Hides data quality issues, inaccurate modeling
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+```
+
+**Decision Matrix**:
+| Scenario | Type Choice | Rationale |
+|----------|-------------|-----------|
+| Source data can be null | `Optional[T]` | Accurate representation, enforces null safety |
+| Source data always present | `T` | Non-null guarantee, simpler for consumers |
+| Computed/derived field | `@property -> T` | Helper methods for convenience |
+
+**Benefits of This Approach**:
+- Type system enforces null safety (consumers must handle Optional explicitly)
+- Accurate data modeling prevents silent data quality issues
+- Helper properties provide convenience without sacrificing accuracy
+
+### Critical Pattern 3: Frozen Model Copy Semantics
+
+**Pydantic v2 Behavior**: `model_copy()` performs **shallow copy by default** for frozen models
+
+```python
+# Default behavior: shallow copy (SAFE for frozen models)
+original = Conversation(messages=[msg1, msg2], ...)
+shallow_copy = original.model_copy()
+
+# Both share list reference - but immutability prevents modification
+assert original.messages is shallow_copy.messages  # ✅ Same object
+
+# Explicit deep copy when needed
+deep_copy = original.model_copy(deep=True)
+assert original.messages is not deep_copy.messages  # ✅ Different objects
+```
+
+**Why Shallow Copy is Safe**:
+```python
+# frozen=True prevents ALL modifications
+original.messages = [new_msg]          # ❌ ValidationError
+original.messages.append(new_msg)      # ❌ Frozen prevents this
+shallow_copy.messages[0].content = "x" # ❌ Message is also frozen
+```
+
+**Performance Benefit**: Shallow copy avoids unnecessary object duplication when immutability guarantees safety
+
+**When to Use Deep Copy**:
+- Passing model to untrusted code (security isolation)
+- Serializing to separate memory spaces (multiprocessing)
+- Debugging/testing to ensure complete isolation
+
+### Additional Pattern: Mutable Collection Defaults
+
+```python
+# ❌ WRONG - Mutable default (runtime error)
+tags: list[str] = Field(default=[], description="Tags")
+
+# ✅ CORRECT - Use default_factory for mutable defaults
+tags: list[str] = Field(default_factory=list, description="Tags")
+metadata: dict[str, Any] = Field(default_factory=dict, description="Metadata")
+children: set[str] = Field(default_factory=set, description="Child IDs")
+```
+
 ## Workflow
 
 1. **Analyze Requirements**: Understand the model's purpose, relationships, and validation needs
@@ -116,12 +225,16 @@ class ExampleModel(BaseModel):
 ## Quality Assurance
 
 Before presenting any model:
+- ✅ All Field() calls use explicit `default=` keyword (not positional)
+- ✅ Optional[T] used when source data can be null (accurate modeling)
+- ✅ Helper properties provided for common Optional field access patterns
 - ✅ Verify frozen=True and extra="forbid" in model_config
 - ✅ Check all datetime fields have timezone validation
 - ✅ Confirm all type hints are explicit and mypy-compliant
 - ✅ Ensure validators have clear error messages
 - ✅ Validate that docstrings include purpose and examples
 - ✅ Consider serialization format (JSON compatibility)
+- ✅ Mutable collections use default_factory (not default=[])
 
 ## When to Seek Clarification
 

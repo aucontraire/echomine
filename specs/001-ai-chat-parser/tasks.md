@@ -178,30 +178,30 @@ Single project structure:
 
 **Independent Test**: Import library, create adapter, call search/list/export methods, verify type hints work in IDE
 
-### Tests for [US2] (TDD - Write First!) ⚠️
+### Tests for [US2] (TDD - Write First!) ✅
 
-- [ ] T058 [P] [US2] Library API test in tests/integration/test_library_api.py (verify import, adapter creation, method calls)
-- [ ] T059 [P] [US2] Type safety test in tests/unit/test_type_contracts.py (verify mypy --strict passes, no Any types in public API)
-- [ ] T060 [P] [US2] Immutability test in tests/unit/models/test_conversation.py (verify frozen=True, model_copy works)
+- [x] T058 [P] [US2] Library API test in tests/integration/test_library_api.py (verify import, adapter creation, method calls) - 18 tests created, 70/75 passing
+- [x] T059 [P] [US2] Type safety test in tests/unit/test_type_contracts.py (verify mypy --strict passes, no Any types in public API) - 13 tests created
+- [x] T060 [P] [US2] Immutability test in tests/unit/models/test_conversation.py (verify frozen=True, model_copy works) - 18 tests created
 
 ### Implementation for [US2]
 
 #### Library API Exports
 
-- [ ] T061 [US2] Update src/echomine/__init__.py to export OpenAIAdapter, Conversation, Message, SearchQuery, SearchResult
-- [ ] T062 [US2] Update src/echomine/__init__.py to export EchomineError, ParseError, ValidationError, SchemaVersionError
-- [ ] T063 [US2] Add __all__ and type stubs for public API in src/echomine/__init__.py
+- [x] T061 [US2] Update src/echomine/__init__.py to export OpenAIAdapter, Conversation, Message, SearchQuery, SearchResult
+- [x] T062 [US2] Update src/echomine/__init__.py to export EchomineError, ParseError, ValidationError, SchemaVersionError
+- [x] T063 [US2] Add __all__ and type stubs for public API in src/echomine/__init__.py
 
 #### Documentation for Library Users
 
-- [ ] T064 [P] [US2] Create cognivault integration example in examples/cognivault_integration.py (demonstrate streaming ingestion per FR-337 to FR-341)
-- [ ] T065 [P] [US2] Create batch processing example in examples/batch_processing.py (demonstrate concurrent file processing per FR-361 to FR-365)
-- [ ] T066 [P] [US2] Create rate limiting example in examples/rate_limiting.py (demonstrate consumer-side throttling per FR-342 to FR-345)
+- [x] T064 [P] [US2] Create cognivault integration example in examples/cognivault_integration.py (demonstrate streaming ingestion per FR-337 to FR-341) - Also addresses CHK077 P1 gap
+- [x] T065 [P] [US2] Create batch processing example in examples/batch_processing.py (demonstrate concurrent file processing per FR-361 to FR-365) - 656 lines: ThreadPoolExecutor, Rich multi-progress, thread-safe statistics, JSON output mode
+- [x] T066 [P] [US2] Create rate limiting example in examples/rate_limiting.py (demonstrate consumer-side throttling per FR-342 to FR-345) - 612 lines: Token bucket algorithm, rate limiter with burst support, Rich progress with rate tracking
 
 #### Library-Specific Tests
 
-- [ ] T067 [P] [US2] Add thread safety test in tests/unit/test_concurrency.py (verify adapter thread-safe, iterators not shared per FR-098 to FR-101)
-- [ ] T068 [P] [US2] Add resource cleanup test in tests/unit/test_cleanup.py (verify file handles closed on early break, exceptions per FR-394 to FR-398)
+- [x] T067 [P] [US2] Add thread safety test in tests/unit/test_concurrency.py (verify adapter thread-safe, iterators not shared per FR-098 to FR-101) - 10 tests created
+- [x] T068 [P] [US2] Add resource cleanup test in tests/unit/test_cleanup.py (verify file handles closed on early break, exceptions per FR-394 to FR-398) - 15 tests created
 
 **Checkpoint**: US2 complete - library API fully documented and tested
 

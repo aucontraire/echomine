@@ -56,16 +56,36 @@ License:
 
 __version__ = "1.0.0"
 __author__ = "Echomine Contributors"
-__all__: list[str] = [
-    "__version__",
-    # Public API will be exported here as implemented:
-    # "OpenAIAdapter",
-    # "Conversation",
-    # "Message",
-    # "SearchQuery",
-    # "SearchResult",
-    # "ConversationProvider",
-]
 
-# Public API exports will be added as implementation progresses
-# Following library-first architecture (Constitution Principle I)
+# Public API imports (T061-T062)
+from echomine.adapters.openai import OpenAIAdapter
+from echomine.exceptions import (
+    EchomineError,
+    ParseError,
+    SchemaVersionError,
+    ValidationError,
+)
+from echomine.models.conversation import Conversation
+from echomine.models.message import Message
+from echomine.models.protocols import ConversationProvider
+from echomine.models.search import SearchQuery, SearchResult
+
+# T063: __all__ defines public API surface for library consumers
+__all__: list[str] = [
+    # Version metadata
+    "__version__",
+    # Data models
+    "Conversation",
+    "Message",
+    "SearchQuery",
+    "SearchResult",
+    # Adapters
+    "OpenAIAdapter",
+    # Protocols
+    "ConversationProvider",
+    # Exceptions
+    "EchomineError",
+    "ParseError",
+    "ValidationError",
+    "SchemaVersionError",
+]

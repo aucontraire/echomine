@@ -1,28 +1,28 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version: 1.0.0 → 1.1.0
-Change Type: MINOR (Added domain-specific principles)
+Version: 1.1.0 → 1.1.1
+Change Type: PATCH (Enhanced existing principle with clarification)
 
-Modified Principles: None (existing I-V unchanged)
+Modified Principles:
+- VI. Strict Typing Mandatory - Added "Data Integrity" bullet point and enhanced rationale
 
-Added Sections:
-- VI. Strict Typing Mandatory
-- VII. Multi-Provider Adapter Pattern
-- VIII. Memory Efficiency & Streaming
-- Technology Standards (new section after Governance)
+Added Sections: None
 
 Removed Sections: None
 
 Templates Requiring Updates:
-- ✅ .specify/templates/plan-template.md - Will require type safety checks in Constitution Check section
-- ✅ .specify/templates/spec-template.md - No changes needed (requirements stay technology-agnostic)
-- ✅ .specify/templates/tasks-template.md - Will need mypy validation tasks in quality gates
+- .specify/templates/plan-template.md - No changes needed (type safety already covered)
+- .specify/templates/spec-template.md - No changes needed
+- .specify/templates/tasks-template.md - No changes needed
 
-Follow-up TODOs:
-- Add mypy --strict to pre-commit hooks configuration
-- Create ConversationProvider protocol definition
-- Establish performance test baselines for memory/streaming requirements
+Follow-up TODOs: None (documentation already updated in CLAUDE.md and agent files)
+
+Previous Changes (1.0.0 → 1.1.0):
+- Added VI. Strict Typing Mandatory
+- Added VII. Multi-Provider Adapter Pattern
+- Added VIII. Memory Efficiency & Streaming
+- Added Technology Standards section
 -->
 
 # Echomine Constitution
@@ -93,9 +93,10 @@ All Python code MUST use strict type checking without exception:
 - **Type hints mandatory**: All functions, methods, parameters, and return values
 - **NO `Any` types**: Prohibited without explicit justification documented in code comments
 - **Pydantic models mandatory**: ALL structured data uses Pydantic models (no raw dicts/lists)
+- **Data Integrity**: Model data as it exists in source (nullable fields stay Optional, not hidden with defaults)
 - **CI pipeline enforcement**: Type checking blocks merges on failures
 
-**Rationale**: Strict typing catches bugs at development time, serves as inline documentation, and enables confident refactoring. For a data parsing tool handling complex JSON structures from multiple AI platforms, type safety is non-negotiable. Dynamic typing's flexibility becomes a liability when processing untrusted external data.
+**Rationale**: Strict typing catches bugs at development time, serves as inline documentation, and enables confident refactoring. For a data parsing tool handling complex JSON structures from multiple AI platforms, type safety is non-negotiable. Dynamic typing's flexibility becomes a liability when processing untrusted external data. Data integrity ensures type safety reflects reality—using Optional[T] for nullable fields enforces null safety and exposes data quality issues rather than papering over them with defaults.
 
 ### VII. Multi-Provider Adapter Pattern
 
@@ -242,4 +243,4 @@ class ConversationProvider(Protocol):
 - **Fixture typing**: Test fixtures properly typed (no `Any` in conftest.py)
 - **Provider contract tests**: Shared test suite verifying all providers implement protocol correctly
 
-**Version**: 1.1.0 | **Ratified**: 2025-11-21 | **Last Amended**: 2025-11-21
+**Version**: 1.1.1 | **Ratified**: 2025-11-21 | **Last Amended**: 2025-11-22
