@@ -56,6 +56,7 @@ from pydantic import ValidationError as PydanticValidationError
 
 from echomine.exceptions import ParseError, ValidationError
 from echomine.models.conversation import Conversation
+from echomine.models.image import ImageRef
 from echomine.models.message import Message
 from echomine.models.protocols import OnSkipCallback, ProgressCallback
 from echomine.models.search import SearchQuery, SearchResult
@@ -667,14 +668,20 @@ class OpenAIAdapter:
         # Extract content from parts array or handle special content types
         # OpenAI content structure varies by type:
         # - Text messages: content.parts is list[str]
+        # - Multimodal messages: content.parts is list[str | dict] with image_asset_pointer
         # - Image messages: content is dict with content_type='image_asset_pointer'
         # - Other types: may have different structures
         content_data = message_data.get("content", {})
+        images: list[ImageRef] = []  # Initialize images list
 
         if isinstance(content_data, dict):
             content_type = content_data.get("content_type", "text")
 
-            if content_type == "text":
+            if content_type == "multimodal_text":
+                # Multimodal message - extract text and images from parts
+                content_parts = content_data.get("parts", [])
+                content, images = self._parse_multimodal_parts(content_parts)
+            elif content_type == "text":
                 # Standard text message - extract from parts array
                 content_parts = content_data.get("parts", [])
                 content = content_parts[0] if content_parts and isinstance(content_parts[0], str) else ""
@@ -713,6 +720,7 @@ class OpenAIAdapter:
             role=role,
             timestamp=timestamp,
             parent_id=parent_id,
+            images=images,  # Pass extracted images (empty list for non-multimodal)
             metadata={
                 "original_role": raw_role,
                 "update_time": message_data.get("update_time"),
@@ -746,3 +754,91 @@ class OpenAIAdapter:
 
         # Default unknown roles to assistant
         return role_mapping.get(raw_role, "assistant")
+
+    def _parse_multimodal_parts(
+        self, parts: list[Any]
+    ) -> tuple[str, list[ImageRef]]:
+        """Extract text and images from multimodal_text content parts.
+
+        OpenAI's multimodal_text content contains mixed text and image_asset_pointer
+        objects in the parts array. This method separates them into:
+        - Concatenated text content (string parts joined with spaces)
+        - List of ImageRef objects (from image_asset_pointer parts)
+
+        Args:
+            parts: List of parts from multimodal_text content
+                   Can contain strings (text) and dicts (image_asset_pointer)
+
+        Returns:
+            Tuple of (concatenated_text, image_refs)
+            - concatenated_text: All text parts joined with spaces
+            - image_refs: List of ImageRef objects for images
+
+        Example OpenAI structure:
+            ```json
+            {
+              "content_type": "multimodal_text",
+              "parts": [
+                {
+                  "content_type": "image_asset_pointer",
+                  "asset_pointer": "sediment://file_xxx",
+                  "size_bytes": 89512,
+                  "width": 1536,
+                  "height": 503
+                },
+                "Here is the diagram you requested"
+              ]
+            }
+            ```
+
+        Memory: O(N) where N = number of parts
+        """
+        text_parts: list[str] = []
+        images: list[ImageRef] = []
+
+        for part in parts:
+            if isinstance(part, str):
+                # Text part - add to text_parts
+                text_parts.append(part)
+            elif isinstance(part, dict):
+                # Check if it's an image_asset_pointer
+                content_type = part.get("content_type")
+                if content_type == "image_asset_pointer":
+                    # Extract image data and create ImageRef
+                    try:
+                        asset_pointer = part.get("asset_pointer", "")
+                        if asset_pointer:  # Only create ImageRef if asset_pointer exists
+                            image_ref = ImageRef(
+                                asset_pointer=asset_pointer,
+                                size_bytes=part.get("size_bytes"),
+                                width=part.get("width"),
+                                height=part.get("height"),
+                                metadata={
+                                    k: v
+                                    for k, v in part.items()
+                                    if k
+                                    not in {
+                                        "asset_pointer",
+                                        "content_type",
+                                        "size_bytes",
+                                        "width",
+                                        "height",
+                                    }
+                                },
+                            )
+                            images.append(image_ref)
+                    except (KeyError, PydanticValidationError) as e:
+                        # Skip malformed image references (graceful degradation)
+                        logger.warning(
+                            f"Skipping malformed image_asset_pointer: {e}"
+                        )
+                        continue
+                else:
+                    # Other dict types - skip or log
+                    logger.debug(f"Skipping non-image dict part: {content_type}")
+            # Ignore other types (list, int, etc.)
+
+        # Concatenate text parts with spaces
+        concatenated_text = " ".join(text_parts)
+
+        return concatenated_text, images

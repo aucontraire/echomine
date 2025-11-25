@@ -31,6 +31,7 @@ import sys
 
 import typer
 
+from echomine.cli.commands.export import export_conversation
 from echomine.cli.commands.list import list_conversations
 from echomine.cli.commands.search import search_conversations
 
@@ -56,6 +57,7 @@ def callback() -> None:
 # Register commands
 app.command(name="list", help="List all conversations from export file")(list_conversations)
 app.command(name="search", help="Search conversations by keywords")(search_conversations)
+app.command(name="export", help="Export conversation to markdown format")(export_conversation)
 
 
 def main() -> None:

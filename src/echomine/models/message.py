@@ -16,6 +16,8 @@ from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from echomine.models.image import ImageRef
+
 
 class Message(BaseModel):
     """Immutable message structure from conversation export (per FR-223, FR-227).
@@ -56,6 +58,7 @@ class Message(BaseModel):
         role: Normalized message role (user, assistant, or system)
         timestamp: Message creation time (timezone-aware UTC)
         parent_id: Parent message ID for threading (None for root messages)
+        images: Image attachments extracted from multimodal content (empty for text-only)
         metadata: Provider-specific fields (e.g., original_role, token_count)
     """
 
@@ -88,6 +91,12 @@ class Message(BaseModel):
     parent_id: Optional[str] = Field(
         None,
         description="Parent message ID for threading (None for root, per FR-276)",
+    )
+
+    # Image Attachments (Phase 6: Export with Images, FR-XXX)
+    images: list[ImageRef] = Field(
+        default_factory=list,
+        description="Image attachments extracted from multimodal content (empty for text-only)",
     )
 
     # Optional Provider-Specific Metadata (per FR-236)

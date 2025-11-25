@@ -213,34 +213,36 @@ Single project structure:
 
 **Goal**: Export specific conversations to markdown format for documentation
 
+**Detailed Plan**: See [implementation/phase-6-export.md](implementation/phase-6-export.md) for complete architecture decisions, testing strategy, and phased rollout with checkpoints.
+
 **Independent Test**: Select conversation by ID/title, export to markdown, verify file contains all messages with proper formatting
 
 ### Tests for [US3] (TDD - Write First!) ⚠️
 
-- [ ] T069 [P] [US3] Integration test for export workflow in tests/integration/test_export_flow.py (end-to-end: file → search by ID → export → verify markdown)
-- [ ] T070 [P] [US3] Unit test for markdown formatting in tests/unit/exporters/test_markdown.py (verify tree structure, code blocks, metadata)
+- [x] T069 [P] [US3] Integration test for export workflow in tests/integration/test_export_flow.py (end-to-end: file → search by ID → export → verify markdown)
+- [x] T070 [P] [US3] Unit test for markdown formatting in tests/integration/test_golden_master.py (golden master tests with 3 representative conversations)
 
 ### Implementation for [US3]
 
 #### ID-Based Retrieval
 
-- [ ] T071 [US3] Implement OpenAIAdapter.get_conversation_by_id in src/echomine/adapters/openai.py (stream until ID found, O(1) memory per FR-048)
+- [x] T071 [US3] Implement OpenAIAdapter.get_conversation_by_id in src/echomine/adapters/openai.py (stream until ID found, O(1) memory per FR-048)
 
 #### Markdown Exporter
 
-- [ ] T072 [P] [US3] Implement MarkdownExporter in src/echomine/exporters/markdown.py (render conversation metadata, messages, preserve tree structure)
-- [ ] T073 [P] [US3] Add code block preservation in MarkdownExporter (preserve fencing and formatting)
-- [ ] T074 [P] [US3] Add tree structure visualization in MarkdownExporter (indentation or markers for branches)
+- [x] T072 [P] [US3] Implement MarkdownExporter in src/echomine/export/markdown.py (render conversation metadata, messages, emoji headers, ISO timestamps)
+- [x] T073 [P] [US3] Add code block preservation in MarkdownExporter (preserve fencing and formatting)
+- [x] T074 [P] [US3] Add multimodal content support in MarkdownExporter (images from multimodal_text)
 
 #### CLI Export Command
 
-- [ ] T075 [US3] Implement `export` command in src/echomine/cli/export_cmd.py with --id, --title, --output flags
-- [ ] T076 [US3] Add filename slugification in export_cmd.py using python-slugify
-- [ ] T077 [US3] Add default output directory handling in export_cmd.py (current dir per FR-399, --output flag per FR-400)
+- [x] T075 [US3] Implement `export` command in src/echomine/cli/commands/export.py with conversation_id argument, --title, --output flags
+- [x] T076 [US3] Add title-based search in export command (case-insensitive substring matching)
+- [x] T077 [US3] Add stdout/file output handling in export command (default stdout, --output for file)
 
 #### Search-Then-Export Workflow (per FR-356 to FR-360)
 
-- [ ] T078 [US3] Add conversation_id to JSON search results in search_cmd.py for piping to export command
+- [x] T078 [US3] Add conversation_id to JSON search results (already implemented in formatters.py:312, validated by test_cli_contract.py:899)
 - [ ] T079 [P] [US3] Create search-then-export example in examples/search_then_export.sh (demonstrate pipeline workflow)
 
 **Checkpoint**: US3 complete - markdown export functional

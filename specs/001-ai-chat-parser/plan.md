@@ -96,8 +96,13 @@ specs/001-ai-chat-parser/
 ├── data-model.md        # Phase 1 output (/speckit.plan command)
 ├── quickstart.md        # Phase 1 output (/speckit.plan command)
 ├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+├── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+└── implementation/      # Detailed implementation plans per phase
+    ├── README.md        # Index of implementation docs
+    └── phase-6-export.md # Phase 6 detailed plan (export to markdown)
 ```
+
+**Implementation Documentation**: For phases requiring detailed architecture decisions, testing strategies, or complex coordination, see `implementation/*.md` for phase-specific implementation guides.
 
 ### Source Code (repository root)
 

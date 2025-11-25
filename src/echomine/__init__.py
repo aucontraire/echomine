@@ -65,6 +65,7 @@ from echomine.exceptions import (
     SchemaVersionError,
     ValidationError,
 )
+from echomine.export.markdown import MarkdownExporter
 from echomine.models.conversation import Conversation
 from echomine.models.message import Message
 from echomine.models.protocols import ConversationProvider
@@ -81,6 +82,8 @@ __all__: list[str] = [
     "SearchResult",
     # Adapters
     "OpenAIAdapter",
+    # Exporters
+    "MarkdownExporter",
     # Protocols
     "ConversationProvider",
     # Exceptions
