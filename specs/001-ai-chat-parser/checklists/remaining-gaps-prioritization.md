@@ -1,13 +1,13 @@
 # Remaining Gap Prioritization Analysis
 
-**Total Remaining Gaps**: 112 items (103 remaining, 9 resolved)
+**Total Remaining Gaps**: 112 items (97 remaining, 15 resolved)
 **Analysis Date**: 2025-11-22
-**Last Updated**: 2025-11-22
+**Last Updated**: 2025-11-26 (Phase 6/7 completion)
 **Feature**: 001-ai-chat-parser
 
 ---
 
-## ✅ Resolved Gaps (23 items - 14 P1 + 9 P2)
+## ✅ Resolved Gaps (29 items - 14 P1 + 15 P2)
 
 ### Priority 1 Gaps Resolved (14 items) - Expert Validation & Phase 5 Implementation 2025-11-22
 
@@ -34,7 +34,7 @@
 - ✅ **CHK077** - Mid-stream error handling - RESOLVED (on_skip callback implemented + comprehensive example in Phase 5)
 - ✅ **CHK134** - Exception contract clarity - RESOLVED (EchomineError hierarchy documented)
 
-### Priority 2 Gaps Resolved (9 items) - Phase 3/4 Implementation
+### Priority 2 Gaps Resolved (15 items) - Phase 3/4/6/7 Implementation
 
 **CLI Interface Contract (5 items) - commits: 996160e, 44271fa, 387f603**
 - ✅ **CHK031** - stdout/stderr separation (FR-291-295) - Implemented in Phase 3/4
@@ -48,6 +48,18 @@
 - ✅ **CHK039** - Keyword frequency at conversation level (FR-322-326)
 - ✅ **CHK044** - Case-insensitive substring title matching (FR-327-331)
 - ✅ **CHK136** - Limit applied after relevance ranking (FR-332-336)
+
+**Consistency Checks (3 items) - Phase 6/7 Implementation (commits: b3669c7, 60203fe, 2b26621)**
+- ✅ **CHK052** - FR-018 and library API alignment - Phase 6: Export defaults to stdout, library returns str
+- ✅ **CHK053** - Date filtering consistency (CLI vs library) - Phase 7: CLI parses ISO 8601, library uses date objects
+- ✅ **CHK054** - Limit requirements consistency (CLI vs library) - Phase 7: Both default to 10, range 1-1000
+
+**Workflow Coverage (1 item) - Phase 6 Implementation**
+- ✅ **CHK072** - Search-then-export workflow - Phase 6: Search by keyword → Extract ID → Export to markdown (36 tests)
+
+**Documentation Alignment (2 items) - Phase 6/7 Implementation**
+- ✅ **CHK060** - quickstart.md examples consistent with spec - Phase 6: Docstrings match implementation
+- ✅ **CHK061** - CLI spec examples consistent with FR-017/FR-018 - Phase 6/7: Contract tests validate spec alignment
 
 ---
 
@@ -111,7 +123,7 @@
 
 ---
 
-## Priority 2: High - Should Resolve Early in Implementation (28 items, 9 resolved)
+## Priority 2: High - Should Resolve Early in Implementation (28 items, 15 resolved)
 
 **Impact**: Needed for core workflows, CLI contract, and cognivault integration. Can be resolved during early implementation phases.
 
@@ -131,6 +143,31 @@
 - ✅ ~~**CHK136** - Interaction between --limit and relevance ranking~~ [RESOLVED: FR-332-336]
 
 **Rationale**: Search semantics affect user expectations and test design.
+
+### Consistency Checks - 3/5 RESOLVED ✅
+- ✅ ~~**CHK052** - FR-018 and library API alignment (default output)~~ [RESOLVED: Phase 6 export to stdout]
+- ✅ ~~**CHK053** - Date filtering consistency (CLI vs library)~~ [RESOLVED: Phase 7 date filtering]
+- ✅ ~~**CHK054** - Limit requirements consistency (CLI vs library)~~ [RESOLVED: Phase 7 validation]
+- **CHK055** - Error handling consistency (CLI exit codes vs library exceptions) [Remaining]
+- **CHK056** - Keyword search requirements consistency [Remaining]
+
+**Rationale**: CLI/library inconsistencies cause user confusion and integration bugs.
+
+### Workflow Coverage - 1/5 RESOLVED ✅
+- ✅ ~~**CHK072** - Search-then-export workflow~~ [RESOLVED: Phase 6 markdown export, 36 tests]
+- **CHK073** - Batch processing scenarios [Remaining]
+- **CHK074** - Title-based search fallback [Remaining - covered by existing tests]
+- **CHK075** - Pagination or result streaming (10K+ results) [Remaining]
+- **CHK076** - Partial result delivery [Remaining]
+
+**Rationale**: Core user workflows must be completely specified for v1.0.
+
+### Documentation Alignment - 2/3 RESOLVED ✅
+- ✅ ~~**CHK060** - quickstart.md examples consistent with spec~~ [RESOLVED: Phase 6 docstrings]
+- ✅ ~~**CHK061** - CLI spec examples consistent with FR-017/FR-018~~ [RESOLVED: Phase 6/7 contract tests]
+- **CHK062** - Data model documentation vs Pydantic specifications [Remaining]
+
+**Rationale**: Documentation mismatches cause integration failures.
 
 ### cognivault Integration Requirements
 - **CHK071** - cognivault integration flow requirements complete [Coverage]
@@ -314,13 +351,14 @@
 | Priority | Count | Resolved | Remaining | Focus | Status |
 |----------|-------|----------|-----------|-------|--------|
 | **P1: Critical** | 17 | **14** ✅ | **3** ⚠️ | API contracts, type safety, multi-provider | 82% complete (needs docs only) |
-| **P2: High** | 28 | **9** ✅ | **19** | CLI contract, cognivault integration, workflows | 32% complete |
+| **P2: High** | 28 | **15** ✅ | **13** | CLI contract, cognivault integration, workflows | **54% complete** (+22% from Phase 6/7) |
 | **P3: Medium** | 37 | **0** | **37** | Performance, testing, edge cases, dependencies | Deferred to implementation |
 | **P4: Low** | 30 | **0** | **30** | Rare edge cases, future features, polish | Deferred post-v1.0 |
-| **TOTAL** | 112 | **23** | **89** | | |
+| **TOTAL** | 112 | **29** | **83** | | |
 
-**Progress**: 21% of gaps resolved (23/112)
+**Progress**: **26% of gaps resolved** (29/112) - **+5% from Phase 6/7**
 **Critical Path**: 82% of P1 gaps resolved (14/17) - **ZERO blocking issues**
+**P2 Progress**: 54% complete (15/28) - **+22% from Phase 6/7** (export workflow + date filtering + consistency checks)
 
 ---
 

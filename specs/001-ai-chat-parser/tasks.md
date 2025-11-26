@@ -251,33 +251,55 @@ Single project structure:
 
 ---
 
-## Phase 7: User Story 4 - Filter Conversations by Date Range (Priority: P4)
+## Phase 7: User Story 4 - Filter Conversations by Date Range (Priority: P4) ✅ COMPLETE
 
 **Goal**: Add temporal filtering to search functionality
 
 **Independent Test**: Specify date range, run search, verify only conversations within range returned
 
-### Tests for [US4] (TDD - Write First!) ⚠️
+**Status**: ✅ COMPLETE (2025-11-26) - 31 comprehensive tests, all passing
+**Coverage**: OpenAIAdapter 9.58% → 53.64% (+44%)
+**Commits**: 60203fe (tests), 2b26621 (mypy fix)
 
-- [ ] T080 [P] [US4] Integration test for date filtering in tests/integration/test_date_filtering.py (verify date range logic)
-- [ ] T081 [P] [US4] Unit test for date parsing in tests/unit/test_date_utils.py (verify ISO 8601 parsing per FR-404 to FR-408)
+### Tests for [US4] (TDD - Write First!) ✅ COMPLETE
 
-### Implementation for [US4]
+- [x] T080 [P] [US4] Integration test for date filtering in tests/integration/test_date_filtering.py (7 tests - verify date range logic)
+- [x] T081 [P] [US4] Unit test for date parsing in tests/unit/test_date_utils.py (10 tests - verify ISO 8601 parsing per FR-404 to FR-408)
+- [x] T081b [P] [US4] Unit test for SearchQuery date fields in tests/unit/test_search_query.py (7 tests - Pydantic validation)
+- [x] T081c [P] [US4] Contract test for CLI date flags in tests/contract/test_cli_contract.py (7 tests - CLI error handling)
+
+### Implementation for [US4] ✅ COMPLETE
+
+**Note**: Implementation already existed from commit 996160e (2025-11-22) but lacked tests. Phase 7 added comprehensive retroactive test coverage.
 
 #### Date Filtering Logic
 
-- [ ] T082 [US4] Add date_from/date_to filtering in src/echomine/search/filters.py (support datetime, date, ISO 8601 strings per FR-404)
-- [ ] T083 [US4] Add Pydantic validator for date parsing in SearchQuery model (auto-parse ISO 8601 strings per FR-405)
-- [ ] T084 [US4] Update OpenAIAdapter.search to apply date filters in src/echomine/adapters/openai.py
+- [x] T082 [US4] from_date/to_date fields in SearchQuery model (src/echomine/models/search.py:86-93, 131-145)
+- [x] T083 [US4] CLI date parsing via parse_date() function (src/echomine/cli/commands/search.py:55-70)
+- [x] T084 [US4] Date filter application in OpenAIAdapter.search (src/echomine/adapters/openai.py:291-300)
 
 #### CLI Date Flags
 
-- [ ] T085 [US4] Add --from and --to flags to search command in src/echomine/cli/search_cmd.py
-- [ ] T086 [US4] Add date format validation and error messages in search_cmd.py (clear error for invalid formats per acceptance scenario 3)
+- [x] T085 [US4] --from-date and --to-date flags (src/echomine/cli/commands/search.py:101-114, 226-241)
+- [x] T086 [US4] Date format validation with exit code 2 on invalid format (parse_date() raises ValueError)
 
-**Checkpoint**: US4 complete - date range filtering functional
+**Checkpoint**: ✅ US4 COMPLETE - Date range filtering fully functional with 31 tests passing
 
-**Parallel Opportunities**: T080-T081 (tests), T082-T083 (filtering logic) can run in parallel
+**Test Coverage**:
+- 17 unit tests (date parsing + SearchQuery validation)
+- 7 integration tests (end-to-end date filtering)
+- 7 contract tests (CLI interface validation)
+
+**US4 Acceptance Scenarios**: 5/5 validated
+**Functional Requirements**: FR-404, FR-405, FR-406, FR-407, FR-408 covered
+**Gaps Resolved**: CHK053 (date filtering consistency), CHK054 (limit consistency)
+
+**Files Created**:
+- tests/fixtures/date_test_conversations.json (strategic date fixture)
+- tests/unit/test_date_utils.py (10 tests)
+- tests/unit/test_search_query.py (7 date tests)
+- tests/integration/test_date_filtering.py (7 tests)
+- tests/contract/test_cli_contract.py::TestCLIDateFilteringContract (7 tests)
 
 ---
 
