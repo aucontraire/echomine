@@ -82,7 +82,11 @@ class TestSearchQueryDateFields:
             from_date=date(2024, 12, 31),
             to_date=date(2024, 1, 1)
         )
-        
+
+        # Type narrowing for mypy --strict
+        assert query.from_date is not None
+        assert query.to_date is not None
+
         # Model accepts invalid range (no validation here)
         assert query.from_date > query.to_date
         assert query.has_date_filter() is True
