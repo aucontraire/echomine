@@ -1,0 +1,112 @@
+[
+  {
+    "id": "date-2024-01-15",
+    "title": "Early January conversation",
+    "create_time": 1705315200.0,
+    "update_time": 1705315200.0,
+    "mapping": {
+      "msg1": {
+        "id": "msg1",
+        "message": {
+          "id": "msg1",
+          "author": {"role": "user"},
+          "create_time": 1705315200.0,
+          "content": {
+            "content_type": "text",
+            "parts": ["Test message for early January"]
+          },
+          "status": "finished_successfully",
+          "metadata": {}
+        }
+      }
+    }
+  },
+  {
+    "id": "date-2024-02-29",
+    "title": "Leap year conversation",
+    "create_time": 1709251199.0,
+    "update_time": 1709251199.0,
+    "mapping": {
+      "msg2": {
+        "id": "msg2",
+        "message": {
+          "id": "msg2",
+          "author": {"role": "user"},
+          "create_time": 1709251199.0,
+          "content": {
+            "content_type": "text",
+            "parts": ["Test message for leap day"]
+          },
+          "status": "finished_successfully",
+          "metadata": {}
+        }
+      }
+    }
+  },
+  {
+    "id": "date-2024-03-01",
+    "title": "Post-leap-day conversation",
+    "create_time": 1709251201.0,
+    "update_time": 1709251201.0,
+    "mapping": {
+      "msg3": {
+        "id": "msg3",
+        "message": {
+          "id": "msg3",
+          "author": {"role": "user"},
+          "create_time": 1709251201.0,
+          "content": {
+            "content_type": "text",
+            "parts": ["Test message for post-leap-day"]
+          },
+          "status": "finished_successfully",
+          "metadata": {}
+        }
+      }
+    }
+  },
+  {
+    "id": "date-2024-12-31",
+    "title": "Year-end conversation",
+    "create_time": 1735689599.0,
+    "update_time": 1735689599.0,
+    "mapping": {
+      "msg4": {
+        "id": "msg4",
+        "message": {
+          "id": "msg4",
+          "author": {"role": "user"},
+          "create_time": 1735689599.0,
+          "content": {
+            "content_type": "text",
+            "parts": ["Test message for year end"]
+          },
+          "status": "finished_successfully",
+          "metadata": {}
+        }
+      }
+    }
+  },
+  {
+    "id": "date-2023-06-15",
+    "title": "Previous year conversation",
+    "create_time": 1686830400.0,
+    "update_time": 1686830400.0,
+    "mapping": {
+      "msg5": {
+        "id": "msg5",
+        "message": {
+          "id": "msg5",
+          "author": {"role": "user"},
+          "create_time": 1686830400.0,
+          "content": {
+            "content_type": "text",
+            "parts": ["Test message for previous year"]
+          },
+          "status": "finished_successfully",
+          "metadata": {}
+        }
+      }
+    }
+  }
+]

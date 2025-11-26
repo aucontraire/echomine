@@ -1238,3 +1238,488 @@ class TestCLISearchCommandContract:
             cwd=sample_cli_export.parent,
         )
         assert result_rel.returncode == 0
+
+
+# =============================================================================
+# T085-T086: CLI Contract Tests - Date Filtering (GREEN Phase)
+# =============================================================================
+
+
+@pytest.mark.contract
+class TestCLIDateFilteringContract:
+    """Contract tests for date filtering flags in search command.
+
+    Tasks: T085-T086 - Date filtering CLI contract validation
+    Phase: GREEN (tests validate existing implementation)
+
+    These tests validate the --from-date and --to-date CLI flags work correctly
+    and provide proper error handling for invalid date formats.
+
+    Contract Requirements Validated:
+    - FR-442: --from-date flag filters conversations >= from_date
+    - FR-443: --to-date flag filters conversations <= to_date
+    - CHK032: Exit codes (0=success, 2=invalid date format)
+    - ISO 8601 date format validation (YYYY-MM-DD)
+    """
+
+    def test_from_date_flag_filters_results(
+        self, cli_command: list[str], tmp_path: Path
+    ) -> None:
+        """Test --from-date flag filters conversations >= from_date (inclusive).
+
+        Validates:
+        - FR-442: --from-date flag accepts ISO 8601 date
+        - Filtering logic: only conversations >= from_date included
+        - Exit code 0 on success
+        """
+        # Create fixture with known dates
+        import json
+
+        conversations = [
+            {
+                "id": "conv-2024-01",
+                "title": "January conversation",
+                "create_time": 1704067200.0,  # 2024-01-01
+                "update_time": 1704067200.0,
+                "mapping": {
+                    "msg1": {
+                        "id": "msg1",
+                        "message": {
+                            "id": "msg1",
+                            "author": {"role": "user"},
+                            "content": {"content_type": "text", "parts": ["Test"]},
+                            "create_time": 1704067200.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": [],
+                    }
+                },
+                "moderation_results": [],
+                "current_node": "msg1",
+            },
+            {
+                "id": "conv-2024-03",
+                "title": "March conversation",
+                "create_time": 1709251200.0,  # 2024-03-01
+                "update_time": 1709251200.0,
+                "mapping": {
+                    "msg2": {
+                        "id": "msg2",
+                        "message": {
+                            "id": "msg2",
+                            "author": {"role": "user"},
+                            "content": {"content_type": "text", "parts": ["Test"]},
+                            "create_time": 1709251200.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": [],
+                    }
+                },
+                "moderation_results": [],
+                "current_node": "msg2",
+            },
+        ]
+
+        export_file = tmp_path / "date_filter_test.json"
+        with export_file.open("w") as f:
+            json.dump(conversations, f)
+
+        # Act: Search with --from-date 2024-02-01
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(export_file),
+                "--keywords",
+                "Test",
+                "--from-date",
+                "2024-02-01",
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Success
+        assert result.returncode == 0, f"Expected exit code 0, got {result.returncode}"
+
+        # Assert: Only March conversation included (>= 2024-02-01)
+        stdout = result.stdout
+        assert "March" in stdout, "March conversation should be included"
+        assert "January" not in stdout, "January conversation should be excluded"
+
+    def test_to_date_flag_filters_results(
+        self, cli_command: list[str], tmp_path: Path
+    ) -> None:
+        """Test --to-date flag filters conversations <= to_date (inclusive).
+
+        Validates:
+        - FR-443: --to-date flag accepts ISO 8601 date
+        - Filtering logic: only conversations <= to_date included
+        - Exit code 0 on success
+        """
+        # Create fixture with known dates
+        import json
+
+        conversations = [
+            {
+                "id": "conv-2024-01",
+                "title": "January conversation",
+                "create_time": 1704067200.0,  # 2024-01-01
+                "update_time": 1704067200.0,
+                "mapping": {
+                    "msg1": {
+                        "id": "msg1",
+                        "message": {
+                            "id": "msg1",
+                            "author": {"role": "user"},
+                            "content": {"content_type": "text", "parts": ["Test"]},
+                            "create_time": 1704067200.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": [],
+                    }
+                },
+                "moderation_results": [],
+                "current_node": "msg1",
+            },
+            {
+                "id": "conv-2024-12",
+                "title": "December conversation",
+                "create_time": 1733011200.0,  # 2024-12-01
+                "update_time": 1733011200.0,
+                "mapping": {
+                    "msg2": {
+                        "id": "msg2",
+                        "message": {
+                            "id": "msg2",
+                            "author": {"role": "user"},
+                            "content": {"content_type": "text", "parts": ["Test"]},
+                            "create_time": 1733011200.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": [],
+                    }
+                },
+                "moderation_results": [],
+                "current_node": "msg2",
+            },
+        ]
+
+        export_file = tmp_path / "date_filter_test.json"
+        with export_file.open("w") as f:
+            json.dump(conversations, f)
+
+        # Act: Search with --to-date 2024-06-30
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(export_file),
+                "--keywords",
+                "Test",
+                "--to-date",
+                "2024-06-30",
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Success
+        assert result.returncode == 0, f"Expected exit code 0, got {result.returncode}"
+
+        # Assert: Only January conversation included (<= 2024-06-30)
+        stdout = result.stdout
+        assert "January" in stdout, "January conversation should be included"
+        assert "December" not in stdout, "December conversation should be excluded"
+
+    def test_both_date_flags_combined(
+        self, cli_command: list[str], tmp_path: Path
+    ) -> None:
+        """Test --from-date and --to-date together create valid date range.
+
+        Validates:
+        - FR-442-443: Both flags work together (AND logic)
+        - Filtering logic: only conversations in [from_date, to_date] included
+        - Exit code 0 on success
+        """
+        # Create fixture with dates across a range
+        import json
+
+        conversations = [
+            {
+                "id": "conv-2024-01",
+                "title": "January conversation",
+                "create_time": 1704067200.0,  # 2024-01-01
+                "update_time": 1704067200.0,
+                "mapping": {
+                    "msg1": {
+                        "id": "msg1",
+                        "message": {
+                            "id": "msg1",
+                            "author": {"role": "user"},
+                            "content": {"content_type": "text", "parts": ["Test"]},
+                            "create_time": 1704067200.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": [],
+                    }
+                },
+                "moderation_results": [],
+                "current_node": "msg1",
+            },
+            {
+                "id": "conv-2024-03",
+                "title": "March conversation",
+                "create_time": 1709251200.0,  # 2024-03-01
+                "update_time": 1709251200.0,
+                "mapping": {
+                    "msg2": {
+                        "id": "msg2",
+                        "message": {
+                            "id": "msg2",
+                            "author": {"role": "user"},
+                            "content": {"content_type": "text", "parts": ["Test"]},
+                            "create_time": 1709251200.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": [],
+                    }
+                },
+                "moderation_results": [],
+                "current_node": "msg2",
+            },
+            {
+                "id": "conv-2024-12",
+                "title": "December conversation",
+                "create_time": 1733011200.0,  # 2024-12-01
+                "update_time": 1733011200.0,
+                "mapping": {
+                    "msg3": {
+                        "id": "msg3",
+                        "message": {
+                            "id": "msg3",
+                            "author": {"role": "user"},
+                            "content": {"content_type": "text", "parts": ["Test"]},
+                            "create_time": 1733011200.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": [],
+                    }
+                },
+                "moderation_results": [],
+                "current_node": "msg3",
+            },
+        ]
+
+        export_file = tmp_path / "date_range_test.json"
+        with export_file.open("w") as f:
+            json.dump(conversations, f)
+
+        # Act: Search with date range [2024-02-01, 2024-06-30]
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(export_file),
+                "--keywords",
+                "Test",
+                "--from-date",
+                "2024-02-01",
+                "--to-date",
+                "2024-06-30",
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Success
+        assert result.returncode == 0, f"Expected exit code 0, got {result.returncode}"
+
+        # Assert: Only March conversation in range
+        stdout = result.stdout
+        assert "March" in stdout, "March conversation should be in range"
+        assert "January" not in stdout, "January before range"
+        assert "December" not in stdout, "December after range"
+
+    def test_invalid_date_format_exits_with_code_2(
+        self, cli_command: list[str], tmp_path: Path
+    ) -> None:
+        """Test invalid date format (MM/DD/YYYY) returns exit code 2.
+
+        Validates:
+        - FR-086: ISO 8601 format required (YYYY-MM-DD)
+        - Exit code 2 for invalid argument format
+        - Clear error message on stderr
+        """
+        # Create minimal fixture
+        import json
+
+        export_file = tmp_path / "minimal.json"
+        with export_file.open("w") as f:
+            json.dump([], f)
+
+        # Act: Search with MM/DD/YYYY format (invalid)
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(export_file),
+                "--keywords",
+                "test",
+                "--from-date",
+                "12/31/2024",  # Invalid format
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Exit code 2 (invalid argument)
+        assert result.returncode == 2, (
+            f"Invalid date format should exit with code 2. Got {result.returncode}"
+        )
+
+        # Assert: Error message mentions date format
+        stderr = result.stderr
+        assert len(stderr) > 0, "Error message should be on stderr"
+        assert "date" in stderr.lower(), f"Error should mention date. Got: {stderr}"
+
+    def test_from_date_after_to_date_exits_with_code_2(
+        self, cli_command: list[str], tmp_path: Path
+    ) -> None:
+        """Test from_date > to_date (inverted range) returns exit code 2.
+
+        Validates:
+        - CLI validates from_date <= to_date
+        - Exit code 2 for invalid date range
+        - Clear error message on stderr
+        """
+        # Create minimal fixture
+        import json
+
+        export_file = tmp_path / "minimal.json"
+        with export_file.open("w") as f:
+            json.dump([], f)
+
+        # Act: Search with inverted date range
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(export_file),
+                "--keywords",
+                "test",
+                "--from-date",
+                "2024-12-31",
+                "--to-date",
+                "2024-01-01",  # Before from_date!
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Exit code 2 (invalid argument)
+        assert result.returncode == 2, (
+            f"Inverted date range should exit with code 2. Got {result.returncode}"
+        )
+
+        # Assert: Error message mentions date range issue
+        stderr = result.stderr
+        assert len(stderr) > 0, "Error message should be on stderr"
+        # Error should mention "from" or "to" or "range" or "after" or "before"
+        date_keywords = ["from", "to", "range", "after", "before"]
+        assert any(keyword in stderr.lower() for keyword in date_keywords), (
+            f"Error should mention date range issue. Got: {stderr}"
+        )
+
+    def test_leap_year_date_accepted(
+        self, cli_command: list[str], tmp_path: Path
+    ) -> None:
+        """Test leap year date (2024-02-29) is accepted as valid.
+
+        Validates:
+        - FR-086: Leap year dates accepted in leap years
+        - Exit code 0 on success
+        """
+        # Create minimal fixture
+        import json
+
+        export_file = tmp_path / "minimal.json"
+        with export_file.open("w") as f:
+            json.dump([], f)
+
+        # Act: Search with leap year date (Feb 29, 2024)
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(export_file),
+                "--keywords",
+                "test",
+                "--from-date",
+                "2024-02-29",  # Valid leap year date
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Exit code 0 (success - date accepted)
+        assert result.returncode == 0, (
+            f"Leap year date should be accepted. Got exit code {result.returncode}. "
+            f"stderr: {result.stderr}"
+        )
+
+    def test_invalid_leap_year_date_exits_with_code_2(
+        self, cli_command: list[str], tmp_path: Path
+    ) -> None:
+        """Test Feb 29 in non-leap year (2023-02-29) returns exit code 2.
+
+        Validates:
+        - FR-086: Invalid leap year dates rejected
+        - Exit code 2 for invalid date
+        - Clear error message on stderr
+        """
+        # Create minimal fixture
+        import json
+
+        export_file = tmp_path / "minimal.json"
+        with export_file.open("w") as f:
+            json.dump([], f)
+
+        # Act: Search with Feb 29 in non-leap year (2023)
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(export_file),
+                "--keywords",
+                "test",
+                "--from-date",
+                "2023-02-29",  # Invalid - 2023 is not a leap year
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Exit code 2 (invalid date)
+        assert result.returncode == 2, (
+            f"Invalid leap year date should exit with code 2. Got {result.returncode}"
+        )
+
+        # Assert: Error message mentions date issue
+        stderr = result.stderr
+        assert len(stderr) > 0, "Error message should be on stderr"
+        assert "date" in stderr.lower(), f"Error should mention date. Got: {stderr}"
