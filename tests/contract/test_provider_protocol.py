@@ -427,12 +427,21 @@ class TestConversationProviderSearchProtocol:
         from datetime import UTC, datetime
 
         # Create a minimal Conversation for testing
+        from echomine.models.message import Message
+
         conversation = Conversation(
             id="test-conv",
             title="Test",
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
-            messages=[],
+            messages=[
+                Message(
+                    id="msg-1",
+                    role="user",
+                    content="test",
+                    timestamp=datetime.now(UTC),
+                )
+            ],
         )
 
         result = SearchResult(
@@ -516,12 +525,21 @@ class TestSearchQueryValidation:
 
         from pydantic import ValidationError
 
+        from echomine.models.message import Message
+
         conversation = Conversation(
             id="test-conv",
             title="Test",
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
-            messages=[],
+            messages=[
+                Message(
+                    id="msg-1",
+                    role="user",
+                    content="test",
+                    timestamp=datetime.now(UTC),
+                )
+            ],
         )
 
         # Assert: score > 1.0 raises ValidationError

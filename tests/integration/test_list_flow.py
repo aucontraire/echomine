@@ -553,19 +553,19 @@ class TestListConversationsIntegration:
             list(adapter.stream_conversations(malformed_file))
 
     def test_missing_required_field_raises_validation_error(
-        self, tmp_path: Path
+        self, tmp_path: Path, caplog: Any
     ) -> None:
-        """Test that conversations missing required fields raise ValidationError.
+        """Test that conversations missing required fields are skipped with graceful degradation.
 
         Validates:
+        - FR-037: Graceful degradation (skip malformed entries)
         - FR-222-227: Pydantic validation enforces required fields
-        - Fail fast on schema violations
+        - Observability: WARNING log for skipped conversation
 
-        Expected to FAIL: ValidationError handling not implemented.
+        Updated: Graceful degradation implemented, skips invalid instead of raising.
         """
         import json
-
-        from echomine.exceptions import ValidationError
+        import logging
 
         # Arrange: Conversation missing 'title' field
         invalid_conversation = {
@@ -584,9 +584,15 @@ class TestListConversationsIntegration:
 
         adapter = OpenAIAdapter()
 
-        # Assert: Should raise ValidationError
-        with pytest.raises(ValidationError, match="title"):
-            list(adapter.stream_conversations(invalid_file))
+        # Assert: Graceful degradation - should skip malformed conversation
+        with caplog.at_level(logging.WARNING):
+            result = list(adapter.stream_conversations(invalid_file))
+
+        # No valid conversations returned
+        assert len(result) == 0
+
+        # WARNING log should mention skipped conversation
+        assert any("Skipped malformed conversation" in record.message for record in caplog.records)
 
     def test_file_not_found_raises_error(self) -> None:
         """Test that non-existent file raises FileNotFoundError.
