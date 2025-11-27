@@ -28,9 +28,11 @@ Usage:
 from __future__ import annotations
 
 import sys
+from typing import Annotated
 
 import typer
 
+from echomine import __version__
 from echomine.cli.commands.export import export_conversation
 from echomine.cli.commands.list import list_conversations
 from echomine.cli.commands.search import search_conversations
@@ -39,19 +41,51 @@ from echomine.cli.commands.search import search_conversations
 app = typer.Typer(
     name="echomine",
     help="Library-first tool for parsing AI conversation exports",
+    epilog="""Examples:
+  # List all conversations
+  echomine list export.json
+
+  # Search by keywords
+  echomine search export.json -k python,algorithm
+
+  # Filter by title and date range
+  echomine search export.json -t "Debug" --from-date 2024-01-01
+
+  # Export conversation to markdown
+  echomine export export.json <conversation-id> --output chat.md
+
+For more help: echomine COMMAND --help""",
     add_completion=False,  # Disable shell completion for simplicity
-    no_args_is_help=True,  # Show help if no command provided
+    no_args_is_help=False,  # Handled manually in callback to support --version
     pretty_exceptions_enable=False,  # Disable pretty exceptions for simpler output
     rich_markup_mode=None,  # Disable Rich markup for cleaner output
 )
 
 
-# Add callback to prevent command collapsing
+# Add callback to prevent command collapsing and handle global flags
 # This ensures "list" remains a subcommand even though it's the only command
-@app.callback()
-def callback() -> None:
+@app.callback(invoke_without_command=True)
+def callback(
+    ctx: typer.Context,
+    version: Annotated[
+        bool,
+        typer.Option(
+            "--version",
+            "-v",
+            help="Show version and exit",
+            is_eager=True,
+        ),
+    ] = False,
+) -> None:
     """Echomine CLI - Library-first tool for parsing AI conversation exports."""
-    pass
+    if version:
+        typer.echo(f"echomine version {__version__}")
+        raise typer.Exit(0)
+
+    # Show help if no command provided (unless --version was used)
+    if ctx.invoked_subcommand is None:
+        typer.echo(ctx.get_help())
+        raise typer.Exit(0)
 
 
 # Register commands

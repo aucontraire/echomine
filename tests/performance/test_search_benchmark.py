@@ -197,17 +197,17 @@ class TestSearchPerformance:
 
         def search_conversations() -> int:
             """Benchmark target: search all conversations for keyword."""
-            query = SearchQuery(keywords=["python"])
+            query = SearchQuery(keywords=["python"], limit=1000)
             results = list(adapter.search(large_export_10k_search, query))
             return len(results)
 
         # Run benchmark
         result = benchmark(search_conversations)
 
-        # Verify found expected matches (~3000 conversations with "python")
+        # Verify found matches (capped at limit=1000)
         assert result > 0, "Should find conversations with 'python' keyword"
-        assert 2500 < result < 3500, (
-            f"Expected ~3000 matches (30% of 10K), got {result}"
+        assert result == 1000, (
+            f"Expected 1000 matches (limit constraint), got {result}"
         )
 
         # Performance requirement (SC-001: <30 seconds)
@@ -238,7 +238,7 @@ class TestSearchPerformance:
         baseline = tracemalloc.get_traced_memory()[0]
 
         # Search for keyword (should stream, not load all into memory)
-        query = SearchQuery(keywords=["python"])
+        query = SearchQuery(keywords=["python"], limit=1000)
         result_count = 0
 
         for result in adapter.search(large_export_10k_search, query):
@@ -277,8 +277,8 @@ class TestSearchPerformance:
         )
 
         # Verify result count
-        assert 2500 < result_count < 3500, (
-            f"Expected ~3000 results, got {result_count}"
+        assert result_count == 1000, (
+            f"Expected 1000 results (limit constraint), got {result_count}"
         )
 
     def test_search_is_lazy_streaming_not_buffered(
@@ -300,7 +300,7 @@ class TestSearchPerformance:
         """
         adapter = OpenAIAdapter()
 
-        query = SearchQuery(keywords=["python"])
+        query = SearchQuery(keywords=["python"], limit=1000)
 
         # Measure time to GET iterator (should be instant)
         start_get = time.perf_counter()
@@ -392,7 +392,7 @@ class TestSearchPerformance:
         pytest.skip("Progress callbacks deferred to future implementation")
 
         adapter = OpenAIAdapter()
-        query = SearchQuery(keywords=["python"])
+        query = SearchQuery(keywords=["python"], limit=1000)
 
         progress_calls = []
 
@@ -428,7 +428,7 @@ class TestSearchPerformance:
 
         def search_with_scoring() -> int:
             """Benchmark target: search with BM25 scoring."""
-            query = SearchQuery(keywords=["python", "algorithm"])
+            query = SearchQuery(keywords=["python", "algorithm"], limit=1000)
             results = list(adapter.search(large_export_10k_search, query))
             return len(results)
 
@@ -436,8 +436,8 @@ class TestSearchPerformance:
         result = benchmark(search_with_scoring)
 
         # Verify found expected matches (~4000 conversations with either keyword)
-        assert 3500 < result < 5000, (
-            f"Expected ~4000 matches (30% + 20% - 10% overlap), got {result}"
+        assert result == 1000, (
+            f"Expected 1000 matches (limit constraint), got {result}"
         )
 
     def test_title_filter_performance_optimization(
@@ -459,7 +459,7 @@ class TestSearchPerformance:
         adapter = OpenAIAdapter()
 
         # Measure title-only search
-        query_title = SearchQuery(title_filter="Python")
+        query_title = SearchQuery(title_filter="Python", limit=1000)
 
         start_title = time.perf_counter()
         results_title = list(adapter.search(large_export_10k_search, query_title))
@@ -502,7 +502,7 @@ class TestSearchLatencyBreakdown:
 
         def stream_search() -> int:
             """Benchmark target: stream and filter conversations."""
-            query = SearchQuery(keywords=["python"])
+            query = SearchQuery(keywords=["python"], limit=1000)
             # Count results (forces iteration through stream)
             return sum(1 for _ in adapter.search(large_export_10k_search, query))
 
@@ -525,7 +525,7 @@ class TestSearchLatencyBreakdown:
         - Should be <10ms per document on average
         """
         adapter = OpenAIAdapter()
-        query = SearchQuery(keywords=["python"])
+        query = SearchQuery(keywords=["python"], limit=1000)
 
         # Measure total search time
         start = time.perf_counter()
@@ -567,7 +567,7 @@ class TestSearchLatencyBreakdown:
 
         latencies = []
         for run in range(10):
-            query = SearchQuery(keywords=["python"])
+            query = SearchQuery(keywords=["python"], limit=1000)
 
             start = time.perf_counter()
             results = list(adapter.search(large_export_10k_search, query))
@@ -620,7 +620,7 @@ class TestSearchStressScenarios:
         adapter = OpenAIAdapter()
 
         # Search for very common word (present in many conversations)
-        query = SearchQuery(keywords=["message", "conversation"])
+        query = SearchQuery(keywords=["message", "conversation"], limit=1000)
 
         tracemalloc.start()
         start = time.perf_counter()

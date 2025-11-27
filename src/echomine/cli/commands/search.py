@@ -38,6 +38,7 @@ Command Contract:
 
 from __future__ import annotations
 
+import sys
 import time
 from datetime import date, datetime
 from pathlib import Path
@@ -68,6 +69,51 @@ def parse_date(value: str) -> date:
         return datetime.strptime(value, "%Y-%m-%d").date()
     except ValueError as e:
         raise ValueError(f"Invalid date format. Use YYYY-MM-DD: {e}") from e
+
+
+def _build_search_suggestions(
+    keywords: Optional[list[str]],
+    title_filter: Optional[str],
+    from_date: Optional[date],
+    to_date: Optional[date],
+) -> list[str]:
+    """Build actionable suggestions for zero search results.
+
+    Args:
+        keywords: Search keywords that returned no results
+        title_filter: Title filter that returned no results
+        from_date: From date filter
+        to_date: To date filter
+
+    Returns:
+        List of suggestion strings for stderr output
+    """
+    suggestions = []
+
+    if keywords:
+        suggestions.append(
+            f"Try broader or alternate keywords: "
+            f"echomine search <file> -k {keywords[0]}"
+        )
+
+    if title_filter:
+        suggestions.append(
+            f"Try a partial title match: "
+            f"echomine search <file> -t \"{title_filter.split()[0]}\""
+        )
+
+    if from_date or to_date:
+        suggestions.append(
+            "Try expanding the date range or removing date filters"
+        )
+
+    # Always suggest listing all conversations
+    suggestions.append(
+        "List all conversations to verify file contents: "
+        "echomine list <file>"
+    )
+
+    return suggestions
 
 
 def search_conversations(
@@ -318,6 +364,27 @@ def search_conversations(
         # Apply actual limit if specified and different from query limit
         if limit is not None:
             results = results[:limit]
+
+        # Provide zero-results guidance if no matches (FR-097, TTY-aware)
+        if len(results) == 0 and sys.stderr.isatty():
+            typer.echo(
+                "No conversations matched your search criteria.",
+                err=True,
+            )
+            typer.echo("", err=True)  # Blank line for readability
+            typer.echo("Suggestions:", err=True)
+
+            suggestions = _build_search_suggestions(
+                keywords=processed_keywords,
+                title_filter=title,
+                from_date=parsed_from_date,
+                to_date=parsed_to_date,
+            )
+
+            for suggestion in suggestions:
+                typer.echo(f"  - {suggestion}", err=True)
+
+            typer.echo("", err=True)  # Blank line for readability
 
         # Format output based on requested format
         if format_lower == "json":

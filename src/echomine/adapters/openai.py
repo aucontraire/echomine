@@ -215,8 +215,11 @@ class OpenAIAdapter:
 
                 except ijson.JSONError as e:
                     # ijson.JSONError raised for malformed JSON
-                    # Convert to our ParseError for consistent error handling
-                    raise ParseError(f"Invalid JSON in export file: {e}") from e
+                    # Convert to our ParseError for consistent error handling (FR-039, FR-041)
+                    raise ParseError(
+                        f"JSON parsing failed: {e}. "
+                        f"Verify export file '{file_path}' is valid JSON from OpenAI ChatGPT."
+                    ) from e
 
         except FileNotFoundError:
             # Re-raise FileNotFoundError without wrapping
