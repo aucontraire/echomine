@@ -417,9 +417,7 @@ class TestListConversationsIntegration:
         long_title_conv = next(c for c in conversations if c.id == "conv-003")
         assert len(long_title_conv.title) > 100
 
-    def test_stream_conversations_is_lazy_iterator(
-        self, realistic_openai_export: Path
-    ) -> None:
+    def test_stream_conversations_is_lazy_iterator(self, realistic_openai_export: Path) -> None:
         """Test that streaming doesn't load entire file into memory.
 
         Validates:
@@ -435,8 +433,7 @@ class TestListConversationsIntegration:
 
         # Assert: Should be generator/iterator, not list
         assert hasattr(iterator, "__iter__") and hasattr(iterator, "__next__"), (
-            "stream_conversations must return iterator, not list "
-            "(streaming requirement)"
+            "stream_conversations must return iterator, not list (streaming requirement)"
         )
 
         # Verify we can consume it lazily
@@ -447,9 +444,7 @@ class TestListConversationsIntegration:
         assert isinstance(second, Conversation)
         assert second.id != first.id  # Different conversations
 
-    def test_empty_export_yields_no_conversations(
-        self, empty_openai_export: Path
-    ) -> None:
+    def test_empty_export_yields_no_conversations(self, empty_openai_export: Path) -> None:
         """Test that empty export file is handled gracefully.
 
         Validates:
@@ -501,9 +496,7 @@ class TestListConversationsIntegration:
         conv_002 = next(c for c in conversations if c.id == "conv-002")
         assert conv_002.message_count == 5, "conv-002 has 5 messages (multi-turn)"
 
-    def test_timestamps_are_parsed_correctly(
-        self, realistic_openai_export: Path
-    ) -> None:
+    def test_timestamps_are_parsed_correctly(self, realistic_openai_export: Path) -> None:
         """Test that Unix timestamps are converted to datetime objects.
 
         Validates:
@@ -549,7 +542,7 @@ class TestListConversationsIntegration:
         adapter = OpenAIAdapter()
 
         # Assert: Should raise ParseError
-        with pytest.raises(ParseError, match="Invalid JSON"):
+        with pytest.raises(ParseError, match="JSON parsing failed"):
             list(adapter.stream_conversations(malformed_file))
 
     def test_missing_required_field_raises_validation_error(
@@ -619,9 +612,7 @@ class TestListConversationsIntegration:
 class TestEdgeCases:
     """Edge case integration tests for list operation."""
 
-    def test_large_message_content_does_not_break_parsing(
-        self, tmp_path: Path
-    ) -> None:
+    def test_large_message_content_does_not_break_parsing(self, tmp_path: Path) -> None:
         """Test that conversations with very large messages parse correctly.
 
         Validates:

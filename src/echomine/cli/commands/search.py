@@ -42,7 +42,7 @@ import sys
 import time
 from datetime import date, datetime
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from pydantic import ValidationError as PydanticValidationError
@@ -72,10 +72,10 @@ def parse_date(value: str) -> date:
 
 
 def _build_search_suggestions(
-    keywords: Optional[list[str]],
-    title_filter: Optional[str],
-    from_date: Optional[date],
-    to_date: Optional[date],
+    keywords: list[str] | None,
+    title_filter: str | None,
+    from_date: date | None,
+    to_date: date | None,
 ) -> list[str]:
     """Build actionable suggestions for zero search results.
 
@@ -92,26 +92,19 @@ def _build_search_suggestions(
 
     if keywords:
         suggestions.append(
-            f"Try broader or alternate keywords: "
-            f"echomine search <file> -k {keywords[0]}"
+            f"Try broader or alternate keywords: echomine search <file> -k {keywords[0]}"
         )
 
     if title_filter:
         suggestions.append(
-            f"Try a partial title match: "
-            f"echomine search <file> -t \"{title_filter.split()[0]}\""
+            f'Try a partial title match: echomine search <file> -t "{title_filter.split()[0]}"'
         )
 
     if from_date or to_date:
-        suggestions.append(
-            "Try expanding the date range or removing date filters"
-        )
+        suggestions.append("Try expanding the date range or removing date filters")
 
     # Always suggest listing all conversations
-    suggestions.append(
-        "List all conversations to verify file contents: "
-        "echomine list <file>"
-    )
+    suggestions.append("List all conversations to verify file contents: echomine list <file>")
 
     return suggestions
 
@@ -129,7 +122,7 @@ def search_conversations(
         ),
     ],
     keywords: Annotated[
-        Optional[list[str]],
+        list[str] | None,
         typer.Option(
             "--keywords",
             "-k",
@@ -137,7 +130,7 @@ def search_conversations(
         ),
     ] = None,
     title: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(
             "--title",
             "-t",
@@ -145,21 +138,21 @@ def search_conversations(
         ),
     ] = None,
     from_date: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(
             "--from-date",
             help="Filter from date (YYYY-MM-DD)",
         ),
     ] = None,
     to_date: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(
             "--to-date",
             help="Filter to date (YYYY-MM-DD)",
         ),
     ] = None,
     limit: Annotated[
-        Optional[int],
+        int | None,
         typer.Option(
             "--limit",
             "-n",
@@ -269,8 +262,8 @@ def search_conversations(
             raise typer.Exit(code=2)
 
         # Parse date strings to date objects
-        parsed_from_date: Optional[date] = None
-        parsed_to_date: Optional[date] = None
+        parsed_from_date: date | None = None
+        parsed_to_date: date | None = None
 
         if from_date is not None:
             try:
@@ -314,7 +307,7 @@ def search_conversations(
         query_limit = limit if limit is not None else 1000
 
         # Handle comma-separated keywords (--keywords "alpha,beta")
-        processed_keywords: Optional[list[str]] = None
+        processed_keywords: list[str] | None = None
         if keywords:
             processed_keywords = []
             for kw in keywords:
@@ -390,7 +383,9 @@ def search_conversations(
         if format_lower == "json":
             # FR-301-306: Pass metadata to JSON formatter
             # Convert dates to ISO 8601 format for metadata
-            query_from_date_str = parsed_from_date.strftime("%Y-%m-%d") if parsed_from_date else None
+            query_from_date_str = (
+                parsed_from_date.strftime("%Y-%m-%d") if parsed_from_date else None
+            )
             query_to_date_str = parsed_to_date.strftime("%Y-%m-%d") if parsed_to_date else None
 
             output = format_search_results_json(

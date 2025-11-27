@@ -17,7 +17,6 @@ Fixture Naming Convention:
 """
 
 import json
-import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -111,9 +110,7 @@ def sample_export_data(sample_conversation_data: dict[str, Any]) -> list[dict[st
 
 
 @pytest.fixture
-def tmp_export_file(
-    tmp_path: Path, sample_export_data: list[dict[str, Any]]
-) -> Path:
+def tmp_export_file(tmp_path: Path, sample_export_data: list[dict[str, Any]]) -> Path:
     """Create a temporary OpenAI export JSON file.
 
     Args:
@@ -165,8 +162,8 @@ def tmp_large_export_file(tmp_path: Path) -> Path:
         messages_mapping = {}
         for j in range(10):
             msg_id = f"msg-{i}-{j}"
-            parent_id = f"msg-{i}-{j-1}" if j > 0 else None
-            children_ids = [f"msg-{i}-{j+1}"] if j < 9 else []
+            parent_id = f"msg-{i}-{j - 1}" if j > 0 else None
+            children_ids = [f"msg-{i}-{j + 1}"] if j < 9 else []
 
             messages_mapping[msg_id] = {
                 "id": msg_id,
@@ -228,12 +225,6 @@ def pytest_configure(config: pytest.Config) -> None:
     Registers test markers for different test categories.
     """
     config.addinivalue_line("markers", "unit: Unit tests for individual components")
-    config.addinivalue_line(
-        "markers", "integration: Integration tests for end-to-end workflows"
-    )
-    config.addinivalue_line(
-        "markers", "contract: Contract tests for protocols and interfaces"
-    )
-    config.addinivalue_line(
-        "markers", "performance: Performance benchmarks and stress tests"
-    )
+    config.addinivalue_line("markers", "integration: Integration tests for end-to-end workflows")
+    config.addinivalue_line("markers", "contract: Contract tests for protocols and interfaces")
+    config.addinivalue_line("markers", "performance: Performance benchmarks and stress tests")

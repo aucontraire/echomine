@@ -12,4 +12,5 @@ Constitution Compliance:
 from echomine.cli.commands.list import list_conversations
 from echomine.cli.commands.search import search_conversations
 
+
 __all__ = ["list_conversations", "search_conversations"]

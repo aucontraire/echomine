@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -46,17 +46,17 @@ class ImageRef(BaseModel):
         default="image_asset_pointer",
         description="Type discriminator for image references",
     )
-    size_bytes: Optional[int] = Field(
+    size_bytes: int | None = Field(
         default=None,
         ge=0,
         description="Image file size in bytes",
     )
-    width: Optional[int] = Field(
+    width: int | None = Field(
         default=None,
         ge=1,
         description="Image width in pixels",
     )
-    height: Optional[int] = Field(
+    height: int | None = Field(
         default=None,
         ge=1,
         description="Image height in pixels",

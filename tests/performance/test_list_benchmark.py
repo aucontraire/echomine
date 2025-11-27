@@ -26,7 +26,6 @@ Fixtures Required:
 - Generated via tests/fixtures/generate_large_export.py
 """
 
-import sys
 import time
 import tracemalloc
 from pathlib import Path
@@ -37,8 +36,6 @@ import pytest
 from echomine.adapters.openai import OpenAIAdapter
 from echomine.constants import (
     MAX_BATCH_SIZE,
-    MAX_CONVERSATION_OVERHEAD,
-    MAX_PARSER_STATE_MEMORY,
     PROGRESS_UPDATE_INTERVAL,
     TARGET_WORKING_SET,
 )
@@ -74,8 +71,8 @@ def large_export_10k(tmp_path_factory: pytest.TempPathFactory) -> Path:
         messages_mapping = {}
         for j in range(5):
             msg_id = f"msg-{i:05d}-{j}"
-            parent_id = f"msg-{i:05d}-{j-1}" if j > 0 else None
-            children_ids = [f"msg-{i:05d}-{j+1}"] if j < 4 else []
+            parent_id = f"msg-{i:05d}-{j - 1}" if j > 0 else None
+            children_ids = [f"msg-{i:05d}-{j + 1}"] if j < 4 else []
 
             messages_mapping[msg_id] = {
                 "id": msg_id,
@@ -182,9 +179,7 @@ class TestListPerformance:
         # pytest-benchmark reports stats after test completion
         # Manual verification: Check benchmark table output shows mean <5.0s
 
-    def test_streaming_memory_efficiency_10k_conversations(
-        self, large_export_10k: Path
-    ) -> None:
+    def test_streaming_memory_efficiency_10k_conversations(self, large_export_10k: Path) -> None:
         """Measure memory usage during streaming (SC-001: <1GB).
 
         Validates:
@@ -214,10 +209,7 @@ class TestListPerformance:
             if conversation_count % 1000 == 0:
                 current, peak = tracemalloc.get_traced_memory()
                 memory_mb = (current - baseline) / (1024 * 1024)
-                print(
-                    f"[{conversation_count:5d} conversations] "
-                    f"Memory: {memory_mb:.2f} MB"
-                )
+                print(f"[{conversation_count:5d} conversations] Memory: {memory_mb:.2f} MB")
 
         # Get final memory stats
         current, peak = tracemalloc.get_traced_memory()
@@ -226,7 +218,7 @@ class TestListPerformance:
         final_memory_mb = (current - baseline) / (1024 * 1024)
         peak_memory_mb = (peak - baseline) / (1024 * 1024)
 
-        print(f"\nMemory Profile:")
+        print("\nMemory Profile:")
         print(f"  Final: {final_memory_mb:.2f} MB")
         print(f"  Peak:  {peak_memory_mb:.2f} MB")
         print(f"  Conversations: {conversation_count:,}")
@@ -292,8 +284,7 @@ class TestListPerformance:
         # Ratio validation: consuming should take >>100x longer than getting
         ratio = (time_to_consume_s * 1000) / time_to_get_ms
         assert ratio > 10, (
-            f"Consume/get ratio is {ratio:.1f}x. Expected >10x, "
-            f"indicating lazy streaming."
+            f"Consume/get ratio is {ratio:.1f}x. Expected >10x, indicating lazy streaming."
         )
 
     @pytest.mark.skip(reason="Progress callbacks deferred to future implementation (CHK043)")
@@ -330,8 +321,7 @@ class TestListPerformance:
 
         # Verify incremental counts
         assert progress_tracker[0] >= PROGRESS_UPDATE_INTERVAL, (
-            f"First progress should be at {PROGRESS_UPDATE_INTERVAL}, "
-            f"got {progress_tracker[0]}"
+            f"First progress should be at {PROGRESS_UPDATE_INTERVAL}, got {progress_tracker[0]}"
         )
         assert progress_tracker[-1] == 10000, (
             f"Final progress should be 10000, got {progress_tracker[-1]}"
@@ -380,8 +370,7 @@ class TestListPerformance:
             # Coefficient of variation should be low (consistent batching)
             cv = stddev_interval / mean_interval
             assert cv < 1.0, (
-                f"Yield intervals vary too much (CV={cv:.2f}), "
-                f"suggests inconsistent batching"
+                f"Yield intervals vary too much (CV={cv:.2f}), suggests inconsistent batching"
             )
 
 
@@ -397,9 +386,7 @@ class TestLatencyBreakdown:
     - Performance monitoring infrastructure not in place
     """
 
-    def test_json_parsing_latency(
-        self, large_export_10k: Path, benchmark: Any
-    ) -> None:
+    def test_json_parsing_latency(self, large_export_10k: Path, benchmark: Any) -> None:
         """Benchmark raw JSON parsing (ijson) latency.
 
         Validates:
@@ -423,9 +410,7 @@ class TestLatencyBreakdown:
 
         # Performance stats reported by pytest-benchmark table output
 
-    def test_model_transformation_latency(
-        self, large_export_10k: Path, benchmark: Any
-    ) -> None:
+    def test_model_transformation_latency(self, large_export_10k: Path, benchmark: Any) -> None:
         """Benchmark Pydantic model transformation latency.
 
         Validates:
@@ -478,7 +463,7 @@ class TestLatencyBreakdown:
         p95 = latencies_sorted[int(len(latencies_sorted) * 0.95)]
         p99 = latencies_sorted[int(len(latencies_sorted) * 0.99)]
 
-        print(f"\nLatency Percentiles (10 runs):")
+        print("\nLatency Percentiles (10 runs):")
         print(f"  P50 (median): {p50:.3f}s")
         print(f"  P95:          {p95:.3f}s")
         print(f"  P99:          {p99:.3f}s")
@@ -567,7 +552,7 @@ class TestStressScenarios:
         current, peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
 
-        print(f"\n50K Stress Test Results:")
+        print("\n50K Stress Test Results:")
         print(f"  Time: {elapsed:.2f}s")
         print(f"  Peak Memory: {peak / (1024 * 1024):.2f} MB")
         print(f"  Throughput: {50000 / elapsed:.0f} conversations/s")

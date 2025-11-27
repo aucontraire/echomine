@@ -269,7 +269,7 @@ class TestExportIntegrationFlow:
 
         # Act: Find conversation by title
         # (Implementation will need to scan JSON for matching title)
-        with open(integration_export_file, "r") as f:
+        with open(integration_export_file) as f:
             data = json.load(f)
             found_conv = None
             for conv in data:
@@ -283,16 +283,12 @@ class TestExportIntegrationFlow:
 
         # Export using ID (once title lookup is working)
         exporter = MarkdownExporter()
-        markdown = exporter.export_conversation(
-            integration_export_file, found_conv["id"]
-        )
+        markdown = exporter.export_conversation(integration_export_file, found_conv["id"])
 
         # Verify export
         assert "async/await" in markdown, "Should export correct conversation"
 
-    def test_export_conversation_to_stdout(
-        self, integration_export_file: Path
-    ) -> None:
+    def test_export_conversation_to_stdout(self, integration_export_file: Path) -> None:
         """Test export to stdout (no file writing).
 
         Validates:
@@ -454,9 +450,7 @@ class TestExportLibraryIntegration:
     as a library API (not just CLI).
     """
 
-    def test_export_uses_markdown_exporter_class(
-        self, integration_export_file: Path
-    ) -> None:
+    def test_export_uses_markdown_exporter_class(self, integration_export_file: Path) -> None:
         """Test that export functionality uses MarkdownExporter class.
 
         Validates:
@@ -473,22 +467,16 @@ class TestExportLibraryIntegration:
 
         # Assert: Instance created successfully
         assert exporter is not None, "Should create MarkdownExporter instance"
-        assert hasattr(exporter, "export_conversation"), (
-            "Should have export_conversation method"
-        )
+        assert hasattr(exporter, "export_conversation"), "Should have export_conversation method"
 
         # Act: Use exporter
-        markdown = exporter.export_conversation(
-            integration_export_file, "integ-conv-001"
-        )
+        markdown = exporter.export_conversation(integration_export_file, "integ-conv-001")
 
         # Assert: Returns markdown string
         assert isinstance(markdown, str), "Should return markdown string"
         assert len(markdown) > 0, "Should not be empty"
 
-    def test_export_streams_efficiently_for_large_files(
-        self, tmp_path: Path
-    ) -> None:
+    def test_export_streams_efficiently_for_large_files(self, tmp_path: Path) -> None:
         """Test that export is memory-efficient for large export files.
 
         Validates:
@@ -585,7 +573,7 @@ class TestSearchThenExportWorkflow:
         # 3. Pass conversation_id to export command
 
         # For now, just verify we can get conversation IDs from file
-        with open(integration_export_file, "r") as f:
+        with open(integration_export_file) as f:
             data = json.load(f)
             conversation_ids = [conv["id"] for conv in data]
 

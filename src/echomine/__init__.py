@@ -71,6 +71,7 @@ from echomine.models.message import Message
 from echomine.models.protocols import ConversationProvider
 from echomine.models.search import SearchQuery, SearchResult
 
+
 # T063: __all__ defines public API surface for library consumers
 __all__: list[str] = [
     # Version metadata

@@ -12,7 +12,7 @@ Constitution Compliance:
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -99,7 +99,7 @@ class Conversation(BaseModel):
         ...,
         description="Conversation creation timestamp (timezone-aware UTC, REQUIRED)",
     )
-    updated_at: Optional[datetime] = Field(
+    updated_at: datetime | None = Field(
         default=None,
         description="Last modification timestamp (timezone-aware UTC, defaults to created_at if null)",
     )
@@ -142,7 +142,7 @@ class Conversation(BaseModel):
 
     @field_validator("updated_at")
     @classmethod
-    def validate_updated_at_timezone_aware(cls, v: Optional[datetime], info: Any) -> Optional[datetime]:
+    def validate_updated_at_timezone_aware(cls, v: datetime | None, info: Any) -> datetime | None:
         """Ensure updated_at is timezone-aware and >= created_at (if provided).
 
         Args:
@@ -238,7 +238,7 @@ class Conversation(BaseModel):
 
     # Tree Navigation Methods (per FR-278, FR-280)
 
-    def get_message_by_id(self, message_id: str) -> Optional[Message]:
+    def get_message_by_id(self, message_id: str) -> Message | None:
         """Find message by ID.
 
         Args:
@@ -327,9 +327,7 @@ class Conversation(BaseModel):
 
         while current:
             thread.insert(0, current)  # Prepend (oldest first)
-            current = (
-                self.get_message_by_id(current.parent_id) if current.parent_id else None
-            )
+            current = self.get_message_by_id(current.parent_id) if current.parent_id else None
 
         return thread
 

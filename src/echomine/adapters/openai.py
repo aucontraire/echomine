@@ -47,14 +47,15 @@ Performance Targets (T028):
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator, Literal, Optional
+from typing import Any, Literal
 
 import ijson
 from pydantic import ValidationError as PydanticValidationError
 
-from echomine.exceptions import ParseError, ValidationError
+from echomine.exceptions import ParseError
 from echomine.models.conversation import Conversation
 from echomine.models.image import ImageRef
 from echomine.models.message import Message
@@ -62,8 +63,6 @@ from echomine.models.protocols import OnSkipCallback, ProgressCallback
 from echomine.models.search import SearchQuery, SearchResult
 from echomine.search.ranking import BM25Scorer
 
-if TYPE_CHECKING:
-    from decimal import Decimal
 
 # Module logger for operational visibility
 logger = logging.getLogger(__name__)
@@ -118,8 +117,8 @@ class OpenAIAdapter:
         self,
         file_path: Path,
         *,
-        progress_callback: Optional[ProgressCallback] = None,
-        on_skip: Optional[OnSkipCallback] = None,
+        progress_callback: ProgressCallback | None = None,
+        on_skip: OnSkipCallback | None = None,
     ) -> Iterator[Conversation]:
         """Stream conversations from OpenAI export file with O(1) memory.
 
@@ -231,8 +230,8 @@ class OpenAIAdapter:
         file_path: Path,
         query: SearchQuery,
         *,
-        progress_callback: Optional[ProgressCallback] = None,
-        on_skip: Optional[OnSkipCallback] = None,
+        progress_callback: ProgressCallback | None = None,
+        on_skip: OnSkipCallback | None = None,
     ) -> Iterator[SearchResult[Conversation]]:
         """Search conversations with BM25 relevance ranking.
 
@@ -303,9 +302,7 @@ class OpenAIAdapter:
                     continue
 
             # Build corpus text (title + all message content)
-            conv_text = f"{conv.title} " + " ".join(
-                m.content for m in conv.messages
-            )
+            conv_text = f"{conv.title} " + " ".join(m.content for m in conv.messages)
 
             conversations.append(conv)
             corpus_texts.append(conv_text)
@@ -325,14 +322,11 @@ class OpenAIAdapter:
         def tokenize_for_length(text: str) -> int:
             """Count tokens using same method as BM25Scorer."""
             text_lower = text.lower()
-            count = len(re.findall(r'[a-z0-9]+', text_lower))
-            count += len(re.findall(r'[^\W\d_a-z]', text_lower))
+            count = len(re.findall(r"[a-z0-9]+", text_lower))
+            count += len(re.findall(r"[^\W\d_a-z]", text_lower))
             return count
 
-        avg_doc_length = (
-            sum(tokenize_for_length(text) for text in corpus_texts)
-            / len(corpus_texts)
-        )
+        avg_doc_length = sum(tokenize_for_length(text) for text in corpus_texts) / len(corpus_texts)
 
         # Initialize BM25 scorer
         scorer = BM25Scorer(corpus=corpus_texts, avg_doc_length=avg_doc_length)
@@ -347,9 +341,7 @@ class OpenAIAdapter:
                 score = scorer.score(conv_text, query.keywords)
 
                 # Track which messages contain keyword matches
-                matched_message_ids = self._find_matched_messages(
-                    conv, query.keywords
-                )
+                matched_message_ids = self._find_matched_messages(conv, query.keywords)
 
                 # Skip conversations with no matches (score = 0)
                 if score == 0.0:
@@ -392,7 +384,7 @@ class OpenAIAdapter:
         self,
         file_path: Path,
         conversation_id: str,
-    ) -> Optional[Conversation]:
+    ) -> Conversation | None:
         """Retrieve specific conversation by UUID (FR-155, FR-217, FR-356).
 
         Uses streaming search for memory efficiency - O(N) time, O(1) memory.
@@ -435,9 +427,7 @@ class OpenAIAdapter:
         # Not found - return None per FR-155
         return None
 
-    def _find_matched_messages(
-        self, conversation: Conversation, keywords: list[str]
-    ) -> list[str]:
+    def _find_matched_messages(self, conversation: Conversation, keywords: list[str]) -> list[str]:
         """Find message IDs containing any of the keywords.
 
         Uses word-boundary matching to find keywords as complete tokens,
@@ -469,9 +459,9 @@ class OpenAIAdapter:
         for keyword in keywords:
             kw_lower = keyword.lower()
             # Latin tokens
-            keyword_tokens.extend(re.findall(r'[a-z0-9]+', kw_lower))
+            keyword_tokens.extend(re.findall(r"[a-z0-9]+", kw_lower))
             # Non-Latin tokens (CJK characters)
-            keyword_tokens.extend(re.findall(r'[^\W\d_a-z]', kw_lower))
+            keyword_tokens.extend(re.findall(r"[^\W\d_a-z]", kw_lower))
 
         for message in conversation.messages:
             # Tokenize message content using same method as BM25Scorer
@@ -479,9 +469,9 @@ class OpenAIAdapter:
             message_tokens: list[str] = []
 
             # Latin tokens
-            message_tokens.extend(re.findall(r'[a-z0-9]+', content_lower))
+            message_tokens.extend(re.findall(r"[a-z0-9]+", content_lower))
             # Non-Latin tokens (CJK characters)
-            message_tokens.extend(re.findall(r'[^\W\d_a-z]', content_lower))
+            message_tokens.extend(re.findall(r"[^\W\d_a-z]", content_lower))
 
             # Check if any keyword token is in the message tokens
             if any(kw_token in message_tokens for kw_token in keyword_tokens):
@@ -512,9 +502,7 @@ class OpenAIAdapter:
         """
         # Extract messages from mapping structure
         # Memory: O(N) - creates list of N messages
-        messages = self._extract_messages_from_mapping(
-            raw_data.get("mapping", {})
-        )
+        messages = self._extract_messages_from_mapping(raw_data.get("mapping", {}))
 
         # Validate required fields exist before attempting conversion
         # Missing fields will cause KeyError, which we catch and re-raise as PydanticValidationError
@@ -565,10 +553,8 @@ class OpenAIAdapter:
         created_at = datetime.fromtimestamp(float(create_time), tz=UTC)
 
         # Handle optional updated_at - None is valid (conversation never updated)
-        updated_at: Optional[datetime] = (
-            datetime.fromtimestamp(float(update_time), tz=UTC)
-            if update_time is not None
-            else None
+        updated_at: datetime | None = (
+            datetime.fromtimestamp(float(update_time), tz=UTC) if update_time is not None else None
         )
 
         # Build Conversation model (Pydantic validation automatic)
@@ -585,9 +571,7 @@ class OpenAIAdapter:
             },
         )
 
-    def _extract_messages_from_mapping(
-        self, mapping: dict[str, Any]
-    ) -> list[Message]:
+    def _extract_messages_from_mapping(self, mapping: dict[str, Any]) -> list[Message]:
         """Extract messages from OpenAI mapping tree structure.
 
         OpenAI stores messages in a dict-based tree where:
@@ -627,9 +611,7 @@ class OpenAIAdapter:
             except (KeyError, ValueError, PydanticValidationError) as e:
                 # Graceful degradation: skip malformed messages
                 # FR-281: Log and continue instead of failing
-                logger.warning(
-                    f"Skipping malformed message in node {node_id}: {e}"
-                )
+                logger.warning(f"Skipping malformed message in node {node_id}: {e}")
                 continue
 
         # Sort messages chronologically
@@ -638,9 +620,7 @@ class OpenAIAdapter:
 
         return messages
 
-    def _parse_message(
-        self, message_data: dict[str, Any], node_data: dict[str, Any]
-    ) -> Message:
+    def _parse_message(self, message_data: dict[str, Any], node_data: dict[str, Any]) -> Message:
         """Parse OpenAI message dict to Message model.
 
         Handles nested OpenAI structure:
@@ -687,14 +667,20 @@ class OpenAIAdapter:
             elif content_type == "text":
                 # Standard text message - extract from parts array
                 content_parts = content_data.get("parts", [])
-                content = content_parts[0] if content_parts and isinstance(content_parts[0], str) else ""
+                content = (
+                    content_parts[0] if content_parts and isinstance(content_parts[0], str) else ""
+                )
             elif content_type in ("image_asset_pointer", "image"):
                 # Image message - use placeholder text
                 content = "[Image]"
             elif content_type == "code":
                 # Code message - extract from parts if available
                 content_parts = content_data.get("parts", [])
-                content = content_parts[0] if content_parts and isinstance(content_parts[0], str) else "[Code]"
+                content = (
+                    content_parts[0]
+                    if content_parts and isinstance(content_parts[0], str)
+                    else "[Code]"
+                )
             else:
                 # Unknown content type - use placeholder
                 content = f"[{content_type}]"
@@ -758,9 +744,7 @@ class OpenAIAdapter:
         # Default unknown roles to assistant
         return role_mapping.get(raw_role, "assistant")
 
-    def _parse_multimodal_parts(
-        self, parts: list[Any]
-    ) -> tuple[str, list[ImageRef]]:
+    def _parse_multimodal_parts(self, parts: list[Any]) -> tuple[str, list[ImageRef]]:
         """Extract text and images from multimodal_text content parts.
 
         OpenAI's multimodal_text content contains mixed text and image_asset_pointer
@@ -832,9 +816,7 @@ class OpenAIAdapter:
                             images.append(image_ref)
                     except (KeyError, PydanticValidationError) as e:
                         # Skip malformed image references (graceful degradation)
-                        logger.warning(
-                            f"Skipping malformed image_asset_pointer: {e}"
-                        )
+                        logger.warning(f"Skipping malformed image_asset_pointer: {e}")
                         continue
                 else:
                     # Other dict types - skip or log

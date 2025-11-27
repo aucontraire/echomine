@@ -29,7 +29,7 @@ from __future__ import annotations
 import math
 import re
 from collections import Counter
-from typing import Counter as CounterType
+from collections import Counter as CounterType
 
 
 class BM25Scorer:
@@ -124,12 +124,12 @@ class BM25Scorer:
         tokens: list[str] = []
 
         # Match Latin alphanumeric sequences
-        for match in re.finditer(r'[a-z0-9]+', text_lower):
+        for match in re.finditer(r"[a-z0-9]+", text_lower):
             tokens.append(match.group())
 
         # Match non-Latin word characters (one at a time for CJK)
         # This allows matching "python" in "python很适合初学者"
-        for match in re.finditer(r'[^\W\d_a-z]', text_lower):
+        for match in re.finditer(r"[^\W\d_a-z]", text_lower):
             tokens.append(match.group())
 
         return tokens

@@ -43,6 +43,18 @@ htmlcov/
 *.log
 logs/
 
+# MkDocs generated site
+site/
+
+# Benchmarks and performance data
+.benchmarks/
+performance_baselines.json
+
+# Temporary validation/audit reports
+*_VALIDATION*.md
+*_AUDIT*.md
+*_SUMMARY.txt
+
 # Environment & secrets
 .env
 .env.*

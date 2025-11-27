@@ -26,7 +26,6 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -211,6 +210,7 @@ class TestCLIListCommandContract:
         # Act: Run 'echomine list <file>'
         result = subprocess.run(
             [*cli_command, "list", str(sample_cli_export)],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -247,6 +247,7 @@ class TestCLIListCommandContract:
 
         result = subprocess.run(
             [*cli_command, "list", str(sample_cli_export)],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -261,9 +262,7 @@ class TestCLIListCommandContract:
                 "Progress MUST go to stderr per CHK031"
             )
 
-    def test_exit_code_0_on_success(
-        self, cli_command: list[str], sample_cli_export: Path
-    ) -> None:
+    def test_exit_code_0_on_success(self, cli_command: list[str], sample_cli_export: Path) -> None:
         """Test that successful execution returns exit code 0.
 
         Validates:
@@ -273,6 +272,7 @@ class TestCLIListCommandContract:
         """
         result = subprocess.run(
             [*cli_command, "list", str(sample_cli_export)],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -295,6 +295,7 @@ class TestCLIListCommandContract:
 
         result = subprocess.run(
             [*cli_command, "list", non_existent_file],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -323,6 +324,7 @@ class TestCLIListCommandContract:
         # Missing required file argument
         result = subprocess.run(
             [*cli_command, "list"],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -336,9 +338,7 @@ class TestCLIListCommandContract:
         stderr = result.stderr
         assert len(stderr) > 0, "Usage/error message should be on stderr"
 
-    def test_exit_code_1_on_invalid_json(
-        self, cli_command: list[str], tmp_path: Path
-    ) -> None:
+    def test_exit_code_1_on_invalid_json(self, cli_command: list[str], tmp_path: Path) -> None:
         """Test that malformed JSON returns exit code 1.
 
         Validates:
@@ -353,6 +353,7 @@ class TestCLIListCommandContract:
 
         result = subprocess.run(
             [*cli_command, "list", str(malformed_file)],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -379,6 +380,7 @@ class TestCLIListCommandContract:
         """
         result = subprocess.run(
             [*cli_command, "list", str(sample_cli_export)],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -389,9 +391,9 @@ class TestCLIListCommandContract:
         # Based on CHK040 resolution: simple text table format
         assert "ID" in stdout or "id" in stdout, "Header should include ID column"
         assert "Title" in stdout or "title" in stdout, "Header should include Title"
-        assert (
-            "Messages" in stdout or "messages" in stdout or "Message" in stdout
-        ), "Header should include message count"
+        assert "Messages" in stdout or "messages" in stdout or "Message" in stdout, (
+            "Header should include message count"
+        )
 
         # Verify conversation data is present
         assert "cli-conv-001" in stdout
@@ -411,6 +413,7 @@ class TestCLIListCommandContract:
         # Test 1: Pipe to head (get first N lines)
         head_proc = subprocess.run(
             f"{' '.join(cli_command)} list {sample_cli_export} | head -n 5",
+            check=False,
             shell=True,
             capture_output=True,
             text=True,
@@ -421,6 +424,7 @@ class TestCLIListCommandContract:
         # Test 2: Pipe to grep (filter output)
         grep_proc = subprocess.run(
             f"{' '.join(cli_command)} list {sample_cli_export} | grep 'Alpha'",
+            check=False,
             shell=True,
             capture_output=True,
             text=True,
@@ -431,6 +435,7 @@ class TestCLIListCommandContract:
         # Test 3: Pipe to wc (count lines)
         wc_proc = subprocess.run(
             f"{' '.join(cli_command)} list {sample_cli_export} | wc -l",
+            check=False,
             shell=True,
             capture_output=True,
             text=True,
@@ -439,9 +444,7 @@ class TestCLIListCommandContract:
         line_count = int(wc_proc.stdout.strip())
         assert line_count > 0, "Should have output lines"
 
-    def test_json_output_format_flag(
-        self, cli_command: list[str], sample_cli_export: Path
-    ) -> None:
+    def test_json_output_format_flag(self, cli_command: list[str], sample_cli_export: Path) -> None:
         """Test that --format json produces valid JSON output.
 
         Validates:
@@ -452,6 +455,7 @@ class TestCLIListCommandContract:
         """
         result = subprocess.run(
             [*cli_command, "list", str(sample_cli_export), "--format", "json"],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -495,6 +499,7 @@ class TestCLIListCommandContract:
 
         result = subprocess.run(
             [*cli_command, "list", str(empty_file)],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -504,9 +509,9 @@ class TestCLIListCommandContract:
 
         # Assert: Output indicates zero conversations
         stdout = result.stdout
-        assert (
-            "0" in stdout or "no conversations" in stdout.lower() or len(stdout) < 100
-        ), "Should indicate zero conversations"
+        assert "0" in stdout or "no conversations" in stdout.lower() or len(stdout) < 100, (
+            "Should indicate zero conversations"
+        )
 
     def test_help_flag_displays_usage(self, cli_command: list[str]) -> None:
         """Test that --help flag displays usage information.
@@ -519,6 +524,7 @@ class TestCLIListCommandContract:
         """
         result = subprocess.run(
             [*cli_command, "list", "--help"],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -587,6 +593,7 @@ class TestCLIContractEdgeCases:
 
         result = subprocess.run(
             [*cli_command, "list", str(unicode_file)],
+            check=False,
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -610,6 +617,7 @@ class TestCLIContractEdgeCases:
         # Test 1: Absolute path
         result_abs = subprocess.run(
             [*cli_command, "list", str(sample_cli_export.absolute())],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -618,15 +626,14 @@ class TestCLIContractEdgeCases:
         # Test 2: Relative path (from parent directory)
         result_rel = subprocess.run(
             [*cli_command, "list", str(sample_cli_export)],
+            check=False,
             capture_output=True,
             text=True,
             cwd=sample_cli_export.parent,
         )
         assert result_rel.returncode == 0
 
-    def test_permission_denied_error_handling(
-        self, cli_command: list[str], tmp_path: Path
-    ) -> None:
+    def test_permission_denied_error_handling(self, cli_command: list[str], tmp_path: Path) -> None:
         """Test that permission denied errors are handled gracefully.
 
         Validates:
@@ -656,6 +663,7 @@ class TestCLIContractEdgeCases:
         try:
             result = subprocess.run(
                 [*cli_command, "list", str(no_read_file)],
+                check=False,
                 capture_output=True,
                 text=True,
             )
@@ -709,6 +717,7 @@ class TestCLISearchCommandContract:
         # Act: Run 'echomine search <file> --keywords "alpha"'
         result = subprocess.run(
             [*cli_command, "search", str(sample_cli_export), "--keywords", "alpha"],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -746,6 +755,7 @@ class TestCLISearchCommandContract:
                 "--keywords",
                 "alpha,beta",
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -773,6 +783,7 @@ class TestCLISearchCommandContract:
         # Act: Run 'echomine search <file> --title "Alpha"'
         result = subprocess.run(
             [*cli_command, "search", str(sample_cli_export), "--title", "Alpha"],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -806,6 +817,7 @@ class TestCLISearchCommandContract:
                 "--title",
                 "Alpha",
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -839,6 +851,7 @@ class TestCLISearchCommandContract:
                 "--limit",
                 "1",
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -872,6 +885,7 @@ class TestCLISearchCommandContract:
                 "alpha",
                 "--json",
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -912,7 +926,9 @@ class TestCLISearchCommandContract:
         metadata = data["metadata"]
         assert "query" in metadata, "Metadata should have query field (FR-303)"
         assert "total_results" in metadata, "Metadata should have total_results (FR-303)"
-        assert "skipped_conversations" in metadata, "Metadata should have skipped_conversations (FR-303)"
+        assert "skipped_conversations" in metadata, (
+            "Metadata should have skipped_conversations (FR-303)"
+        )
         assert "elapsed_seconds" in metadata, "Metadata should have elapsed_seconds (FR-303)"
 
         # Assert: Query metadata structure
@@ -944,6 +960,7 @@ class TestCLISearchCommandContract:
                 "alpha",
                 "--quiet",
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -976,6 +993,7 @@ class TestCLISearchCommandContract:
         # Act: Run search command
         result = subprocess.run(
             [*cli_command, "search", str(sample_cli_export), "--keywords", "alpha"],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1001,6 +1019,7 @@ class TestCLISearchCommandContract:
         """
         result = subprocess.run(
             [*cli_command, "search", str(sample_cli_export), "--keywords", "alpha"],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1030,6 +1049,7 @@ class TestCLISearchCommandContract:
                 "--keywords",
                 "zzzzznonexistent",
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1041,13 +1061,11 @@ class TestCLISearchCommandContract:
 
         # Assert: Output indicates zero results
         stdout = result.stdout
-        assert (
-            "0" in stdout or "no results" in stdout.lower() or len(stdout) < 100
-        ), "Should indicate zero results"
+        assert "0" in stdout or "no results" in stdout.lower() or len(stdout) < 100, (
+            "Should indicate zero results"
+        )
 
-    def test_search_command_exit_code_1_on_file_not_found(
-        self, cli_command: list[str]
-    ) -> None:
+    def test_search_command_exit_code_1_on_file_not_found(self, cli_command: list[str]) -> None:
         """Test that missing file returns exit code 1.
 
         Validates:
@@ -1059,6 +1077,7 @@ class TestCLISearchCommandContract:
 
         result = subprocess.run(
             [*cli_command, "search", non_existent_file, "--keywords", "test"],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1087,6 +1106,7 @@ class TestCLISearchCommandContract:
         # Act: Search without any filter flags
         result = subprocess.run(
             [*cli_command, "search", str(sample_cli_export)],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1130,6 +1150,7 @@ class TestCLISearchCommandContract:
         """
         result = subprocess.run(
             [*cli_command, "search", "--help"],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1157,8 +1178,8 @@ class TestCLISearchCommandContract:
         """
         # Test 1: Pipe search output to grep
         grep_proc = subprocess.run(
-            f"{' '.join(cli_command)} search {sample_cli_export} "
-            f"--keywords 'alpha' | grep 'Alpha'",
+            f"{' '.join(cli_command)} search {sample_cli_export} --keywords 'alpha' | grep 'Alpha'",
+            check=False,
             shell=True,
             capture_output=True,
             text=True,
@@ -1168,8 +1189,8 @@ class TestCLISearchCommandContract:
 
         # Test 2: Pipe to head
         head_proc = subprocess.run(
-            f"{' '.join(cli_command)} search {sample_cli_export} "
-            f"--keywords 'test' | head -n 3",
+            f"{' '.join(cli_command)} search {sample_cli_export} --keywords 'test' | head -n 3",
+            check=False,
             shell=True,
             capture_output=True,
             text=True,
@@ -1189,6 +1210,7 @@ class TestCLISearchCommandContract:
         """
         result = subprocess.run(
             [*cli_command, "search", str(sample_cli_export), "--keywords", "alpha"],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1225,6 +1247,7 @@ class TestCLISearchCommandContract:
                 "--keywords",
                 "alpha",
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1233,6 +1256,7 @@ class TestCLISearchCommandContract:
         # Test 2: Relative path
         result_rel = subprocess.run(
             [*cli_command, "search", str(sample_cli_export), "--keywords", "alpha"],
+            check=False,
             capture_output=True,
             text=True,
             cwd=sample_cli_export.parent,
@@ -1262,9 +1286,7 @@ class TestCLIDateFilteringContract:
     - ISO 8601 date format validation (YYYY-MM-DD)
     """
 
-    def test_from_date_flag_filters_results(
-        self, cli_command: list[str], tmp_path: Path
-    ) -> None:
+    def test_from_date_flag_filters_results(self, cli_command: list[str], tmp_path: Path) -> None:
         """Test --from-date flag filters conversations >= from_date (inclusive).
 
         Validates:
@@ -1339,6 +1361,7 @@ class TestCLIDateFilteringContract:
                 "--from-date",
                 "2024-02-01",
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1351,9 +1374,7 @@ class TestCLIDateFilteringContract:
         assert "March" in stdout, "March conversation should be included"
         assert "January" not in stdout, "January conversation should be excluded"
 
-    def test_to_date_flag_filters_results(
-        self, cli_command: list[str], tmp_path: Path
-    ) -> None:
+    def test_to_date_flag_filters_results(self, cli_command: list[str], tmp_path: Path) -> None:
         """Test --to-date flag filters conversations <= to_date (inclusive).
 
         Validates:
@@ -1428,6 +1449,7 @@ class TestCLIDateFilteringContract:
                 "--to-date",
                 "2024-06-30",
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1440,9 +1462,7 @@ class TestCLIDateFilteringContract:
         assert "January" in stdout, "January conversation should be included"
         assert "December" not in stdout, "December conversation should be excluded"
 
-    def test_both_date_flags_combined(
-        self, cli_command: list[str], tmp_path: Path
-    ) -> None:
+    def test_both_date_flags_combined(self, cli_command: list[str], tmp_path: Path) -> None:
         """Test --from-date and --to-date together create valid date range.
 
         Validates:
@@ -1542,6 +1562,7 @@ class TestCLIDateFilteringContract:
                 "--to-date",
                 "2024-06-30",
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1583,6 +1604,7 @@ class TestCLIDateFilteringContract:
                 "--from-date",
                 "12/31/2024",  # Invalid format
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1627,6 +1649,7 @@ class TestCLIDateFilteringContract:
                 "--to-date",
                 "2024-01-01",  # Before from_date!
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1645,9 +1668,7 @@ class TestCLIDateFilteringContract:
             f"Error should mention date range issue. Got: {stderr}"
         )
 
-    def test_leap_year_date_accepted(
-        self, cli_command: list[str], tmp_path: Path
-    ) -> None:
+    def test_leap_year_date_accepted(self, cli_command: list[str], tmp_path: Path) -> None:
         """Test leap year date (2024-02-29) is accepted as valid.
 
         Validates:
@@ -1672,6 +1693,7 @@ class TestCLIDateFilteringContract:
                 "--from-date",
                 "2024-02-29",  # Valid leap year date
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1710,6 +1732,7 @@ class TestCLIDateFilteringContract:
                 "--from-date",
                 "2023-02-29",  # Invalid - 2023 is not a leap year
             ],
+            check=False,
             capture_output=True,
             text=True,
         )

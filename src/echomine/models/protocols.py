@@ -16,12 +16,11 @@ protocol method signatures with proper types, exceptions, and guarantees.
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Optional, Protocol, TypeVar, runtime_checkable
+from typing import Protocol, TypeVar, runtime_checkable
 
-from echomine.models.conversation import Conversation
 from echomine.models.search import SearchQuery, SearchResult
 
 
@@ -220,8 +219,8 @@ class ConversationProvider(Protocol[ConversationT]):
         self,
         file_path: Path,
         *,
-        progress_callback: Optional[ProgressCallback] = None,
-        on_skip: Optional[OnSkipCallback] = None,
+        progress_callback: ProgressCallback | None = None,
+        on_skip: OnSkipCallback | None = None,
     ) -> Iterator[ConversationT]:
         """Stream conversations one at a time from export file (per FR-151, FR-153).
 
@@ -275,8 +274,8 @@ class ConversationProvider(Protocol[ConversationT]):
         file_path: Path,
         query: SearchQuery,
         *,
-        progress_callback: Optional[ProgressCallback] = None,
-        on_skip: Optional[OnSkipCallback] = None,
+        progress_callback: ProgressCallback | None = None,
+        on_skip: OnSkipCallback | None = None,
     ) -> Iterator[SearchResult[ConversationT]]:
         """Search conversations matching query criteria with relevance ranking.
 
@@ -314,7 +313,7 @@ class ConversationProvider(Protocol[ConversationT]):
         self,
         file_path: Path,
         conversation_id: str,
-    ) -> Optional[ConversationT]:
+    ) -> ConversationT | None:
         """Retrieve specific conversation by UUID (per FR-151, FR-153, FR-155).
 
         Performance Contract: MAY use streaming or index lookup. For large files,

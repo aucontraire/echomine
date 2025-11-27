@@ -30,15 +30,10 @@ Expected State: FAILING (imports will fail until exports added to __init__.py)
 from __future__ import annotations
 
 import gc
-import os
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import psutil
 import pytest
-
-if TYPE_CHECKING:
-    from echomine import OpenAIAdapter
 
 
 # ============================================================================
@@ -84,9 +79,9 @@ def assert_no_file_descriptor_leak(fds_before: set[int]) -> None:
     # New file descriptors indicate a leak
     leaked_fds = fds_after - fds_before
 
-    assert (
-        len(leaked_fds) == 0
-    ), f"File descriptor leak detected: {leaked_fds} file descriptors not closed"
+    assert len(leaked_fds) == 0, (
+        f"File descriptor leak detected: {leaked_fds} file descriptors not closed"
+    )
 
 
 # ============================================================================
@@ -290,10 +285,8 @@ def test_file_handle_closed_when_exception_raised_during_iteration(
 
     # Raise exception during iteration
     with pytest.raises(RuntimeError):
-        for i, conversation in enumerate(
-            adapter.stream_conversations(tmp_export_file)
-        ):
-            if i == 1:
+        for i, conversation in enumerate(adapter.stream_conversations(tmp_export_file)):
+            if i == 0:
                 raise RuntimeError("Test exception during iteration")
 
     # File handle should still be closed
@@ -301,7 +294,7 @@ def test_file_handle_closed_when_exception_raised_during_iteration(
 
 
 def test_file_handle_closed_when_callback_raises_exception(
-    tmp_export_file: Path,
+    tmp_large_export_file: Path,
     open_fds_before: set[int],
 ) -> None:
     """Verify file handle is closed when progress callback raises exception.
@@ -319,15 +312,13 @@ def test_file_handle_closed_when_callback_raises_exception(
 
     def failing_callback(count: int) -> None:
         """Callback that raises exception."""
-        if count > 0:
+        if count >= 100:
             raise RuntimeError("Callback error")
 
     # Exception in callback should propagate
     with pytest.raises(RuntimeError):
         list(
-            adapter.stream_conversations(
-                tmp_export_file, progress_callback=failing_callback
-            )
+            adapter.stream_conversations(tmp_large_export_file, progress_callback=failing_callback)
         )
 
     # File handle should still be closed
@@ -509,9 +500,9 @@ def test_adapter_does_not_use_del_for_cleanup() -> None:
     adapter = OpenAIAdapter()
 
     # Adapter should not define __del__ method
-    assert not hasattr(
-        adapter, "__del__"
-    ), "Adapter should NOT use __del__ for cleanup (use context managers instead)"
+    assert not hasattr(adapter, "__del__"), (
+        "Adapter should NOT use __del__ for cleanup (use context managers instead)"
+    )
 
 
 def test_iterator_cleanup_without_del_method(
@@ -536,12 +527,14 @@ def test_iterator_cleanup_without_del_method(
     first = next(iterator)
     assert first is not None
 
-    # Iterator should not have __del__ method
-    assert not hasattr(
-        iterator, "__del__"
-    ), "Iterator should NOT use __del__ for cleanup"
+    # Iterator should be a generator (not a custom class with __del__)
+    # Python generators have built-in __del__ which is acceptable
+    # We're verifying we didn't create a custom iterator class
+    assert type(iterator).__name__ == "generator", (
+        "Iterator should be a generator (not custom class with __del__)"
+    )
 
-    # Delete iterator (should cleanup via context managers, not __del__)
+    # Delete iterator (should cleanup via context managers in generator)
     del iterator
 
     # Cleanup should still occur
@@ -570,7 +563,7 @@ def test_file_handle_cleanup_on_permission_error(
 
     # Create a file with no read permissions
     restricted_file = tmp_path / "restricted.json"
-    restricted_file.write_text('[]')
+    restricted_file.write_text("[]")
     restricted_file.chmod(0o000)  # No permissions
 
     adapter = OpenAIAdapter()

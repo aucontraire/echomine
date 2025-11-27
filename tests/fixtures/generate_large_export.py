@@ -45,13 +45,9 @@ def generate_conversation(
     mapping: dict[str, Any] = {}
     for msg_index in range(messages_per_conversation):
         msg_id = f"msg-{conversation_index:06d}-{msg_index:02d}"
-        parent_id = (
-            f"msg-{conversation_index:06d}-{msg_index-1:02d}"
-            if msg_index > 0
-            else None
-        )
+        parent_id = f"msg-{conversation_index:06d}-{msg_index - 1:02d}" if msg_index > 0 else None
         children_ids = (
-            [f"msg-{conversation_index:06d}-{msg_index+1:02d}"]
+            [f"msg-{conversation_index:06d}-{msg_index + 1:02d}"]
             if msg_index < messages_per_conversation - 1
             else []
         )
@@ -85,7 +81,7 @@ def generate_conversation(
         "update_time": base_timestamp + ((messages_per_conversation - 1) * 10),
         "mapping": mapping,
         "moderation_results": [],
-        "current_node": f"msg-{conversation_index:06d}-{messages_per_conversation-1:02d}",
+        "current_node": f"msg-{conversation_index:06d}-{messages_per_conversation - 1:02d}",
     }
 
 

@@ -51,11 +51,9 @@ Usage:
 
 import logging
 import sys
-from pathlib import Path
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 import structlog
-from structlog.types import EventDict, WrappedLogger
 
 
 # ============================================================================
@@ -138,7 +136,7 @@ def get_logger(name: str) -> structlog.stdlib.BoundLogger:
         - FR-032: Logger supports arbitrary contextual fields
     """
     # Explicit cast needed: structlog.get_logger returns Any in type stubs
-    return cast(structlog.stdlib.BoundLogger, structlog.get_logger(name))
+    return cast("structlog.stdlib.BoundLogger", structlog.get_logger(name))
 
 
 # ============================================================================
@@ -278,7 +276,7 @@ class SkipLogger:
 
     def log_skip(
         self,
-        conversation_id: Optional[str],
+        conversation_id: str | None,
         reason: str,
         **extra_context: Any,
     ) -> None:
@@ -332,8 +330,8 @@ class SkipLogger:
 # ============================================================================
 
 __all__ = [
-    "configure_logging",
-    "get_logger",
     "ProgressLogger",
     "SkipLogger",
+    "configure_logging",
+    "get_logger",
 ]

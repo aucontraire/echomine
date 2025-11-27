@@ -35,20 +35,19 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich.console import Console
 
 from echomine.export import MarkdownExporter
 
+
 # Console for stderr output (progress, success messages, errors)
 console = Console(stderr=True)
 
 
-def _find_conversation_by_title(
-    file_path: Path, title: str
-) -> tuple[str, str] | None:
+def _find_conversation_by_title(file_path: Path, title: str) -> tuple[str, str] | None:
     """Find conversation ID and exact title by title substring match.
 
     Args:
@@ -65,7 +64,7 @@ def _find_conversation_by_title(
         json.JSONDecodeError: If file is not valid JSON
         PermissionError: If file cannot be read
     """
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         data = json.load(f)
 
     # Handle both list and single conversation
@@ -88,14 +87,13 @@ def _find_conversation_by_title(
     # Return results based on match count
     if len(matches) == 0:
         return None
-    elif len(matches) == 1:
+    if len(matches) == 1:
         return matches[0]
-    else:
-        # Multiple matches - ambiguous
-        raise ValueError(
-            f"Multiple conversations found with title containing '{title}': "
-            f"{len(matches)} matches. Please use conversation ID instead."
-        )
+    # Multiple matches - ambiguous
+    raise ValueError(
+        f"Multiple conversations found with title containing '{title}': "
+        f"{len(matches)} matches. Please use conversation ID instead."
+    )
 
 
 def export_conversation(
@@ -111,13 +109,13 @@ def export_conversation(
         ),
     ],
     conversation_id: Annotated[
-        Optional[str],
+        str | None,
         typer.Argument(
             help="Conversation ID to export (omit if using --title)",
         ),
     ] = None,
     title: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(
             "--title",
             "-t",
@@ -125,7 +123,7 @@ def export_conversation(
         ),
     ] = None,
     output: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option(
             "--output",
             "-o",
@@ -178,9 +176,7 @@ def export_conversation(
             raise typer.Exit(code=2)
 
         if conversation_id is None and title is None:
-            console.print(
-                "[red]Error: Must specify either conversation ID or --title.[/red]"
-            )
+            console.print("[red]Error: Must specify either conversation ID or --title.[/red]")
             raise typer.Exit(code=2)
 
         # Check file exists (manual check for exit code 1)
@@ -196,8 +192,7 @@ def export_conversation(
                 result = _find_conversation_by_title(file_path, title)
                 if result is None:
                     console.print(
-                        f"[red]Error: No conversation found with title "
-                        f"containing '{title}'[/red]"
+                        f"[red]Error: No conversation found with title containing '{title}'[/red]"
                     )
                     raise typer.Exit(code=1)
 
@@ -205,9 +200,7 @@ def export_conversation(
                 # Show which conversation was matched (helpful feedback)
                 if not output:
                     # Only show to stderr if outputting to stdout
-                    console.print(
-                        f"[dim]Matched conversation: {exact_title}[/dim]"
-                    )
+                    console.print(f"[dim]Matched conversation: {exact_title}[/dim]")
             except ValueError as e:
                 # Multiple matches (ambiguous title)
                 console.print(f"[red]Error: {e}[/red]")
@@ -223,9 +216,7 @@ def export_conversation(
         if output:
             with console.status("[bold green]Exporting conversation..."):
                 try:
-                    markdown = exporter.export_conversation(
-                        file_path, actual_conversation_id
-                    )
+                    markdown = exporter.export_conversation(file_path, actual_conversation_id)
                 except ValueError as e:
                     # Conversation not found
                     console.print(f"[red]Error: {e}[/red]")
@@ -233,9 +224,7 @@ def export_conversation(
         else:
             # No progress indicator when writing to stdout (keeps stdout clean)
             try:
-                markdown = exporter.export_conversation(
-                    file_path, actual_conversation_id
-                )
+                markdown = exporter.export_conversation(file_path, actual_conversation_id)
             except ValueError as e:
                 # Conversation not found
                 console.print(f"[red]Error: {e}[/red]")
@@ -245,23 +234,17 @@ def export_conversation(
         if output:
             # Check if file exists and warn (but still overwrite)
             if output.exists():
-                console.print(
-                    f"[yellow]Warning: Overwriting existing file: {output}[/yellow]"
-                )
+                console.print(f"[yellow]Warning: Overwriting existing file: {output}[/yellow]")
 
             # Write to file
             try:
                 output.write_text(markdown, encoding="utf-8")
                 console.print(f"[green]✓ Exported to {output}[/green]")
             except PermissionError:
-                console.print(
-                    f"[red]Error: Permission denied: {output}[/red]"
-                )
+                console.print(f"[red]Error: Permission denied: {output}[/red]")
                 raise typer.Exit(code=1)
             except OSError as e:
-                console.print(
-                    f"[red]Error: Failed to write file: {e}[/red]"
-                )
+                console.print(f"[red]Error: Failed to write file: {e}[/red]")
                 raise typer.Exit(code=1)
         else:
             # Write to stdout (use print, not console, to go to stdout)
@@ -283,9 +266,7 @@ def export_conversation(
 
     except json.JSONDecodeError as e:
         # Invalid JSON syntax
-        console.print(
-            f"[red]Error: Invalid JSON in export file: {e}[/red]"
-        )
+        console.print(f"[red]Error: Invalid JSON in export file: {e}[/red]")
         raise typer.Exit(code=1)
 
     except KeyboardInterrupt:

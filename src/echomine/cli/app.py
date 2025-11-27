@@ -37,6 +37,7 @@ from echomine.cli.commands.export import export_conversation
 from echomine.cli.commands.list import list_conversations
 from echomine.cli.commands.search import search_conversations
 
+
 # Create Typer application
 app = typer.Typer(
     name="echomine",

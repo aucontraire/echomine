@@ -744,9 +744,7 @@ class TestSearchConversationsIntegration:
             f"Expected: {expected_ids}, got: {result_ids}"
         )
 
-    def test_search_results_sorted_by_relevance_descending(
-        self, search_test_export: Path
-    ) -> None:
+    def test_search_results_sorted_by_relevance_descending(self, search_test_export: Path) -> None:
         """Test that results are sorted by BM25 relevance (highest first).
 
         Validates:
@@ -764,8 +762,7 @@ class TestSearchConversationsIntegration:
         # Assert: Scores are descending
         scores = [r.score for r in results]
         assert scores == sorted(scores, reverse=True), (
-            f"Search results must be sorted by relevance (descending). "
-            f"Got scores: {scores}"
+            f"Search results must be sorted by relevance (descending). Got scores: {scores}"
         )
 
         # Assert: Higher frequency -> higher score
@@ -796,9 +793,7 @@ class TestSearchConversationsIntegration:
         results = list(adapter.search(search_test_export, query))
 
         # Assert: No more than 3 results
-        assert len(results) <= 3, (
-            f"Limit=3 should return max 3 results, got {len(results)}"
-        )
+        assert len(results) <= 3, f"Limit=3 should return max 3 results, got {len(results)}"
 
         # Assert: Returns TOP 3 by relevance (highest scores)
         # Get all results without limit to compare
@@ -851,9 +846,7 @@ class TestSearchConversationsIntegration:
             f"Expected: {expected_ids}, got: {result_ids}"
         )
 
-    def test_search_with_combined_keyword_and_title_filters(
-        self, search_test_export: Path
-    ) -> None:
+    def test_search_with_combined_keyword_and_title_filters(self, search_test_export: Path) -> None:
         """Test search with both keyword AND title filters (AND logic).
 
         Validates:
@@ -881,9 +874,7 @@ class TestSearchConversationsIntegration:
             f"Expected: {expected_ids}, got: {result_ids}"
         )
 
-    def test_search_with_no_matches_returns_empty(
-        self, search_test_export: Path
-    ) -> None:
+    def test_search_with_no_matches_returns_empty(self, search_test_export: Path) -> None:
         """Test that search with no matches returns empty results (not error).
 
         Validates:
@@ -899,9 +890,7 @@ class TestSearchConversationsIntegration:
         results = list(adapter.search(search_test_export, query))
 
         # Assert: Empty results
-        assert len(results) == 0, (
-            "Search with no matches should return empty list, not error"
-        )
+        assert len(results) == 0, "Search with no matches should return empty list, not error"
 
     def test_search_result_structure(self, search_test_export: Path) -> None:
         """Test that SearchResult objects have correct structure.
@@ -934,17 +923,13 @@ class TestSearchConversationsIntegration:
             # Assert: score field
             assert hasattr(result, "score")
             assert isinstance(result.score, float)
-            assert 0.0 <= result.score <= 1.0, (
-                f"Score must be in [0.0, 1.0], got {result.score}"
-            )
+            assert 0.0 <= result.score <= 1.0, f"Score must be in [0.0, 1.0], got {result.score}"
 
             # Assert: matched_message_ids field
             assert hasattr(result, "matched_message_ids")
             assert isinstance(result.matched_message_ids, list)
 
-    def test_search_matched_message_ids_populated(
-        self, search_test_export: Path
-    ) -> None:
+    def test_search_matched_message_ids_populated(self, search_test_export: Path) -> None:
         """Test that matched_message_ids contains messages with keyword matches.
 
         Validates:
@@ -981,9 +966,7 @@ class TestSearchConversationsIntegration:
             f"Invalid IDs: {matched_ids - conv_msg_ids}"
         )
 
-    def test_search_empty_export_returns_no_results(
-        self, tmp_empty_export_file: Path
-    ) -> None:
+    def test_search_empty_export_returns_no_results(self, tmp_empty_export_file: Path) -> None:
         """Test search on empty export file.
 
         Validates:
@@ -1016,9 +999,7 @@ class TestSearchConversationsIntegration:
 
         # Assert: Found Conv 9 with Chinese content
         result_ids = {r.conversation.id for r in results}
-        assert "search-conv-009" in result_ids, (
-            "Should find conversation with Chinese keyword"
-        )
+        assert "search-conv-009" in result_ids, "Should find conversation with Chinese keyword"
 
     def test_search_file_not_found_raises_error(self) -> None:
         """Test that search raises FileNotFoundError for missing files.
@@ -1045,9 +1026,7 @@ class TestBM25RelevanceScoring:
     ranking behavior.
     """
 
-    def test_bm25_scores_are_normalized_0_to_1(
-        self, search_test_export: Path
-    ) -> None:
+    def test_bm25_scores_are_normalized_0_to_1(self, search_test_export: Path) -> None:
         """Test that BM25 scores are normalized to [0.0, 1.0] range.
 
         Validates:
@@ -1067,9 +1046,7 @@ class TestBM25RelevanceScoring:
                 f"Got: {result.score} for {result.conversation.id}"
             )
 
-    def test_bm25_term_frequency_affects_score(
-        self, search_test_export: Path
-    ) -> None:
+    def test_bm25_term_frequency_affects_score(self, search_test_export: Path) -> None:
         """Test that higher term frequency produces higher BM25 score.
 
         Validates:
@@ -1094,9 +1071,7 @@ class TestBM25RelevanceScoring:
             f"Conv 002 (TF=1): {conv_002.score:.3f}"
         )
 
-    def test_bm25_document_length_normalization(
-        self, search_test_export: Path
-    ) -> None:
+    def test_bm25_document_length_normalization(self, search_test_export: Path) -> None:
         """Test that BM25 normalizes for document length.
 
         Validates:

@@ -12,11 +12,10 @@ Constitution Compliance:
 from __future__ import annotations
 
 from datetime import date
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from echomine.models.conversation import Conversation
 
 # Generic type variable for conversation types
 # Not bound to allow compatibility with all conversation implementations
@@ -75,19 +74,19 @@ class SearchQuery(BaseModel):
     )
 
     # Optional Search Filters
-    keywords: Optional[list[str]] = Field(
+    keywords: list[str] | None = Field(
         default=None,
         description="Keywords for full-text search (OR logic, case-insensitive)",
     )
-    title_filter: Optional[str] = Field(
+    title_filter: str | None = Field(
         default=None,
         description="Partial match on conversation title (metadata-only, case-insensitive)",
     )
-    from_date: Optional[date] = Field(
+    from_date: date | None = Field(
         default=None,
         description="Start date for date range filter (inclusive)",
     )
-    to_date: Optional[date] = Field(
+    to_date: date | None = Field(
         default=None,
         description="End date for date range filter (inclusive)",
     )

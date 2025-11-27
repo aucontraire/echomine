@@ -149,6 +149,6 @@ class SchemaVersionError(EchomineError):
 __all__ = [
     "EchomineError",
     "ParseError",
-    "ValidationError",
     "SchemaVersionError",
+    "ValidationError",
 ]

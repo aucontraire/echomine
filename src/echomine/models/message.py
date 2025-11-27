@@ -12,7 +12,7 @@ Constitution Compliance:
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -88,7 +88,7 @@ class Message(BaseModel):
         ...,
         description="Message creation time (timezone-aware UTC, per FR-244)",
     )
-    parent_id: Optional[str] = Field(
+    parent_id: str | None = Field(
         None,
         description="Parent message ID for threading (None for root, per FR-276)",
     )

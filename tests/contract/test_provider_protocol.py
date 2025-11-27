@@ -24,7 +24,6 @@ Architectural Coverage:
 """
 
 from pathlib import Path
-from typing import Iterator
 
 import pytest
 
@@ -87,13 +86,9 @@ class TestConversationProviderSearchProtocol:
         assert hasattr(adapter, "search"), (
             "ConversationProvider implementations must have search() method"
         )
-        assert callable(getattr(adapter, "search")), (
-            "search() must be callable method"
-        )
+        assert callable(adapter.search), "search() must be callable method"
 
-    def test_search_method_signature_matches_protocol(
-        self, tmp_export_file: Path
-    ) -> None:
+    def test_search_method_signature_matches_protocol(self, tmp_export_file: Path) -> None:
         """Test that search() method signature matches protocol definition.
 
         Validates:
@@ -126,9 +121,7 @@ class TestConversationProviderSearchProtocol:
             "not list or single SearchResult"
         )
 
-    def test_search_returns_iterator_of_search_results(
-        self, tmp_export_file: Path
-    ) -> None:
+    def test_search_returns_iterator_of_search_results(self, tmp_export_file: Path) -> None:
         """Test that search() returns Iterator[SearchResult[Conversation]].
 
         Validates:
@@ -175,8 +168,7 @@ class TestConversationProviderSearchProtocol:
                 f"SearchResult.score must be float, got {type(first_result.score)}"
             )
             assert 0.0 <= first_result.score <= 1.0, (
-                f"SearchResult.score must be in range [0.0, 1.0], "
-                f"got {first_result.score}"
+                f"SearchResult.score must be in range [0.0, 1.0], got {first_result.score}"
             )
 
     def test_search_respects_limit_parameter(self, tmp_export_file: Path) -> None:
@@ -198,13 +190,10 @@ class TestConversationProviderSearchProtocol:
 
         # Assert: No more than limit results returned
         assert len(results) <= 2, (
-            f"search() must respect limit parameter. "
-            f"Expected max 2 results, got {len(results)}"
+            f"search() must respect limit parameter. Expected max 2 results, got {len(results)}"
         )
 
-    def test_search_returns_results_sorted_by_relevance(
-        self, tmp_export_file: Path
-    ) -> None:
+    def test_search_returns_results_sorted_by_relevance(self, tmp_export_file: Path) -> None:
         """Test that search results are sorted by relevance (descending).
 
         Validates:
@@ -229,9 +218,7 @@ class TestConversationProviderSearchProtocol:
                 f"Got scores: {scores}, expected: {sorted_scores}"
             )
 
-    def test_search_handles_empty_results_gracefully(
-        self, tmp_export_file: Path
-    ) -> None:
+    def test_search_handles_empty_results_gracefully(self, tmp_export_file: Path) -> None:
         """Test that search with no matches returns empty iterator.
 
         Validates:
@@ -250,9 +237,7 @@ class TestConversationProviderSearchProtocol:
 
         # Assert: Empty list (not exception)
         assert isinstance(results, list), "search() should return iterable"
-        assert len(results) == 0, (
-            "Search with no matches should return empty results, not error"
-        )
+        assert len(results) == 0, "Search with no matches should return empty results, not error"
 
     def test_search_with_title_filter(self, tmp_export_file: Path) -> None:
         """Test that search supports title filtering.
@@ -300,20 +285,15 @@ class TestConversationProviderSearchProtocol:
         for result in results:
             # Title must match
             assert "python" in result.conversation.title.lower(), (
-                f"Combined filter: title should contain 'Python', "
-                f"got: {result.conversation.title}"
+                f"Combined filter: title should contain 'Python', got: {result.conversation.title}"
             )
 
             # Keyword must be present (in title or messages)
             # Note: Full content validation requires message content access
             # For contract test, we just verify search returns something
-            assert result.score > 0.0, (
-                "Combined filter: results should have relevance score > 0"
-            )
+            assert result.score > 0.0, "Combined filter: results should have relevance score > 0"
 
-    def test_search_with_progress_callback_parameter(
-        self, tmp_export_file: Path
-    ) -> None:
+    def test_search_with_progress_callback_parameter(self, tmp_export_file: Path) -> None:
         """Test that search() accepts optional progress_callback parameter.
 
         Validates:
@@ -340,16 +320,12 @@ class TestConversationProviderSearchProtocol:
                 adapter.search(tmp_export_file, query, progress_callback=progress_callback)
             )
         except TypeError as e:
-            pytest.fail(
-                f"search() must accept progress_callback parameter: {e}"
-            )
+            pytest.fail(f"search() must accept progress_callback parameter: {e}")
 
         # If callback is implemented, it should have been called
         # (but not required for contract test - just verify parameter accepted)
 
-    def test_search_with_on_skip_callback_parameter(
-        self, tmp_export_file: Path
-    ) -> None:
+    def test_search_with_on_skip_callback_parameter(self, tmp_export_file: Path) -> None:
         """Test that search() accepts optional on_skip parameter.
 
         Validates:
@@ -372,13 +348,9 @@ class TestConversationProviderSearchProtocol:
         # Act: Call search() with on_skip callback
         # Should NOT raise TypeError about unexpected keyword argument
         try:
-            results = list(
-                adapter.search(tmp_export_file, query, on_skip=on_skip)
-            )
+            results = list(adapter.search(tmp_export_file, query, on_skip=on_skip))
         except TypeError as e:
-            pytest.fail(
-                f"search() must accept on_skip parameter: {e}"
-            )
+            pytest.fail(f"search() must accept on_skip parameter: {e}")
 
         # If callback is implemented, it should have been called for malformed entries
         # (but not required for contract test - just verify parameter accepted)
@@ -508,9 +480,7 @@ class TestSearchQueryValidation:
         """
         query = SearchQuery(keywords=["test"])
 
-        assert query.limit == 10, (
-            f"SearchQuery.limit should default to 10, got {query.limit}"
-        )
+        assert query.limit == 10, f"SearchQuery.limit should default to 10, got {query.limit}"
 
     def test_search_result_score_must_be_0_to_1(self) -> None:
         """Test that SearchResult.score must be in range [0.0, 1.0].

@@ -85,9 +85,7 @@ def export_sample_file(tmp_path: Path) -> Path:
                         "author": {"role": "assistant"},
                         "content": {
                             "content_type": "text",
-                            "parts": [
-                                "AsyncIO is Python's library for asynchronous programming."
-                            ],
+                            "parts": ["AsyncIO is Python's library for asynchronous programming."],
                         },
                         "create_time": 1710000010.0,
                         "update_time": None,
@@ -264,6 +262,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -296,6 +295,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -336,6 +336,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -387,6 +388,7 @@ class TestCLIExportCommandContract:
                     "--output",
                     str(output_file),
                 ],
+                check=False,
                 capture_output=True,
                 text=True,
             )
@@ -422,6 +424,7 @@ class TestCLIExportCommandContract:
         # Missing conversation ID positional argument
         result = subprocess.run(
             [*cli_command, "export", str(export_sample_file), "--output", str(output_file)],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -464,14 +467,14 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
 
         # Assert: Exit code 2 (invalid arguments)
         assert result.returncode == 2, (
-            f"Expected exit code 2 when both ID and --title provided, "
-            f"got {result.returncode}"
+            f"Expected exit code 2 when both ID and --title provided, got {result.returncode}"
         )
 
         # Assert: Error message on stderr
@@ -496,6 +499,7 @@ class TestCLIExportCommandContract:
         # No --output flag: should write markdown to stdout
         result = subprocess.run(
             [*cli_command, "export", str(export_sample_file), "export-conv-001"],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -532,6 +536,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -570,6 +575,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -617,6 +623,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -667,6 +674,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -704,6 +712,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -737,6 +746,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -806,6 +816,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -816,9 +827,7 @@ class TestCLIExportCommandContract:
 
         # Assert: Output file contains Unicode content
         markdown = output_file.read_text(encoding="utf-8")
-        assert "世界" in markdown or "Test" in markdown, (
-            "Should preserve Unicode content in output"
-        )
+        assert "世界" in markdown or "Test" in markdown, "Should preserve Unicode content in output"
 
     def test_export_command_handles_long_conversations(
         self, cli_command: list[str], tmp_path: Path
@@ -844,8 +853,8 @@ class TestCLIExportCommandContract:
                     "update_time": None,
                     "metadata": {},
                 },
-                "parent": f"msg-{i-1}" if i > 0 else None,
-                "children": [f"msg-{i+1}"] if i < 99 else [],
+                "parent": f"msg-{i - 1}" if i > 0 else None,
+                "children": [f"msg-{i + 1}"] if i < 99 else [],
             }
 
         long_conv = {
@@ -873,6 +882,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -910,6 +920,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -946,14 +957,14 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
 
         # Assert: Success
         assert result.returncode == 0, (
-            f"Export by --title should succeed. Got {result.returncode}. "
-            f"stderr: {result.stderr}"
+            f"Export by --title should succeed. Got {result.returncode}. stderr: {result.stderr}"
         )
 
         # Assert: Correct conversation exported
@@ -984,6 +995,7 @@ class TestCLIExportCommandContract:
                 "--output",
                 str(output_file),
             ],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -1018,6 +1030,7 @@ class TestCLIExportCommandContract:
                 str(export_sample_file),
                 "export-conv-001",
             ],
+            check=False,
             capture_output=True,
             text=True,
             cwd=str(tmp_path),
@@ -1043,6 +1056,7 @@ class TestCLIExportCommandContract:
         """
         result = subprocess.run(
             [*cli_command, "export", "--help"],
+            check=False,
             capture_output=True,
             text=True,
         )

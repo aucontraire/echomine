@@ -173,23 +173,19 @@ def test_conversation_model_copy_deep_copies_mutable_fields() -> None:
 
     # But should have same values
     assert len(original.messages) == len(shallow_copy.messages), "Should have same message count"
-    assert (
-        original.messages[0].id == shallow_copy.messages[0].id
-    ), "Messages should have same content"
+    assert original.messages[0].id == shallow_copy.messages[0].id, (
+        "Messages should have same content"
+    )
 
     # Create deep copy if truly needed
     deep_copy = original.model_copy(deep=True)
 
     # Deep copy should have different list object
-    assert original.messages is not deep_copy.messages, (
-        "Deep copy should create new list object"
-    )
+    assert original.messages is not deep_copy.messages, "Deep copy should create new list object"
 
     # But still have same values
     assert len(original.messages) == len(deep_copy.messages), "Should have same message count"
-    assert (
-        original.messages[0].id == deep_copy.messages[0].id
-    ), "Messages should have same content"
+    assert original.messages[0].id == deep_copy.messages[0].id, "Messages should have same content"
 
 
 # ============================================================================
@@ -255,9 +251,7 @@ def test_message_model_copy_creates_modified_instance() -> None:
     assert original.content == "Original content", "Original should not be modified"
 
     # Modified should have new value
-    assert (
-        modified.content == "Modified content"
-    ), "Modified copy should have new content"
+    assert modified.content == "Modified content", "Modified copy should have new content"
     assert modified.id == "msg-1", "Modified copy should preserve other fields"
     assert modified.role == "user", "Modified copy should preserve other fields"
 
@@ -377,9 +371,7 @@ def test_search_result_fields_are_immutable() -> None:
     )
 
     # Create search result
-    result = SearchResult(
-        conversation=conversation, score=0.85, matched_message_ids=["msg-1"]
-    )
+    result = SearchResult(conversation=conversation, score=0.85, matched_message_ids=["msg-1"])
 
     # Attempting to modify fields should raise ValidationError or AttributeError
     with pytest.raises((ValidationError, AttributeError)):
@@ -422,9 +414,7 @@ def test_search_result_model_copy_creates_modified_instance() -> None:
     )
 
     # Create original result
-    original = SearchResult(
-        conversation=conversation, score=0.85, matched_message_ids=["msg-1"]
-    )
+    original = SearchResult(conversation=conversation, score=0.85, matched_message_ids=["msg-1"])
 
     # Create modified copy with different score
     modified = original.model_copy(update={"score": 0.95})
@@ -434,9 +424,7 @@ def test_search_result_model_copy_creates_modified_instance() -> None:
 
     # Modified should have new value
     assert modified.score == 0.95, "Modified copy should have new score"
-    assert (
-        modified.conversation == conversation
-    ), "Modified copy should preserve conversation"
+    assert modified.conversation == conversation, "Modified copy should preserve conversation"
 
 
 # ============================================================================
@@ -522,9 +510,7 @@ def test_conversation_in_search_result_is_immutable() -> None:
         messages=messages,
     )
 
-    result = SearchResult(
-        conversation=conversation, score=0.85, matched_message_ids=["msg-1"]
-    )
+    result = SearchResult(conversation=conversation, score=0.85, matched_message_ids=["msg-1"])
 
     # Nested conversation should be immutable
     with pytest.raises((ValidationError, AttributeError)):
@@ -550,9 +536,7 @@ def test_conversation_model_config_has_frozen_true() -> None:
 
     # Verify ConfigDict has frozen=True
     assert hasattr(Conversation, "model_config"), "Should have model_config"
-    assert (
-        Conversation.model_config.get("frozen") is True
-    ), "model_config should have frozen=True"
+    assert Conversation.model_config.get("frozen") is True, "model_config should have frozen=True"
 
 
 def test_message_model_config_has_frozen_true() -> None:
@@ -567,9 +551,7 @@ def test_message_model_config_has_frozen_true() -> None:
     from echomine import Message
 
     assert hasattr(Message, "model_config"), "Should have model_config"
-    assert (
-        Message.model_config.get("frozen") is True
-    ), "model_config should have frozen=True"
+    assert Message.model_config.get("frozen") is True, "model_config should have frozen=True"
 
 
 def test_search_query_model_config_has_frozen_true() -> None:
@@ -584,9 +566,7 @@ def test_search_query_model_config_has_frozen_true() -> None:
     from echomine import SearchQuery
 
     assert hasattr(SearchQuery, "model_config"), "Should have model_config"
-    assert (
-        SearchQuery.model_config.get("frozen") is True
-    ), "model_config should have frozen=True"
+    assert SearchQuery.model_config.get("frozen") is True, "model_config should have frozen=True"
 
 
 def test_search_result_model_config_has_frozen_true() -> None:
@@ -601,9 +581,7 @@ def test_search_result_model_config_has_frozen_true() -> None:
     from echomine import SearchResult
 
     assert hasattr(SearchResult, "model_config"), "Should have model_config"
-    assert (
-        SearchResult.model_config.get("frozen") is True
-    ), "model_config should have frozen=True"
+    assert SearchResult.model_config.get("frozen") is True, "model_config should have frozen=True"
 
 
 # ============================================================================

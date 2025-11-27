@@ -51,9 +51,10 @@ from echomine.models.conversation import Conversation
 from echomine.models.message import Message
 from echomine.models.search import SearchQuery, SearchResult
 
+
 __all__ = [
-    "Message",
     "Conversation",
+    "Message",
     "SearchQuery",
     "SearchResult",
 ]

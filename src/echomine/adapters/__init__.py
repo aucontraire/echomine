@@ -14,4 +14,5 @@ Constitution Compliance:
 
 from echomine.adapters.openai import OpenAIAdapter
 
+
 __all__ = ["OpenAIAdapter"]

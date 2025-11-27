@@ -35,8 +35,6 @@ import tempfile
 from pathlib import Path
 from typing import Any, get_args, get_origin
 
-import pytest
-
 
 # ============================================================================
 # T059-001: Mypy Strict Mode Validation
@@ -203,9 +201,7 @@ def generic_adapter_usage(adapter: ConversationProvider[Conversation]) -> None:
 '''
 
     # Write consumer code to temporary file
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".py", delete=False
-    ) as tmp_file:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as tmp_file:
         tmp_file.write(consumer_code)
         tmp_path = Path(tmp_file.name)
 
@@ -221,6 +217,7 @@ def generic_adapter_usage(adapter: ConversationProvider[Conversation]) -> None:
                 "--pretty",
                 str(tmp_path),
             ],
+            check=False,
             capture_output=True,
             text=True,
             timeout=30,
@@ -307,12 +304,12 @@ def test_all_public_functions_have_type_annotations() -> None:
 
     for method_name in public_methods:
         method = getattr(adapter, method_name)
-        assert hasattr(
-            method, "__annotations__"
-        ), f"Method '{method_name}' should have type annotations"
-        assert (
-            len(method.__annotations__) > 0
-        ), f"Method '{method_name}' annotations should not be empty"
+        assert hasattr(method, "__annotations__"), (
+            f"Method '{method_name}' should have type annotations"
+        )
+        assert len(method.__annotations__) > 0, (
+            f"Method '{method_name}' annotations should not be empty"
+        )
 
 
 def test_model_classes_have_type_annotations() -> None:
@@ -329,12 +326,12 @@ def test_model_classes_have_type_annotations() -> None:
 
     # All model classes should have __annotations__
     for model_class in [Conversation, Message, SearchQuery, SearchResult]:
-        assert hasattr(
-            model_class, "__annotations__"
-        ), f"Model {model_class.__name__} should have field annotations"
-        assert (
-            len(model_class.__annotations__) > 0
-        ), f"Model {model_class.__name__} should have fields"
+        assert hasattr(model_class, "__annotations__"), (
+            f"Model {model_class.__name__} should have field annotations"
+        )
+        assert len(model_class.__annotations__) > 0, (
+            f"Model {model_class.__name__} should have fields"
+        )
 
 
 # ============================================================================
@@ -368,6 +365,7 @@ def test_search_result_generic_type_works() -> None:
 
     # Verify SearchResult has Generic in its bases (Pydantic pattern)
     import typing
+
     assert hasattr(SearchResult, "__orig_bases__"), "Should have __orig_bases__"
     bases = SearchResult.__orig_bases__
     assert any(
@@ -421,9 +419,9 @@ def test_adapter_implements_conversation_provider_protocol() -> None:
     adapter = OpenAIAdapter()
 
     # Should pass runtime protocol check
-    assert isinstance(
-        adapter, ConversationProvider
-    ), "OpenAIAdapter should implement ConversationProvider protocol"
+    assert isinstance(adapter, ConversationProvider), (
+        "OpenAIAdapter should implement ConversationProvider protocol"
+    )
 
 
 def test_protocol_has_all_required_methods() -> None:
@@ -442,9 +440,9 @@ def test_protocol_has_all_required_methods() -> None:
     required_methods = ["stream_conversations", "search", "get_conversation_by_id"]
 
     for method_name in required_methods:
-        assert hasattr(
-            ConversationProvider, method_name
-        ), f"ConversationProvider should define {method_name}"
+        assert hasattr(ConversationProvider, method_name), (
+            f"ConversationProvider should define {method_name}"
+        )
 
 
 # ============================================================================
@@ -517,9 +515,7 @@ def test_search_result_type_inference_works(
         # IDE should provide autocomplete for SearchResult attributes
         assert hasattr(result, "conversation"), "Should have conversation attribute"
         assert hasattr(result, "score"), "Should have score attribute"
-        assert hasattr(
-            result, "matched_message_ids"
-        ), "Should have matched_message_ids attribute"
+        assert hasattr(result, "matched_message_ids"), "Should have matched_message_ids attribute"
 
         # IDE should know conversation is a Conversation object
         conversation = result.conversation
@@ -559,7 +555,7 @@ def test_callback_type_annotations_are_correct() -> None:
 
 
 def test_adapter_accepts_typed_callbacks(
-    tmp_export_file: Path,
+    tmp_large_export_file: Path,
 ) -> None:
     """Verify adapter methods accept properly typed callbacks.
 
@@ -588,17 +584,21 @@ def test_adapter_accepts_typed_callbacks(
         nonlocal skip_count
         skip_count += 1
 
-    # Should accept typed callbacks
+    # Should accept typed callbacks (large file has 1000 conversations)
     conversations = list(
         adapter.stream_conversations(
-            tmp_export_file,
+            tmp_large_export_file,
             progress_callback=progress_callback,
             on_skip=skip_callback,
         )
     )
 
-    # Callbacks should have been called (progress at least)
+    # Progress callback should have been called at 100, 200, ..., 1000
+    # (called every 100 items per FR-069)
     assert progress_count > 0, "Progress callback should have been called"
+    assert progress_count >= 100, (
+        f"Progress callback should reach at least 100, got {progress_count}"
+    )
 
 
 # ============================================================================
@@ -625,18 +625,14 @@ def test_exception_hierarchy_is_properly_typed() -> None:
     )
 
     # All exceptions should be Exception subclasses
-    assert issubclass(
-        EchomineError, Exception
-    ), "EchomineError should inherit from Exception"
-    assert issubclass(
-        ParseError, EchomineError
-    ), "ParseError should inherit from EchomineError"
-    assert issubclass(
-        ValidationError, EchomineError
-    ), "ValidationError should inherit from EchomineError"
-    assert issubclass(
-        SchemaVersionError, EchomineError
-    ), "SchemaVersionError should inherit from EchomineError"
+    assert issubclass(EchomineError, Exception), "EchomineError should inherit from Exception"
+    assert issubclass(ParseError, EchomineError), "ParseError should inherit from EchomineError"
+    assert issubclass(ValidationError, EchomineError), (
+        "ValidationError should inherit from EchomineError"
+    )
+    assert issubclass(SchemaVersionError, EchomineError), (
+        "SchemaVersionError should inherit from EchomineError"
+    )
 
     # Should be able to instantiate with string message
     try:

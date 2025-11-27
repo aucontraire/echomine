@@ -52,52 +52,65 @@ pip install echomine
 
 ## Quick Start
 
-### CLI Usage
+### Library API (Primary Interface)
+
+```python
+from echomine import OpenAIAdapter, SearchQuery
+from pathlib import Path
+
+# Initialize adapter (stateless, reusable)
+adapter = OpenAIAdapter()
+export_file = Path("conversations.json")
+
+# 1. List all conversations (discovery)
+for conversation in adapter.stream_conversations(export_file):
+    print(f"[{conversation.created_at.date()}] {conversation.title}")
+    print(f"  Messages: {len(conversation.messages)}")
+
+# 2. Search with keywords (BM25 ranking)
+query = SearchQuery(keywords=["algorithm", "design"], limit=10)
+for result in adapter.search(export_file, query):
+    print(f"{result.conversation.title} (score: {result.score:.2f})")
+
+# 3. Filter by date range
+from datetime import date
+query = SearchQuery(
+    keywords=["refactor"],
+    from_date=date(2024, 1, 1),
+    to_date=date(2024, 3, 31),
+    limit=5
+)
+results = list(adapter.search(export_file, query))
+
+# 4. Get specific conversation by ID
+conversation = adapter.get_conversation_by_id(export_file, "conv-abc123")
+if conversation:
+    print(f"Found: {conversation.title}")
+```
+
+### CLI Usage (Built on Library)
 
 ```bash
-# List all conversations in an export file
+# List all conversations
 echomine list export.json
 
 # Search by keywords
 echomine search export.json --keywords "algorithm,design" --limit 10
 
-# Search by title
+# Search by title (fast, metadata-only)
 echomine search export.json --title "Project"
 
 # Filter by date range
-echomine search export.json --from "2024-01-01" --to "2024-03-31"
+echomine search export.json --from-date "2024-01-01" --to-date "2024-03-31"
 
 # Export conversation to markdown
-echomine export export.json --title "Algorithm Design" --output algo.md
+echomine export export.json conv-abc123 --output algo.md
 
 # JSON output for piping
-echomine list export.json --json | jq '.[].title'
-```
+echomine search export.json --keywords "python" --json | jq '.results[].title'
 
-### Library Usage
-
-```python
-from echomine import OpenAIAdapter
-from pathlib import Path
-
-# Initialize adapter
-adapter = OpenAIAdapter()
-
-# List conversations
-for conversation in adapter.stream_conversations(Path("export.json")):
-    print(f"[{conversation.created_at.date()}] {conversation.title}")
-    print(f"  Messages: {len(conversation.messages)}")
-
-# Search with keywords
-results = adapter.search(
-    Path("export.json"),
-    keywords=["algorithm", "design"],
-    limit=10
-)
-
-for result in results:
-    print(f"{result.conversation.title} (score: {result.relevance_score:.2f})")
-    print(f"  {result.excerpt}")
+# Version info
+echomine --version
 ```
 
 See [Quickstart Guide](specs/001-ai-chat-parser/quickstart.md) for detailed examples.
@@ -194,12 +207,14 @@ See [Performance Requirements](specs/001-ai-chat-parser/spec.md#performance-requ
 
 ## Contributing
 
-Contributions are welcome! Please see our development guidelines:
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
-1. **Test-Driven Development**: Write tests first, verify they fail
-2. **Type Safety**: All code must pass `mypy --strict`
-3. **Code Style**: Use `ruff` for formatting and linting
-4. **Documentation**: Update specs and docstrings for new features
+- Development setup and prerequisites
+- TDD workflow (RED-GREEN-REFACTOR cycle mandatory)
+- Testing guidelines (pytest, mypy --strict, ruff)
+- Code quality standards and conventions
+- Commit message format (conventional commits)
+- Pull request process
 
 ## License
 

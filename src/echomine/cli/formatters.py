@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from echomine.models.conversation import Conversation
     from echomine.models.search import SearchResult
@@ -77,7 +78,7 @@ def format_text_table(conversations: list[Conversation]) -> str:
         # Format title (truncate with ellipsis if >30 chars)
         title = conv.title
         if len(title) > title_width:
-            title = title[:title_width - 3] + "..."
+            title = title[: title_width - 3] + "..."
 
         # Format timestamp (ISO 8601 without timezone, just local representation)
         # Remove timezone info for display (tests expect "2024-03-15 14:23:11" format)
@@ -152,7 +153,7 @@ def format_json(conversations: list[Conversation]) -> str:
 
     # Serialize to JSON (compact format for pipeline efficiency)
     # separators=(',', ':') removes whitespace for compact output
-    json_output = json.dumps(conv_dicts, separators=(',', ':'), ensure_ascii=False)
+    json_output = json.dumps(conv_dicts, separators=(",", ":"), ensure_ascii=False)
 
     # Return with trailing newline (Unix convention)
     return json_output + "\n"
@@ -213,7 +214,7 @@ def format_search_results(results: list[SearchResult[Conversation]]) -> str:
         # Truncate title
         title = conv.title
         if len(title) > title_width:
-            title = title[:title_width - 3] + "..."
+            title = title[: title_width - 3] + "..."
 
         # Format created date
         created = conv.created_at.strftime("%Y-%m-%d %H:%M:%S")
@@ -308,15 +309,17 @@ def format_search_results_json(
         created_at = conv.created_at.strftime("%Y-%m-%dT%H:%M:%SZ")
         updated_at = conv.updated_at_or_created.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        results_array.append({
-            "conversation_id": conv.id,  # FR-302: Use conversation_id not nested id
-            "title": conv.title,
-            "created_at": created_at,
-            "updated_at": updated_at,
-            "score": result.score,
-            "matched_message_ids": result.matched_message_ids,
-            "message_count": conv.message_count,
-        })
+        results_array.append(
+            {
+                "conversation_id": conv.id,  # FR-302: Use conversation_id not nested id
+                "title": conv.title,
+                "created_at": created_at,
+                "updated_at": updated_at,
+                "score": result.score,
+                "matched_message_ids": result.matched_message_ids,
+                "message_count": conv.message_count,
+            }
+        )
 
     # Build metadata object (FR-303)
     metadata = {

@@ -30,19 +30,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import pytest
-
-if TYPE_CHECKING:
-    from echomine import Conversation, Message, OpenAIAdapter, SearchQuery, SearchResult
-    from echomine.exceptions import (
-        EchomineError,
-        ParseError,
-        SchemaVersionError,
-        ValidationError,
-    )
-    from echomine.models.protocols import ConversationProvider
 
 
 # ============================================================================
@@ -206,20 +195,18 @@ def test_can_call_stream_conversations_method(
     conversations_iter = adapter.stream_conversations(tmp_export_file)
 
     # Verify it's an iterator (not a list)
-    assert hasattr(
-        conversations_iter, "__iter__"
-    ), "Should return iterator, not list"
+    assert hasattr(conversations_iter, "__iter__"), "Should return iterator, not list"
     assert hasattr(conversations_iter, "__next__"), "Should be an iterator"
 
     # Consume iterator to verify it works
     conversations = list(conversations_iter)
     assert len(conversations) > 0, "Should yield at least one conversation"
-    assert all(
-        hasattr(conv, "id") for conv in conversations
-    ), "Conversations should have id attribute"
-    assert all(
-        hasattr(conv, "title") for conv in conversations
-    ), "Conversations should have title attribute"
+    assert all(hasattr(conv, "id") for conv in conversations), (
+        "Conversations should have id attribute"
+    )
+    assert all(hasattr(conv, "title") for conv in conversations), (
+        "Conversations should have title attribute"
+    )
 
 
 def test_can_call_search_method(
@@ -253,12 +240,12 @@ def test_can_call_search_method(
 
     # Results should be SearchResult instances
     if len(results) > 0:  # May be empty if no matches
-        assert all(
-            hasattr(result, "conversation") for result in results
-        ), "Results should have conversation attribute"
-        assert all(
-            hasattr(result, "score") for result in results
-        ), "Results should have score attribute"
+        assert all(hasattr(result, "conversation") for result in results), (
+            "Results should have conversation attribute"
+        )
+        assert all(hasattr(result, "score") for result in results), (
+            "Results should have score attribute"
+        )
 
 
 def test_can_call_get_conversation_by_id_method(
@@ -306,9 +293,7 @@ def test_get_conversation_by_id_returns_none_for_missing_id(
     adapter = OpenAIAdapter()
 
     # Use non-existent ID
-    conversation = adapter.get_conversation_by_id(
-        tmp_export_file, "non-existent-uuid-12345"
-    )
+    conversation = adapter.get_conversation_by_id(tmp_export_file, "non-existent-uuid-12345")
 
     assert conversation is None, "Should return None for non-existent ID"
 
@@ -397,9 +382,9 @@ def test_search_result_has_expected_attributes(
         # Verify SearchResult structure
         assert hasattr(result, "conversation"), "SearchResult should have conversation"
         assert hasattr(result, "score"), "SearchResult should have score"
-        assert hasattr(
-            result, "matched_message_ids"
-        ), "SearchResult should have matched_message_ids"
+        assert hasattr(result, "matched_message_ids"), (
+            "SearchResult should have matched_message_ids"
+        )
 
         # Verify types
         assert isinstance(result.score, float), "Score should be float"
@@ -518,15 +503,13 @@ def test_library_raises_echomine_error_hierarchy() -> None:
     )
 
     # Verify inheritance hierarchy
-    assert issubclass(
-        ParseError, EchomineError
-    ), "ParseError should inherit from EchomineError"
-    assert issubclass(
-        ValidationError, EchomineError
-    ), "ValidationError should inherit from EchomineError"
-    assert issubclass(
-        SchemaVersionError, EchomineError
-    ), "SchemaVersionError should inherit from EchomineError"
+    assert issubclass(ParseError, EchomineError), "ParseError should inherit from EchomineError"
+    assert issubclass(ValidationError, EchomineError), (
+        "ValidationError should inherit from EchomineError"
+    )
+    assert issubclass(SchemaVersionError, EchomineError), (
+        "SchemaVersionError should inherit from EchomineError"
+    )
 
 
 # ============================================================================
@@ -566,15 +549,13 @@ def test_complete_programmatic_workflow(
     # Results should be sorted by relevance
     if len(search_results) > 1:
         for i in range(len(search_results) - 1):
-            assert (
-                search_results[i].score >= search_results[i + 1].score
-            ), "Results should be sorted by score (descending)"
+            assert search_results[i].score >= search_results[i + 1].score, (
+                "Results should be sorted by score (descending)"
+            )
 
     # Step 4: Get specific conversation by ID
     if len(all_conversations) > 0:
         conversation_id = all_conversations[0].id
-        conversation = adapter.get_conversation_by_id(
-            tmp_export_file, conversation_id
-        )
+        conversation = adapter.get_conversation_by_id(tmp_export_file, conversation_id)
         assert conversation is not None, "Should retrieve conversation by ID"
         assert conversation.id == conversation_id, "Should return correct conversation"

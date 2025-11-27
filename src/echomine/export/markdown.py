@@ -16,8 +16,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from echomine.models import Message
-
 
 class MarkdownExporter:
     """Export OpenAI conversation data to markdown format.
@@ -79,15 +77,13 @@ class MarkdownExporter:
             ```
         """
         # Load conversation data
-        with open(export_file, "r", encoding="utf-8") as f:
+        with open(export_file, encoding="utf-8") as f:
             data = json.load(f)
 
         # Find the conversation
         conversation_data = self._find_conversation(data, conversation_id)
         if conversation_data is None:
-            raise ValueError(
-                f"Conversation {conversation_id} not found in {export_file}"
-            )
+            raise ValueError(f"Conversation {conversation_id} not found in {export_file}")
 
         # Extract messages from mapping structure
         messages = self._extract_messages(conversation_data)
@@ -95,9 +91,7 @@ class MarkdownExporter:
         # Convert to markdown
         return self._render_markdown(messages)
 
-    def _find_conversation(
-        self, data: Any, conversation_id: str
-    ) -> dict[str, Any] | None:
+    def _find_conversation(self, data: Any, conversation_id: str) -> dict[str, Any] | None:
         """Find conversation by ID in OpenAI export data.
 
         Args:
@@ -113,17 +107,13 @@ class MarkdownExporter:
         for conv in conversations:
             if not isinstance(conv, dict):
                 continue
-            if conv.get("id") == conversation_id or conv.get(
-                "conversation_id"
-            ) == conversation_id:
+            if conv.get("id") == conversation_id or conv.get("conversation_id") == conversation_id:
                 # Type narrowed to dict[str, Any] by isinstance check
                 return dict(conv)
 
         return None
 
-    def _extract_messages(
-        self, conversation_data: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    def _extract_messages(self, conversation_data: dict[str, Any]) -> list[dict[str, Any]]:
         """Extract messages from OpenAI conversation mapping structure.
 
         Args:
@@ -170,9 +160,7 @@ class MarkdownExporter:
 
         return messages
 
-    def _extract_content_and_images(
-        self, msg_data: dict[str, Any]
-    ) -> tuple[str, list[str]]:
+    def _extract_content_and_images(self, msg_data: dict[str, Any]) -> tuple[str, list[str]]:
         """Extract text content and image references from message.
 
         Args:
@@ -188,7 +176,7 @@ class MarkdownExporter:
             parts = content_data.get("parts", [])
             return " ".join(parts), []
 
-        elif content_type == "multimodal_text":
+        if content_type == "multimodal_text":
             parts = content_data.get("parts", [])
             text_parts = []
             images = []
@@ -206,12 +194,11 @@ class MarkdownExporter:
 
             return " ".join(text_parts), images
 
-        elif content_type == "code":
+        if content_type == "code":
             return content_data.get("text", ""), []
 
-        else:
-            # Unknown content type - return empty
-            return "", []
+        # Unknown content type - return empty
+        return "", []
 
     def _render_markdown(self, messages: list[dict[str, Any]]) -> str:
         """Render messages as markdown string.

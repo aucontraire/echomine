@@ -11,12 +11,9 @@ Constitution Compliance:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import pytest
 
-if TYPE_CHECKING:
-    pass
 
 # Golden master fixture directory
 GOLDEN_MASTER_DIR = Path(__file__).parent.parent / "fixtures" / "golden_master"
@@ -63,9 +60,7 @@ class TestGoldenMasterConversations:
         base = GOLDEN_MASTER_DIR / "003_with_code"
         return base / "raw.json", base / "expected.md"
 
-    def test_simple_text_conversation(
-        self, golden_master_001: tuple[Path, Path]
-    ) -> None:
+    def test_simple_text_conversation(self, golden_master_001: tuple[Path, Path]) -> None:
         """Test markdown export for simple text-only conversation.
 
         Validates:
@@ -84,7 +79,8 @@ class TestGoldenMasterConversations:
 
         # Load the raw conversation
         import json
-        with open(raw_path, "r", encoding="utf-8") as f:
+
+        with open(raw_path, encoding="utf-8") as f:
             conv_data = json.load(f)
         conversation_id = conv_data["id"]
 
@@ -102,9 +98,7 @@ class TestGoldenMasterConversations:
             f"Actual:\n{actual_md[:500]}..."
         )
 
-    def test_conversation_with_images(
-        self, golden_master_002: tuple[Path, Path]
-    ) -> None:
+    def test_conversation_with_images(self, golden_master_002: tuple[Path, Path]) -> None:
         """Test markdown export for conversation with images.
 
         Validates:
@@ -124,7 +118,8 @@ class TestGoldenMasterConversations:
 
         # Load the raw conversation
         import json
-        with open(raw_path, "r", encoding="utf-8") as f:
+
+        with open(raw_path, encoding="utf-8") as f:
             conv_data = json.load(f)
         conversation_id = conv_data["id"]
 
@@ -145,9 +140,7 @@ class TestGoldenMasterConversations:
             f"Actual:\n{actual_md[:500]}..."
         )
 
-    def test_conversation_with_code(
-        self, golden_master_003: tuple[Path, Path]
-    ) -> None:
+    def test_conversation_with_code(self, golden_master_003: tuple[Path, Path]) -> None:
         """Test markdown export for conversation with code blocks.
 
         Validates:
@@ -167,7 +160,8 @@ class TestGoldenMasterConversations:
 
         # Load the raw conversation
         import json
-        with open(raw_path, "r", encoding="utf-8") as f:
+
+        with open(raw_path, encoding="utf-8") as f:
             conv_data = json.load(f)
         conversation_id = conv_data["id"]
 
@@ -229,6 +223,7 @@ class TestGoldenMasterFileStructure:
 
             # Verify ISO 8601 timestamps (format: YYYY-MM-DDTHH:MM:SS+00:00)
             import re
+
             timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}"
             assert re.search(timestamp_pattern, content), (
                 f"{dir_name}: Expected markdown should have ISO 8601 timestamps"
@@ -246,7 +241,7 @@ class TestGoldenMasterFileStructure:
             for i, line in enumerate(lines):
                 if line.startswith("> ") and i > 0:
                     # Check if this is after a User header
-                    prev_lines = "\n".join(lines[max(0, i-10):i])
+                    prev_lines = "\n".join(lines[max(0, i - 10) : i])
                     if "## 👤 User" in prev_lines:
                         # This might be a quote within the message content, not a blockquote format
                         # Only fail if it appears to be structural formatting
