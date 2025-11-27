@@ -1,0 +1,112 @@
+site_name: Echomine
+site_description: Library-first tool for parsing AI conversation exports with search, filtering, and markdown export
+site_author: Echomine Contributors
+site_url: https://github.com/echomine/echomine
+
+repo_name: echomine/echomine
+repo_url: https://github.com/echomine/echomine
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            show_bases: true
+            show_submodules: false
+            members_order: source
+            show_signature_annotations: true
+            separate_signature: true
+            line_length: 80
+            merge_init_into_class: true
+            docstring_section_style: table
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Quick Start: quickstart.md
+      - Installation: installation.md
+  - User Guide:
+      - Library Usage: library-usage.md
+      - CLI Usage: cli-usage.md
+      - Architecture: architecture.md
+  - API Reference:
+      - Overview: api/index.md
+      - Models:
+          - Conversation: api/models/conversation.md
+          - Message: api/models/message.md
+          - Search: api/models/search.md
+      - Adapters:
+          - OpenAI Adapter: api/adapters/openai.md
+          - Protocols: api/adapters/protocols.md
+      - Search: api/search/ranking.md
+      - CLI: api/cli/commands.md
+  - Contributing: contributing.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/echomine/echomine
+  version:
+    provider: mike

@@ -48,6 +48,12 @@ dev = [
     "ruff>=0.1.0",
     "pre-commit>=3.4.0",
 ]
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=1.0.0",
+    "pymdown-extensions>=10.0.0",
+]
 
 [project.scripts]
 echomine = "echomine.cli.app:main"
