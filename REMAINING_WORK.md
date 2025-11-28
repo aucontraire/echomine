@@ -1,7 +1,7 @@
 # Remaining Work for echomine v1.0
 
 **Last Updated**: 2025-11-28
-**Status**: 37/112 gaps resolved (33%), Phase 8: 18/24 tasks complete (75%), **All P1 gaps resolved (100%)**, **API docs built**, **Distribution packages built**, **Manual CLI testing complete**
+**Status**: 37/112 gaps resolved (33%), Phase 8: 19/24 tasks complete (79%), **All P1 gaps resolved (100%)**, **API docs built**, **Distribution packages built**, **Manual CLI testing complete**, **Acceptance scenarios validated (70% pass rate)**
 
 ---
 
@@ -98,17 +98,28 @@
 
 ---
 
-#### T105 - Verify Acceptance Scenarios
+#### T105 - Verify Acceptance Scenarios ✅ **COMPLETE** (2025-11-28)
 **What**: Validate all acceptance scenarios from spec.md pass
 **Reference**: `specs/001-ai-chat-parser/spec.md` (5 user stories × 4-6 scenarios each)
+**Results**: 21/30 scenarios PASS (70%), 7 FAIL, 2 SKIP
 **Actions**:
-- [ ] US0 Acceptance Scenarios (4 scenarios)
-- [ ] US1 Acceptance Scenarios (6 scenarios)
-- [ ] US2 Acceptance Scenarios (5 scenarios)
-- [ ] US3 Acceptance Scenarios (4 scenarios)
-- [ ] US4 Acceptance Scenarios (5 scenarios)
+- [x] US0 Acceptance Scenarios (5/7 PASS)
+- [x] US1 Acceptance Scenarios (8/8 PASS) ✅
+- [x] US2 Acceptance Scenarios (5/5 PASS) ✅
+- [x] US3 Acceptance Scenarios (3/5 PASS)
+- [x] US4 Acceptance Scenarios (2/5 PASS)
 
-**Tool**: Create acceptance test checklist script
+**Deliverable**: ACCEPTANCE_VALIDATION_REPORT.md
+
+**Critical Findings**:
+- ❌ **US0-AS2**: List command missing --limit flag (FR-443)
+- ❌ **US0-AS4**: List command sorts ascending instead of descending (FR-440)
+- ❌ **US3-AS3**: Markdown export lacks conversation metadata header (FR-014)
+- ❌ **US4-AS1/4/5**: Date-only filtering not supported (requires keywords/title)
+
+**v1.0 Blockers**: 7 failures identified, estimated 3-5 hours to fix
+
+**Tool**: validate_acceptance.py created and executed
 
 ---
 
@@ -207,13 +218,14 @@ echomine search export.json --keywords "algorithm" --json | \
 1. ✅ **T115** - Resolve 3 P1 documentation gaps **COMPLETE** (2025-11-28)
 2. ✅ **T089** - Generate API documentation **COMPLETE** (2025-11-28)
 3. ✅ **T109** - Build distribution packages **COMPLETE** (2025-11-28)
-4. **T104** - Manual CLI testing on real exports (~1-2 hours)
-5. **T105** - Verify all acceptance scenarios (~2-3 hours)
-6. **T108** - Test clean install (~30 min)
-7. **T111** - Set up GitHub Actions CI/CD (~2-3 hours)
-8. **T112** - Configure PyPI submission (~1-2 hours)
+4. ✅ **T104** - Manual CLI testing on real exports **COMPLETE** (2025-11-28)
+5. ✅ **T105** - Verify all acceptance scenarios **COMPLETE** (2025-11-28) - **7 failures identified**
+6. **Fix T105 failures** - Address 7 failing acceptance scenarios (~3-5 hours)
+7. **T108** - Test clean install (~30 min)
+8. **T111** - Set up GitHub Actions CI/CD (~2-3 hours)
+9. **T112** - Configure PyPI submission (~1-2 hours)
 
-**Estimated Time**: 7-12 hours (was 7-13 hours)
+**Estimated Time**: 6-11 hours (includes fixing T105 failures)
 
 ### Optional for v1.0 (Can Defer)
 - **T079** - Search-then-export bash example (~30 min)
@@ -273,8 +285,9 @@ echomine search export.json --keywords "algorithm" --json | \
 - [x] API documentation generated (T089) ✅ **2025-11-28**
 - [x] Distribution packages built (T109) ✅ **2025-11-28**
 - [x] Manual CLI testing complete (T104) ✅ **2025-11-28**
-- [ ] All acceptance scenarios validated (T105)
+- [x] All acceptance scenarios validated (T105) ✅ **2025-11-28** - **70% pass, 7 failures**
+- [ ] Acceptance scenario failures fixed (~3-5 hours)
 - [ ] CI/CD pipeline operational (T111)
 - [ ] PyPI package published (T112)
 
-**Status**: 9/12 release criteria met (75%), ~5-10 hours of work remaining
+**Status**: 10/13 release criteria met (77%), ~6-11 hours of work remaining
