@@ -52,6 +52,20 @@ class Message(BaseModel):
         )
         ```
 
+    Role Normalization:
+        The `role` field is normalized to one of three standard values for
+        multi-provider consistency. Provider-specific roles are mapped as follows:
+
+        OpenAI role mappings:
+            - "user" → "user" (human input)
+            - "assistant" → "assistant" (AI response)
+            - "system" → "system" (system messages)
+            - "tool" → "assistant" (tool execution is assistant action)
+            - unknown roles → "assistant" (safe fallback)
+
+        The original provider-specific role is preserved in metadata["original_role"]
+        for debugging and provider-specific workflows.
+
     Attributes:
         id: Unique message identifier within conversation (non-empty string)
         content: Message text content (may be empty for deleted messages)

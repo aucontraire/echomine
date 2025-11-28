@@ -1,15 +1,15 @@
 # Remaining Gap Prioritization Analysis
 
-**Total Remaining Gaps**: 112 items (97 remaining, 15 resolved)
+**Total Remaining Gaps**: 112 items (89 remaining, 37 resolved)
 **Analysis Date**: 2025-11-22
-**Last Updated**: 2025-11-26 (Phase 6/7 completion)
+**Last Updated**: 2025-11-28 (P1 documentation gaps CHK058, CHK133, CHK038 resolved)
 **Feature**: 001-ai-chat-parser
 
 ---
 
-## ✅ Resolved Gaps (29 items - 14 P1 + 15 P2)
+## ✅ Resolved Gaps (37 items - 17 P1 + 20 P2)
 
-### Priority 1 Gaps Resolved (14 items) - Expert Validation & Phase 5 Implementation 2025-11-22
+### Priority 1 Gaps Resolved (17 items) - Expert Validation & Documentation Complete 2025-11-28
 
 **Type Safety & API Contract (5 items)**
 - ✅ **CHK002** - Return type specifications for all protocol methods - RESOLVED (implementation)
@@ -18,15 +18,18 @@
 - ✅ **CHK019** - ConversationProvider protocol method signatures - RESOLVED (complete signatures)
 - ✅ **CHK142** - Protocol method signatures (duplicate of CHK019) - RESOLVED
 
-**Multi-Provider Consistency (2 items)**
+**Multi-Provider Consistency (3 items)**
 - ✅ **CHK057** - Conversation model provider-agnostic - RESOLVED (metadata pattern)
+- ✅ **CHK058** - Message role normalization semantic clarification - RESOLVED (src/echomine/models/message.py:55-67, 2025-11-28)
 - ✅ **CHK059** - Timestamp format consistency - RESOLVED (UTC datetime normalization)
 
-**Critical Ambiguities & Conflicts (2 items)**
+**Critical Ambiguities & Conflicts (3 items)**
+- ✅ **CHK133** - Skip malformed vs fail fast distinction - RESOLVED (docs/library-usage.md:277-314, 2025-11-28)
 - ✅ **CHK137** - FR-003 (streaming) vs FR-008 (ranking) conflict - RESOLVED (bounded memory pattern)
 - ✅ **CHK138** - YAGNI vs Multi-Provider conflict - RESOLVED (protocol now, adapters later)
 
-**Core Data Model (2 items)**
+**Core Data Model (3 items)**
+- ✅ **CHK038** - Malformed entry categories - RESOLVED (docs/library-usage.md:290-306, three-category classification per FR-264, 2025-11-28)
 - ✅ **CHK041** - Conversation metadata enumeration - RESOLVED (5 required fields defined)
 - ✅ **CHK042** - Message tree preservation - RESOLVED (parent_id + navigation methods)
 
@@ -34,7 +37,7 @@
 - ✅ **CHK077** - Mid-stream error handling - RESOLVED (on_skip callback implemented + comprehensive example in Phase 5)
 - ✅ **CHK134** - Exception contract clarity - RESOLVED (EchomineError hierarchy documented)
 
-### Priority 2 Gaps Resolved (15 items) - Phase 3/4/6/7 Implementation
+### Priority 2 Gaps Resolved (20 items) - Phase 3/4/5/6/7 Implementation
 
 **CLI Interface Contract (5 items) - commits: 996160e, 44271fa, 387f603**
 - ✅ **CHK031** - stdout/stderr separation (FR-291-295) - Implemented in Phase 3/4
@@ -54,34 +57,41 @@
 - ✅ **CHK053** - Date filtering consistency (CLI vs library) - Phase 7: CLI parses ISO 8601, library uses date objects
 - ✅ **CHK054** - Limit requirements consistency (CLI vs library) - Phase 7: Both default to 10, range 1-1000
 
-**Workflow Coverage (1 item) - Phase 6 Implementation**
+**Workflow Coverage (3 items) - Phase 5/6 Implementation**
 - ✅ **CHK072** - Search-then-export workflow - Phase 6: Search by keyword → Extract ID → Export to markdown (36 tests)
+- ✅ **CHK073** - Batch processing scenarios - Phase 5: examples/batch_processing.py (T065, 656 lines, ThreadPoolExecutor)
+- ✅ **CHK071** - cognivault integration flow - Phase 5: examples/cognivault_integration.py (T064, 389 lines, batching + on_skip)
 
 **Documentation Alignment (2 items) - Phase 6/7 Implementation**
 - ✅ **CHK060** - quickstart.md examples consistent with spec - Phase 6: Docstrings match implementation
 - ✅ **CHK061** - CLI spec examples consistent with FR-017/FR-018 - Phase 6/7: Contract tests validate spec alignment
 
+**Error Handling & Recovery (3 items) - Phase 5 Implementation**
+- ✅ **CHK081** - Conversations with missing required fields - Phase 5: tests/unit/test_validation_edge_cases.py (comprehensive)
+- ✅ **CHK082** - Messages with no content (deleted messages) - Phase 5: Validation tests handle empty/null content gracefully
+- ✅ **CHK085** - Resource cleanup after exceptions - Phase 5: tests/unit/test_cleanup.py (T068, 606 lines, 15 tests, file handle cleanup)
+
 ---
 
-## Priority 1: Critical - Must Resolve Before Implementation (3 remaining, 14 resolved)
+## Priority 1: Critical - Must Resolve Before Implementation (0 remaining, 17 resolved)
 
-**Status**: 14/17 RESOLVED (82%) - Architecture validated by expert review
+**Status**: 17/17 RESOLVED (100%) ✅ - All P1 gaps resolved
 
-### ⚠️ NEEDS DOCUMENTATION (3 items - No Code Changes Required)
+### ✅ DOCUMENTATION COMPLETE (3 items resolved 2025-11-28)
 
 **Multi-Provider Consistency (1 item)**
-- **CHK058** - Message role normalization semantic clarification [Needs: Docstring update explaining normalized roles]
+- ✅ **CHK058** - Message role normalization semantic clarification ✅ RESOLVED (src/echomine/models/message.py:55-67 Role Normalization section)
 
 **Critical Ambiguities (1 item)**
-- **CHK133** - Skip malformed vs fail fast distinction [Needs: FR-437-440 documenting rules]
+- ✅ **CHK133** - Skip malformed vs fail fast distinction ✅ RESOLVED (docs/library-usage.md:277-314 Fail-Fast vs Skip-Malformed Strategy)
 
 **Core Data Model (1 item)**
-- **CHK038** - Malformed entry categories [Needs: FR-441-444 defining categories]
+- ✅ **CHK038** - Malformed entry categories ✅ RESOLVED (docs/library-usage.md:290-306 three-category classification per FR-264)
 
 **Exception Handling (0 items - ALL RESOLVED)**
 - ✅ **CHK077** - Mid-stream error handling examples [RESOLVED: Comprehensive on_skip demonstration in examples/cognivault_integration.py]
 
-**Risk Assessment**: **LOW** - All are documentation gaps, not design flaws. Implementation correctly handles all scenarios.
+**Risk Assessment**: **ZERO RISK** - All P1 gaps resolved. Implementation and documentation fully aligned.
 
 ---
 
@@ -123,9 +133,11 @@
 
 ---
 
-## Priority 2: High - Should Resolve Early in Implementation (28 items, 15 resolved)
+## Priority 2: High - Should Resolve Early in Implementation (8 remaining, 20 resolved)
 
-**Impact**: Needed for core workflows, CLI contract, and cognivault integration. Can be resolved during early implementation phases.
+**Status**: 20/28 RESOLVED (71%) - Core workflows, CLI contract, and error handling complete
+
+**Impact**: Needed for core workflows, CLI contract, and cognivault integration. Resolved during Phase 3/4/5/6/7 implementation.
 
 ### CLI Interface Contract (Risk Area E) - 5/5 RESOLVED ✅
 - ✅ ~~**CHK031** - stdout/stderr separation requirements~~ [RESOLVED: FR-291-295]
@@ -153,14 +165,15 @@
 
 **Rationale**: CLI/library inconsistencies cause user confusion and integration bugs.
 
-### Workflow Coverage - 1/5 RESOLVED ✅
+### Workflow Coverage - 4/5 RESOLVED ✅
 - ✅ ~~**CHK072** - Search-then-export workflow~~ [RESOLVED: Phase 6 markdown export, 36 tests]
-- **CHK073** - Batch processing scenarios [Remaining]
-- **CHK074** - Title-based search fallback [Remaining - covered by existing tests]
-- **CHK075** - Pagination or result streaming (10K+ results) [Remaining]
-- **CHK076** - Partial result delivery [Remaining]
+- ✅ ~~**CHK073** - Batch processing scenarios~~ [RESOLVED: Phase 5 examples/batch_processing.py, ThreadPoolExecutor]
+- ✅ ~~**CHK071** - cognivault integration flow~~ [RESOLVED: Phase 5 examples/cognivault_integration.py, batching + on_skip]
+- ~~**CHK074** - Title-based search fallback~~ [COVERED: Existing tests validate title search + fallback to keyword search]
+- **CHK075** - Pagination or result streaming (10K+ results) [Remaining - Post v1.0]
+- **CHK076** - Partial result delivery [Remaining - Post v1.0]
 
-**Rationale**: Core user workflows must be completely specified for v1.0.
+**Rationale**: Core user workflows complete for v1.0. Pagination deferred to v1.1+.
 
 ### Documentation Alignment - 2/3 RESOLVED ✅
 - ✅ ~~**CHK060** - quickstart.md examples consistent with spec~~ [RESOLVED: Phase 6 docstrings]
@@ -169,30 +182,21 @@
 
 **Rationale**: Documentation mismatches cause integration failures.
 
-### cognivault Integration Requirements
-- **CHK071** - cognivault integration flow requirements complete [Coverage]
-- **CHK155** - cognivault ingestion rate limiting [Gap]
-- **CHK156** - cognivault data transformation (field mapping) [Gap]
-- **CHK157** - cognivault streaming patterns (batch vs one-at-a-time) [Gap]
+### cognivault Integration Requirements - 1/4 RESOLVED ✅
+- ✅ ~~**CHK071** - cognivault integration flow requirements~~ [RESOLVED: Phase 5 examples/cognivault_integration.py]
+- **CHK155** - cognivault ingestion rate limiting [Remaining - examples/rate_limiting.py provides pattern, needs spec]
+- **CHK156** - cognivault data transformation (field mapping) [Remaining - spec clarification needed]
+- **CHK157** - cognivault streaming patterns (batch vs one-at-a-time) [Remaining - both patterns implemented, needs documentation]
 
-**Rationale**: Primary integration partner; requirements needed for integration testing.
+**Rationale**: Primary integration partner; basic flow complete, advanced patterns need specification.
 
-### Core Workflow Coverage
-- **CHK072** - Search-then-export workflow [Coverage]
-- **CHK073** - Batch processing scenarios [Gap]
-- **CHK074** - Title-based search fallback [Coverage]
-- **CHK075** - Pagination or result streaming (10K+ results) [Gap]
-- **CHK076** - Partial result delivery [Gap]
+### Error Handling & Recovery - 3/4 RESOLVED ✅
+- ✅ ~~**CHK081** - Conversations with missing required fields~~ [RESOLVED: Phase 5 tests/unit/test_validation_edge_cases.py]
+- ✅ ~~**CHK082** - Messages with no content (deleted messages)~~ [RESOLVED: Phase 5 validation tests handle gracefully]
+- **CHK084** - Retry behavior in library API (FR-033 absolute?) [Remaining - Needs spec clarification]
+- ✅ ~~**CHK085** - Resource cleanup after exceptions~~ [RESOLVED: Phase 5 tests/unit/test_cleanup.py]
 
-**Rationale**: Core user workflows must be completely specified for v1.0.
-
-### Error Handling & Recovery
-- **CHK081** - Conversations with missing required fields [Coverage]
-- **CHK082** - Messages with no content (deleted messages) [Coverage]
-- **CHK084** - Retry behavior in library API (FR-033 absolute?) [Clarity, Spec §FR-033]
-- **CHK085** - Resource cleanup after exceptions [Gap]
-
-**Rationale**: Error handling patterns needed for robust implementation.
+**Rationale**: Core error handling complete. Retry semantics need specification (library doesn't retry, users can implement).
 
 ### Consistency Checks
 - **CHK052** - FR-018 and library API alignment (default output) [Consistency, Spec §FR-018]
@@ -350,15 +354,15 @@
 
 | Priority | Count | Resolved | Remaining | Focus | Status |
 |----------|-------|----------|-----------|-------|--------|
-| **P1: Critical** | 17 | **14** ✅ | **3** ⚠️ | API contracts, type safety, multi-provider | 82% complete (needs docs only) |
-| **P2: High** | 28 | **15** ✅ | **13** | CLI contract, cognivault integration, workflows | **54% complete** (+22% from Phase 6/7) |
+| **P1: Critical** | 17 | **17** ✅ | **0** ✅ | API contracts, type safety, multi-provider | 100% complete (all resolved!) |
+| **P2: High** | 28 | **20** ✅ | **8** | CLI contract, cognivault integration, workflows | **71% complete** |
 | **P3: Medium** | 37 | **0** | **37** | Performance, testing, edge cases, dependencies | Deferred to implementation |
 | **P4: Low** | 30 | **0** | **30** | Rare edge cases, future features, polish | Deferred post-v1.0 |
-| **TOTAL** | 112 | **29** | **83** | | |
+| **TOTAL** | 112 | **37** | **75** | | |
 
-**Progress**: **26% of gaps resolved** (29/112) - **+5% from Phase 6/7**
-**Critical Path**: 82% of P1 gaps resolved (14/17) - **ZERO blocking issues**
-**P2 Progress**: 54% complete (15/28) - **+22% from Phase 6/7** (export workflow + date filtering + consistency checks)
+**Progress**: **33% of gaps resolved** (37/112) - **+7% from P1 documentation completion**
+**Critical Path**: 100% of P1 gaps resolved (17/17) ✅ - **ZERO blocking issues for v1.0**
+**P2 Progress**: 71% complete (20/28) - Core workflows and error handling complete
 
 ---
 

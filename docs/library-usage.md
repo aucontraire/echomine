@@ -274,6 +274,45 @@ from echomine import (
 )
 ```
 
+### Fail-Fast vs Skip-Malformed Strategy
+
+Echomine distinguishes between **operational errors** (fail-fast) and **data quality issues** (skip-malformed):
+
+**Fail-Fast: Operational Errors** (raises exceptions)
+- **JSON syntax errors**: Completely malformed file structure
+- **File access errors**: Missing files, permission denied, disk errors
+- **Unsupported schema version**: Export format version mismatch
+
+These errors indicate problems with the export file itself or the environment. Processing cannot continue safely, so exceptions are raised immediately.
+
+**Skip-Malformed: Data Quality Issues** (log warning, continue processing)
+
+The library categorizes malformed entries into three types (per FR-264):
+
+1. **JSON Syntax Errors (Structural)**
+   - Completely malformed conversation objects within valid array
+   - Example: Truncated objects, unescaped quotes, invalid nesting
+   - Handling: Skip conversation, log JSON parse error
+
+2. **Schema Violations (Missing Required Fields)**
+   - Conversations missing required fields: `id`, `title`, `create_time`
+   - Messages missing required fields: `id`, `author.role`, `content`
+   - Example: `{"title": "Test"}` (missing id, create_time)
+   - Handling: Skip conversation, log "missing field: {field_name}"
+
+3. **Validation Failures (Invalid Field Values)**
+   - Fields present but values violate type/format constraints
+   - Examples: Non-UTC timestamps, invalid role values, negative timestamps
+   - Handling: Skip conversation, log "invalid {field}: {reason}"
+
+For all three categories, the library:
+1. Logs WARNING with conversation ID and category-specific error message
+2. Invokes `on_skip` callback if provided (with conversation ID and reason)
+3. Continues processing remaining conversations
+4. Returns partial results (graceful degradation)
+
+This strategy ensures maximum data recovery while maintaining safety for operational errors.
+
 ### Recommended Error Handling Pattern
 
 For library consumers (e.g., cognivault integration):
