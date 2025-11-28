@@ -427,6 +427,91 @@ class OpenAIAdapter:
         # Not found - return None per FR-155
         return None
 
+    def get_message_by_id(
+        self,
+        file_path: Path,
+        message_id: str,
+        *,
+        conversation_id: str | None = None,
+    ) -> tuple[Message, Conversation] | None:
+        """Retrieve specific message by UUID with parent conversation context.
+
+        Searches for a message by ID, optionally scoped to a specific conversation
+        for performance optimization. Returns both the message and its parent
+        conversation to provide full context.
+
+        Uses streaming search for memory efficiency - O(1) memory usage.
+
+        Args:
+            file_path: Path to OpenAI export JSON file
+            message_id: UUID of message to retrieve
+            conversation_id: Optional conversation UUID to scope search (performance hint)
+
+        Returns:
+            Tuple of (Message, Conversation) if found, None otherwise.
+            The Conversation is the parent containing the message.
+
+        Raises:
+            FileNotFoundError: If file doesn't exist
+            ParseError: If JSON is malformed
+
+        Example:
+            ```python
+            adapter = OpenAIAdapter()
+
+            # Search with conversation hint (faster)
+            result = adapter.get_message_by_id(
+                Path("export.json"),
+                "msg-123",
+                conversation_id="conv-456"
+            )
+
+            # Search all conversations (slower)
+            result = adapter.get_message_by_id(
+                Path("export.json"),
+                "msg-123"
+            )
+
+            if result:
+                message, conversation = result
+                print(f"Message: {message.content}")
+                print(f"From conversation: {conversation.title}")
+            else:
+                print("Message not found")
+            ```
+
+        Performance:
+            - With conversation_id:
+                - Time: O(N) where N = conversations until match
+                - Memory: O(1) for file size, O(M) for single conversation
+            - Without conversation_id:
+                - Time: O(N*M) where N = conversations, M = messages per conversation
+                - Memory: O(1) for file size, O(M) for single conversation
+            - Early termination: Returns immediately when match found
+
+        Design Notes:
+            Returns tuple instead of just Message to provide conversation context
+            (title, timestamps, other messages) which is valuable for CLI display
+            and analysis workflows.
+        """
+        # If conversation_id provided, search only that conversation
+        if conversation_id is not None:
+            conv = self.get_conversation_by_id(file_path, conversation_id)
+            if conv is not None:
+                msg = conv.get_message_by_id(message_id)
+                if msg is not None:
+                    return (msg, conv)
+            return None
+
+        # Otherwise, stream all conversations and search each
+        for conv in self.stream_conversations(file_path):
+            msg = conv.get_message_by_id(message_id)
+            if msg is not None:
+                return (msg, conv)
+
+        # Not found in any conversation
+        return None
+
     def _find_matched_messages(self, conversation: Conversation, keywords: list[str]) -> list[str]:
         """Find message IDs containing any of the keywords.
 

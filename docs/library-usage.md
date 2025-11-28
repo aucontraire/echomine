@@ -132,6 +132,44 @@ else:
     print("Conversation not found")
 ```
 
+### Get Message by ID
+
+Retrieve a specific message with its parent conversation context:
+
+```python
+# Search all conversations for the message
+result = adapter.get_message_by_id(export_file, "msg-def456")
+
+if result:
+    message, conversation = result
+    print(f"Message: {message.content}")
+    print(f"From conversation: {conversation.title}")
+    print(f"Role: {message.role}")
+    print(f"Timestamp: {message.timestamp}")
+else:
+    print("Message not found")
+```
+
+For better performance with large files, provide a conversation ID hint:
+
+```python
+# Faster: search only within specified conversation
+result = adapter.get_message_by_id(
+    export_file,
+    "msg-def456",
+    conversation_id="conv-abc123"
+)
+
+if result:
+    message, conversation = result
+    print(f"Found message in {conversation.title}")
+```
+
+**Performance Note:**
+
+- Without `conversation_id`: O(N*M) - searches all conversations and their messages
+- With `conversation_id`: O(N) - searches only until the specified conversation is found
+
 ## Advanced Usage
 
 ### Message Tree Navigation

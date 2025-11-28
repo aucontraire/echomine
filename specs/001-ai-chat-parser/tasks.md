@@ -351,7 +351,8 @@ Single project structure:
 - [x] T110 Add LICENSE file (GNU Affero General Public License v3)
 - [ ] T111 Set up GitHub Actions CI/CD (tests, type checking, linting)
 - [ ] T112 Configure project for PyPI submission (test.pypi.org first)
-- [x] T113 Implement get_conversation_by_id as dedicated CLI command
+- [x] T113 Implement get_conversation_by_id as dedicated CLI command (hierarchical: `get conversation`)
+- [x] T114 Implement get_message_by_id as dedicated CLI command (hierarchical: `get message`)
 
 **Checkpoint**: Project ready for v1.0 release
 

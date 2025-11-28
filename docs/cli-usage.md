@@ -196,6 +196,182 @@ Found 5 conversations (showing top 5)
 
 ---
 
+### get
+
+Retrieve specific conversation or message by ID with metadata display.
+
+The `get` command has two subcommands for retrieving different types of content.
+
+#### get conversation
+
+Retrieve and display a specific conversation by ID.
+
+**Usage:**
+
+```bash
+echomine get conversation [OPTIONS] FILE_PATH CONVERSATION_ID
+```
+
+**Arguments:**
+
+- `FILE_PATH`: Path to OpenAI export JSON file (required)
+- `CONVERSATION_ID`: Conversation ID to retrieve (required)
+
+**Options:**
+
+- `--format TEXT`: Output format: `table` (default) or `json`
+- `--verbose, -v`: Show full message content (table format only)
+- `--help`: Show help message
+
+**Examples:**
+
+```bash
+# Get conversation (human-readable table)
+echomine get conversation export.json conv-abc123
+
+# Get conversation with verbose output (show all messages)
+echomine get conversation export.json conv-abc123 --verbose
+
+# Get conversation as JSON
+echomine get conversation export.json conv-abc123 --format json
+
+# Pipe JSON to jq for processing
+echomine get conversation export.json conv-abc123 -f json | \
+  jq '.messages[] | select(.role == "user") | .content'
+```
+
+**Output (Table Format):**
+
+```
+Conversation Details
+═══════════════════════════════════════════════
+ID:          conv-abc123
+Title:       Python AsyncIO Tutorial
+Created:     2023-11-14 22:13:20 UTC
+Updated:     2023-11-14 22:30:00 UTC
+Messages:    2 messages
+
+Message Summary:
+───────────────────────────────────────────────
+Role                 Count
+───────────────────────────────────────────────
+user                     1
+assistant                1
+```
+
+**Output (JSON Format):**
+
+```json
+{
+  "id": "conv-abc123",
+  "title": "Python AsyncIO Tutorial",
+  "created_at": "2023-11-14T22:13:20Z",
+  "updated_at": "2023-11-14T22:30:00Z",
+  "message_count": 2,
+  "messages": [
+    {
+      "id": "msg-001-1",
+      "role": "user",
+      "content": "Explain Python asyncio",
+      "timestamp": "2023-11-14T22:13:20Z",
+      "parent_id": null
+    }
+  ]
+}
+```
+
+#### get message
+
+Retrieve and display a specific message by ID with conversation context.
+
+**Usage:**
+
+```bash
+echomine get message [OPTIONS] FILE_PATH MESSAGE_ID
+```
+
+**Arguments:**
+
+- `FILE_PATH`: Path to OpenAI export JSON file (required)
+- `MESSAGE_ID`: Message ID to retrieve (required)
+
+**Options:**
+
+- `--format TEXT`: Output format: `table` (default) or `json`
+- `--conversation-id, -c TEXT`: Optional conversation ID hint for faster lookup
+- `--verbose, -v`: Show full content and conversation context (table format only)
+- `--help`: Show help message
+
+**Examples:**
+
+```bash
+# Get message (searches all conversations)
+echomine get message export.json msg-abc123
+
+# Get message with conversation hint (faster for large files)
+echomine get message export.json msg-abc123 -c conv-def456
+
+# Get message with verbose output
+echomine get message export.json msg-abc123 --verbose
+
+# Get message as JSON
+echomine get message export.json msg-abc123 --format json
+
+# Pipe JSON to jq for extracting content
+echomine get message export.json msg-abc123 -f json | jq '.message.content'
+```
+
+**Output (Table Format):**
+
+```
+Message Details
+═══════════════════════════════════════════════
+ID:          msg-abc123
+Role:        user
+Timestamp:   2023-11-14 22:13:20 UTC
+Parent ID:   None (root message)
+
+Content:
+───────────────────────────────────────────────
+Explain Python asyncio
+
+Conversation Context:
+───────────────────────────────────────────────
+Conversation ID:    conv-def456
+Title:              Python AsyncIO Tutorial
+Total Messages:     2
+```
+
+**Output (JSON Format):**
+
+```json
+{
+  "message": {
+    "id": "msg-abc123",
+    "role": "user",
+    "content": "Explain Python asyncio",
+    "timestamp": "2023-11-14T22:13:20Z",
+    "parent_id": null
+  },
+  "conversation": {
+    "id": "conv-def456",
+    "title": "Python AsyncIO Tutorial",
+    "created_at": "2023-11-14T22:13:20Z",
+    "updated_at": "2023-11-14T22:30:00Z",
+    "message_count": 2
+  }
+}
+```
+
+**Performance Note:**
+
+When using `get message` without the `--conversation-id` hint, the command searches through all conversations sequentially. For large files with many conversations, providing a conversation ID hint significantly improves performance:
+
+- **With hint**: O(N) where N = conversations until match
+- **Without hint**: O(N*M) where N = conversations, M = messages per conversation
+
+---
+
 ### export
 
 Export a specific conversation to markdown format.

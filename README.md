@@ -103,6 +103,12 @@ echomine search export.json --title "Project"
 # Filter by date range
 echomine search export.json --from-date "2024-01-01" --to-date "2024-03-31"
 
+# Get conversation by ID
+echomine get conversation export.json conv-abc123
+
+# Get message by ID (with conversation hint for performance)
+echomine get message export.json msg-def456 -c conv-abc123
+
 # Export conversation to markdown
 echomine export export.json conv-abc123 --output algo.md
 
