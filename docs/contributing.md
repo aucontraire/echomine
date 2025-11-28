@@ -4,7 +4,7 @@ Thank you for your interest in contributing to Echomine!
 
 For comprehensive development guidelines, please see:
 
-**[CONTRIBUTING.md](https://github.com/echomine/echomine/blob/main/CONTRIBUTING.md)**
+**[CONTRIBUTING.md](https://github.com/echomine/echomine/blob/master/CONTRIBUTING.md)**
 
 ## Quick Links
 
@@ -63,4 +63,4 @@ pre-commit run --all-files
 
 ---
 
-For complete details, see **[CONTRIBUTING.md](https://github.com/echomine/echomine/blob/main/CONTRIBUTING.md)**.
+For complete details, see **[CONTRIBUTING.md](https://github.com/echomine/echomine/blob/master/CONTRIBUTING.md)**.

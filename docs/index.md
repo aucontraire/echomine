@@ -127,7 +127,7 @@ pre-commit install
 
 ## License
 
-MIT License - See [LICENSE](https://github.com/echomine/echomine/blob/main/LICENSE) file for details
+MIT License - See [LICENSE](https://github.com/echomine/echomine/blob/master/LICENSE) file for details
 
 ## Acknowledgments
 

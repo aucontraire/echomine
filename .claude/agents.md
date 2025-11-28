@@ -382,7 +382,7 @@ Detailed documentation for all Echomine sub-agents and their coordination patter
 
 **Key Rules**:
 - ✅ Conventional commits enforced (feat:, fix:, docs:, refactor:, test:, perf:)
-- ✅ Linear history required (no merge commits on main)
+- ✅ Linear history required (no merge commits on master)
 - ✅ Semantic versioning for releases (MAJOR.MINOR.PATCH)
 - ✅ Meaningful commit messages focusing on "why" not "what"
 - ✅ Never skip hooks (--no-verify) unless explicitly requested

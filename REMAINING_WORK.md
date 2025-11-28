@@ -147,7 +147,7 @@ deactivate && rm -rf /tmp/echomine-test
   - Test on Python 3.12, 3.13
   - Test on Ubuntu, macOS, Windows
 - [ ] Create `.github/workflows/docs.yml`
-  - Build mkdocs on push to main
+  - Build mkdocs on push to master
   - Deploy to GitHub Pages
 - [ ] Create `.github/workflows/release.yml`
   - Build dist packages on tag push

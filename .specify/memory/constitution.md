@@ -149,7 +149,7 @@ This table forces explicit cost-benefit analysis before adding complexity.
 
 ### Quality Gates
 
-Before merging to main:
+Before merging to master:
 
 - ✅ All tests pass (and were written first)
 - ✅ mypy --strict passes with zero errors (code + tests)

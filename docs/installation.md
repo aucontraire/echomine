@@ -132,7 +132,7 @@ pip install --upgrade echomine
 
 ```bash
 cd echomine
-git pull origin main
+git pull origin master
 pip install -e ".[dev]"
 ```
 

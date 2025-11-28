@@ -54,7 +54,7 @@ Echomine follows a strict **Test-Driven Development (TDD)** workflow. All code c
 
 ### Basic Workflow
 
-1. **Create a feature branch** from `main`
+1. **Create a feature branch** from `master`
    ```bash
    git checkout -b feature/your-feature-name
    ```
