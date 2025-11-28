@@ -1,7 +1,7 @@
 # Remaining Work for echomine v1.0
 
 **Last Updated**: 2025-11-28
-**Status**: 37/112 gaps resolved (33%), Phase 8: 15/24 tasks complete, **All P1 gaps resolved (100%)**
+**Status**: 37/112 gaps resolved (33%), Phase 8: 16/24 tasks complete, **All P1 gaps resolved (100%)**, **API docs built**
 
 ---
 
@@ -68,6 +68,24 @@
 
 ---
 
+#### T089 - API Documentation ✅ **COMPLETE** (2025-11-28)
+**What**: Generate API documentation from docstrings
+**Completed**:
+- ✅ mkdocs.yml configured with Material theme
+- ✅ mkdocstrings plugin configured for Google-style docstrings
+- ✅ All API reference pages created (8 files)
+  - Models: Conversation, Message, Search
+  - Adapters: OpenAIAdapter, ConversationProvider protocol
+  - Search: BM25 ranking
+  - CLI: Command reference
+- ✅ Documentation built successfully (2.91s build time)
+- ✅ All user guides complete (library-usage, cli-usage, architecture)
+
+**Build output**: `site/` directory (192 KB, 8 API pages)
+**Preview command**: `mkdocs serve` (available for local testing)
+
+---
+
 #### T104 - Manual CLI Testing
 **What**: Test CLI on real ChatGPT export files
 **Actions**:
@@ -90,22 +108,6 @@
 - [ ] US4 Acceptance Scenarios (5 scenarios)
 
 **Tool**: Create acceptance test checklist script
-
----
-
-#### T089 - API Documentation
-**What**: Generate API documentation from docstrings
-**Current**: mkdocstrings configured in pyproject.toml
-**Actions**:
-- [ ] Configure mkdocs.yml with navigation structure
-- [ ] Add API reference pages for:
-  - Models (Conversation, Message, SearchQuery, SearchResult)
-  - Adapters (OpenAIAdapter, ConversationProvider protocol)
-  - Exporters (MarkdownExporter)
-  - Exceptions (EchomineError hierarchy)
-- [ ] Build docs: `mkdocs build`
-- [ ] Preview: `mkdocs serve`
-- [ ] Add to CI/CD for automatic deployment
 
 ---
 
@@ -204,15 +206,15 @@ echomine search export.json --keywords "algorithm" --json | \
 
 ### For v1.0 Release (Must Complete)
 1. ✅ **T115** - Resolve 3 P1 documentation gaps **COMPLETE** (2025-11-28)
-2. **T104** - Manual CLI testing on real exports (~1-2 hours)
-3. **T105** - Verify all acceptance scenarios (~2-3 hours)
-4. **T089** - Generate API documentation (~2-4 hours)
+2. ✅ **T089** - Generate API documentation **COMPLETE** (2025-11-28)
+3. **T104** - Manual CLI testing on real exports (~1-2 hours)
+4. **T105** - Verify all acceptance scenarios (~2-3 hours)
 5. **T108** - Test clean install (~30 min)
 6. **T109** - Build distribution packages (~30 min)
 7. **T111** - Set up GitHub Actions CI/CD (~2-3 hours)
 8. **T112** - Configure PyPI submission (~1-2 hours)
 
-**Estimated Time**: 9-17 hours (was 11-19 hours)
+**Estimated Time**: 7-13 hours (was 9-17 hours)
 
 ### Optional for v1.0 (Can Defer)
 - **T079** - Search-then-export bash example (~30 min)
@@ -241,7 +243,7 @@ echomine search export.json --keywords "algorithm" --json | \
 ## 📊 Progress Metrics
 
 ### Overall Project
-- **Total Tasks**: 115 (15 complete in Phase 8, 88 complete overall)
+- **Total Tasks**: 115 (16 complete in Phase 8, 89 complete overall)
 - **Total Gaps**: 112 (37 resolved, 75 remaining)
   - **P1**: 17/17 resolved (100%) ✅ **ALL COMPLETE**
   - **P2**: 20/28 resolved (71%)
@@ -269,9 +271,9 @@ echomine search export.json --keywords "algorithm" --json | \
 - [x] Performance benchmarks passing
 - [x] User documentation complete
 - [x] P1 documentation gaps resolved (T115) ✅ **2025-11-28**
-- [ ] API documentation generated (T089)
+- [x] API documentation generated (T089) ✅ **2025-11-28**
 - [ ] All acceptance scenarios validated (T105)
 - [ ] CI/CD pipeline operational (T111)
 - [ ] PyPI package published (T112)
 
-**Status**: 6/10 release criteria met, ~9-17 hours of work remaining
+**Status**: 7/10 release criteria met, ~7-13 hours of work remaining

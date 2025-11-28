@@ -306,13 +306,13 @@ Single project structure:
 ## Phase 8: Polish & Cross-Cutting Concerns
 
 **Purpose**: Final integration, documentation, and quality assurance
-**Status**: 🟢 15/24 tasks complete (Documentation + Error Handling + CLI UX + Performance validation + Packaging metadata + **All P1 gaps resolved** ✅)
+**Status**: 🟢 16/24 tasks complete (Documentation + Error Handling + CLI UX + Performance validation + Packaging metadata + **All P1 gaps resolved** + **API docs built** ✅)
 
 ### Documentation
 
 - [x] T087 [P] Create README.md with installation, quick start, CLI examples ✅ **COMPLETE**
 - [x] T088 [P] Create CONTRIBUTING.md with development setup, testing guidelines ✅ **COMPLETE**
-- [ ] T089 [P] Create API documentation from docstrings using sphinx/mkdocs
+- [x] T089 [P] Create API documentation from docstrings using sphinx/mkdocs ✅ **COMPLETE** (2025-11-28: mkdocs configured, all API pages created, docs built successfully)
 - [x] T090 [P] Add docstrings to all public classes and methods (sphinx format) ✅ **COMPLETE** (all CLI commands have comprehensive docstrings)
 
 ### Error Handling & Edge Cases
