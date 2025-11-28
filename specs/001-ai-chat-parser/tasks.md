@@ -342,12 +342,16 @@ Single project structure:
 - [ ] T104 Test CLI on sample ChatGPT export files (manual validation)
 - [ ] T105 Verify all acceptance scenarios from spec.md pass
 
-### Packaging
+### Packaging & Release
 
 - [ ] T106 Configure pyproject.toml metadata (name, version, description, authors, license)
 - [ ] T107 Add Python version constraint (>=3.12) in pyproject.toml
 - [ ] T108 Test installation in clean virtual environment
 - [ ] T109 Build distribution packages (wheel, sdist)
+- [x] T110 Add LICENSE file (GNU Affero General Public License v3)
+- [ ] T111 Set up GitHub Actions CI/CD (tests, type checking, linting)
+- [ ] T112 Configure project for PyPI submission (test.pypi.org first)
+- [x] T113 Implement get_conversation_by_id as dedicated CLI command
 
 **Checkpoint**: Project ready for v1.0 release
 
@@ -456,15 +460,15 @@ T058-T068 (all tasks parallelizable)
 
 ## Task Summary
 
-- **Total Tasks**: 109 tasks (was 102 before adding US0)
+- **Total Tasks**: 113 tasks (was 109, added T110-T113 for release prep)
 - **Setup**: 9 tasks (T001-T009)
 - **Foundation**: 16 tasks (T010-T025)
-- **User Story 0 (P0)**: 18 tasks (T026-T043) - **NEW**
+- **User Story 0 (P0)**: 18 tasks (T026-T043)
 - **User Story 1 (P1)**: 14 tasks (T044-T057)
 - **User Story 2 (P2)**: 11 tasks (T058-T068)
 - **User Story 3 (P3)**: 11 tasks (T069-T079)
 - **User Story 4 (P4)**: 7 tasks (T080-T086)
-- **Polish**: 23 tasks (T087-T109)
+- **Polish & Release**: 27 tasks (T087-T113)
 
 **Parallel Opportunities**: ~42% of tasks can run in parallel (marked with [P])
 

@@ -34,6 +34,7 @@ import typer
 
 from echomine import __version__
 from echomine.cli.commands.export import export_conversation
+from echomine.cli.commands.get import get_conversation
 from echomine.cli.commands.list import list_conversations
 from echomine.cli.commands.search import search_conversations
 
@@ -45,6 +46,9 @@ app = typer.Typer(
     epilog="""Examples:
   # List all conversations
   echomine list export.json
+
+  # Get conversation by ID
+  echomine get export.json <conversation-id>
 
   # Search by keywords
   echomine search export.json -k python,algorithm
@@ -91,6 +95,7 @@ def callback(
 
 # Register commands
 app.command(name="list", help="List all conversations from export file")(list_conversations)
+app.command(name="get", help="Get conversation by ID and display metadata")(get_conversation)
 app.command(name="search", help="Search conversations by keywords")(search_conversations)
 app.command(name="export", help="Export conversation to markdown format")(export_conversation)
 
