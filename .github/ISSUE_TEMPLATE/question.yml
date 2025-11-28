@@ -1,0 +1,102 @@
+name: Question / Help
+description: Ask a question or request help using echomine
+title: "[Question]: "
+labels: ["question", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about using echomine? We're here to help!
+
+        **Before submitting:**
+        - Check the [documentation](https://github.com/echomine/echomine)
+        - Search [existing issues](https://github.com/echomine/echomine/issues)
+        - Review [GitHub Discussions](https://github.com/echomine/echomine/discussions)
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What would you like to know?
+      placeholder: Clear, concise question here
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and Details
+      description: Provide any relevant context, what you're trying to accomplish, or what you've already tried
+      placeholder: |
+        I'm trying to...
+        I've already tried...
+        My goal is to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: code-sample
+    attributes:
+      label: Code Sample (if applicable)
+      description: If your question involves code, provide a sample
+      placeholder: |
+        ```python
+        from echomine import OpenAIAdapter
+
+        # Your code here
+        ```
+      render: python
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Question Category
+      description: What is your question about?
+      options:
+        - Installation / Setup
+        - Library API Usage
+        - CLI Usage
+        - Search Functionality
+        - Performance / Memory
+        - Export File Format
+        - Adapters / Providers
+        - Type Hints / Type Checking
+        - Testing
+        - Documentation
+        - Other (please specify below)
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Echomine Version
+      description: What version of echomine are you using? (if applicable)
+      placeholder: "e.g., 1.0.0 (run `pip show echomine`)"
+
+  - type: textarea
+    id: docs-checked
+    attributes:
+      label: Documentation Checked
+      description: Which documentation pages have you already consulted?
+      placeholder: |
+        - [ ] README
+        - [ ] Installation guide
+        - [ ] Library usage guide
+        - [ ] CLI usage guide
+        - [ ] API reference
+        - [ ] Quickstart
+        - [ ] Examples
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-Submission Checklist
+      description: Please verify you've completed these steps before submitting
+      options:
+        - label: I have searched existing issues and discussions
+          required: true
+        - label: I have checked the documentation
+          required: true
+        - label: This is not a bug report (use Bug Report template instead)
+          required: true

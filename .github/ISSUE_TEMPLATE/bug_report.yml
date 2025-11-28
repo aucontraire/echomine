@@ -1,0 +1,154 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the information below to help us diagnose and fix the issue.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: What happened? What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the behavior
+      placeholder: |
+        1. Install echomine with `pip install echomine`
+        2. Run command `echomine list export.json`
+        3. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: Describe the expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened? Include error messages, stack traces, or unexpected output.
+      placeholder: Paste error messages or describe what went wrong
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: code-sample
+    attributes:
+      label: Minimal Code Sample
+      description: If using the library API, provide a minimal code sample that reproduces the issue
+      placeholder: |
+        ```python
+        from echomine import OpenAIAdapter
+        from pathlib import Path
+
+        adapter = OpenAIAdapter()
+        # Your code that triggers the bug
+        ```
+      render: python
+
+  - type: input
+    id: version
+    attributes:
+      label: Echomine Version
+      description: What version of echomine are you using?
+      placeholder: "e.g., 1.0.0 (run `pip show echomine` to check)"
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python Version
+      description: What version of Python are you using?
+      placeholder: "e.g., 3.12.0 (run `python --version`)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Other (please specify in Additional Context)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation Method
+      description: How did you install echomine?
+      options:
+        - pip (PyPI)
+        - pip (from source)
+        - Other (please specify in Additional Context)
+    validations:
+      required: true
+
+  - type: textarea
+    id: export-file
+    attributes:
+      label: Export File Details
+      description: If the bug is related to parsing an export file, provide details
+      placeholder: |
+        - File size: 500MB
+        - Number of conversations: ~1000
+        - Export source: OpenAI ChatGPT
+        - Date exported: 2025-11-20
+        - Any unusual characteristics?
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: Include any relevant log output (set log level to DEBUG if possible)
+      placeholder: |
+        Run with verbose logging:
+        ```bash
+        ECHOMINE_LOG_LEVEL=DEBUG echomine list export.json 2>&1 | tee debug.log
+        ```
+        Then paste relevant portions here.
+      render: shell
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other context, screenshots, or information about the problem
+      placeholder: Add any other details that might help diagnose the issue
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-Submission Checklist
+      description: Please verify you've completed these steps before submitting
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I am using the latest version of echomine
+          required: true
+        - label: I have included a minimal reproduction example
+          required: false
+        - label: I have included relevant logs and error messages
+          required: false

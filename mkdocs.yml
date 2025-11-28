@@ -102,6 +102,11 @@ nav:
           - Protocols: api/adapters/protocols.md
       - Search: api/search/ranking.md
       - CLI: api/cli/commands.md
+  - Development:
+      - Overview: development/index.md
+      - Workflows: development/workflows.md
+  - Maintaining:
+      - Overview: maintaining/index.md
   - Contributing: contributing.md
 
 extra:

@@ -1,0 +1,142 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["feature", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in improving echomine! Please describe your feature idea below.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? Is your feature request related to a problem?
+      placeholder: |
+        I'm frustrated when...
+        Currently, users cannot...
+        It would be helpful if...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see
+      placeholder: |
+        I would like echomine to...
+        The feature should work by...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered
+      placeholder: |
+        Alternative approach 1: ...
+        Alternative approach 2: ...
+        Workaround currently using: ...
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Provide a concrete use case or user story for this feature
+      placeholder: |
+        As a [type of user],
+        I want to [do something],
+        So that [achieve goal].
+
+        Example scenario:
+        1. User exports ChatGPT conversations
+        2. User wants to filter by custom metadata field
+        3. Feature would allow: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: api-design
+    attributes:
+      label: Proposed API Design (Optional)
+      description: If you have an idea for the API design, describe it here
+      placeholder: |
+        ```python
+        # Library API example
+        from echomine import OpenAIAdapter
+
+        adapter = OpenAIAdapter()
+        results = adapter.new_feature(parameter="value")
+        ```
+
+        ```bash
+        # CLI example
+        echomine new-command --option value export.json
+        ```
+      render: python
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which part of echomine is this feature related to?
+      options:
+        - Library API
+        - CLI
+        - Search functionality
+        - Parser/Adapter
+        - Documentation
+        - Performance
+        - Other (please specify below)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: Breaking Change
+      description: Would this feature require breaking changes to the existing API?
+      options:
+        - "No - backward compatible"
+        - "Yes - requires breaking changes"
+        - "Unsure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact and Benefits
+      description: Who would benefit from this feature? How would it improve echomine?
+      placeholder: |
+        - User segment affected: researchers, developers, general users
+        - Benefits: improved performance, better UX, new capabilities
+        - Expected usage frequency: daily, weekly, occasionally
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Add any other context, mockups, or references about the feature request
+      placeholder: |
+        - Links to similar features in other tools
+        - Screenshots or mockups
+        - Research or data supporting the request
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-Submission Checklist
+      description: Please verify you've completed these steps before submitting
+      options:
+        - label: I have searched existing issues and feature requests to avoid duplicates
+          required: true
+        - label: This feature aligns with echomine's purpose (parsing AI conversation exports)
+          required: true
+        - label: I have considered backward compatibility
+          required: false
+        - label: I am willing to contribute a PR for this feature
+          required: false
