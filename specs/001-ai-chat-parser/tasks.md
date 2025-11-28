@@ -306,7 +306,7 @@ Single project structure:
 ## Phase 8: Polish & Cross-Cutting Concerns
 
 **Purpose**: Final integration, documentation, and quality assurance
-**Status**: 🟢 17/24 tasks complete (Documentation + Error Handling + CLI UX + Performance validation + Packaging metadata + **All P1 gaps resolved** + **API docs built** + **Distribution packages built** ✅)
+**Status**: 🟢 18/24 tasks complete (Documentation + Error Handling + CLI UX + Performance validation + Packaging metadata + **All P1 gaps resolved** + **API docs built** + **Distribution packages built** + **Manual CLI testing complete** ✅)
 
 ### Documentation
 
@@ -339,7 +339,7 @@ Single project structure:
 - [x] T101 Run full test suite with pytest-cov (ensure >90% coverage per SC-002) ✅ **COMPLETE** (249 passed, 4 skipped)
 - [x] T102 Run mypy --strict and ensure 0 errors ✅ **COMPLETE** (zero errors in 24 source files)
 - [x] T103 Run ruff check and format ✅ **COMPLETE** (configured and runs; stylistic warnings in src/tests/ are intentional design choices)
-- [ ] T104 Test CLI on sample ChatGPT export files (manual validation)
+- [x] T104 Test CLI on sample ChatGPT export files (manual validation) ✅ **COMPLETE** (2025-11-28: 13/14 tests passed on production 114MB file, see TEST_REPORT.md)
 - [ ] T105 Verify all acceptance scenarios from spec.md pass
 
 ### Gap Resolution
