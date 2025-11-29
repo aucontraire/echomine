@@ -117,6 +117,9 @@ def list_conversations(
         adapter = OpenAIAdapter()
         conversations = list(adapter.stream_conversations(file_path))
 
+        # Sort by created_at descending (newest first) per FR-440
+        conversations.sort(key=lambda c: c.created_at, reverse=True)
+
         # Format output based on requested format
         if format_lower == "json":
             output = format_json(conversations)
