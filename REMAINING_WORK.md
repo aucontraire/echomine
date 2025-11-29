@@ -1,7 +1,7 @@
 # Remaining Work for echomine v1.0
 
-**Last Updated**: 2025-11-28
-**Status**: 37/112 gaps resolved (33%), Phase 8: 19/24 tasks complete (79%), **All P1 gaps resolved (100%)**, **API docs built**, **Distribution packages built**, **Manual CLI testing complete**, **Acceptance scenarios validated (86.7% pass rate, 5 failures fixed)**
+**Last Updated**: 2025-11-29
+**Status**: 37/112 gaps resolved (33%), Phase 8: 20/24 tasks complete (83%), **All P1 gaps resolved (100%)**, **API docs built**, **Distribution packages built**, **Manual CLI testing complete**, **Acceptance scenarios validated (90.0% pass rate, 6 failures fixed)** 🎉 **90% TARGET REACHED!**
 
 ---
 
@@ -101,9 +101,9 @@
 #### T105 - Verify Acceptance Scenarios ✅ **COMPLETE** (2025-11-28)
 **What**: Validate all acceptance scenarios from spec.md pass
 **Reference**: `specs/001-ai-chat-parser/spec.md` (5 user stories × 4-6 scenarios each)
-**Results**: 26/30 scenarios PASS (86.7%), 2 FAIL, 2 SKIP
+**Results**: 27/30 scenarios PASS (90.0%), 1 FAIL, 2 SKIP
 **Actions**:
-- [x] US0 Acceptance Scenarios (6/7 PASS) - ✅ **US0-AS4 FIXED** (2025-11-28)
+- [x] US0 Acceptance Scenarios (7/7 PASS) ✅ **COMPLETE!** - ✅ **US0-AS2/AS4 FIXED** (2025-11-29)
 - [x] US1 Acceptance Scenarios (8/8 PASS) ✅
 - [x] US2 Acceptance Scenarios (5/5 PASS) ✅
 - [x] US3 Acceptance Scenarios (4/5 PASS) - ✅ **US3-AS3 FIXED** (2025-11-28)
@@ -111,8 +111,8 @@
 
 **Deliverable**: ACCEPTANCE_VALIDATION_REPORT.md
 
-**Critical Findings** (2 remaining):
-- ❌ **US0-AS2**: List command missing --limit flag (FR-443)
+**Critical Findings** (1 remaining):
+- ✅ **US0-AS2**: List command --limit flag added (FR-443) **RESOLVED** (2025-11-29)
 - ✅ **US0-AS4**: List sort order fixed (FR-440) **RESOLVED**
 - ❌ **US3-AS1**: Title-only search not working (requires keywords)
 - ✅ **US3-AS3**: Markdown metadata header fixed (FR-014) **RESOLVED**
@@ -120,9 +120,10 @@
 - ✅ **US4-AS4**: From-date only filtering fixed (FR-009) **RESOLVED**
 - ✅ **US4-AS5**: To-date only filtering fixed (FR-009) **RESOLVED**
 
-**v1.0 Blockers**: 2 failures remaining (5 fixed), estimated 1-2 hours to fix
+**v1.0 Blockers**: 1 failure remaining (6 fixed), estimated 30-60 minutes to fix
 
-**Major Milestone**: 🎉 **Exceeded 85% acceptance threshold!** Only 2 failures left.
+**Major Milestone**: 🎉 🎉 **90% ACCEPTANCE RATE REACHED!** (27/30 PASS)
+**Major Milestone**: 🎯 **User Story 0 COMPLETE!** (7/7 scenarios passing)
 
 **Tool**: validate_acceptance.py created and executed
 
@@ -224,13 +225,13 @@ echomine search export.json --keywords "algorithm" --json | \
 2. ✅ **T089** - Generate API documentation **COMPLETE** (2025-11-28)
 3. ✅ **T109** - Build distribution packages **COMPLETE** (2025-11-28)
 4. ✅ **T104** - Manual CLI testing on real exports **COMPLETE** (2025-11-28)
-5. ✅ **T105** - Verify all acceptance scenarios **COMPLETE** (2025-11-28) - **2 failures remaining**
-6. **Fix T105 failures** - Address 2 failing acceptance scenarios (5/7 fixed: US0-AS4, US3-AS3, US4-AS1, US4-AS4, US4-AS5) (~1-2 hours)
+5. ✅ **T105** - Verify all acceptance scenarios **COMPLETE** (2025-11-28) - **90% pass rate achieved!**
+6. **Fix T105 failures** - Address 1 failing acceptance scenario (6/7 fixed: US0-AS2, US0-AS4, US3-AS3, US4-AS1, US4-AS4, US4-AS5) (~30-60 min)
 7. **T108** - Test clean install (~30 min)
 8. **T111** - Set up GitHub Actions CI/CD (~2-3 hours)
 9. **T112** - Configure PyPI submission (~1-2 hours)
 
-**Estimated Time**: 4-6 hours (includes fixing remaining 2 T105 failures)
+**Estimated Time**: 3-5 hours (includes fixing remaining 1 T105 failure)
 
 ### Optional for v1.0 (Can Defer)
 - **T079** - Search-then-export bash example (~30 min)
@@ -290,9 +291,9 @@ echomine search export.json --keywords "algorithm" --json | \
 - [x] API documentation generated (T089) ✅ **2025-11-28**
 - [x] Distribution packages built (T109) ✅ **2025-11-28**
 - [x] Manual CLI testing complete (T104) ✅ **2025-11-28**
-- [x] All acceptance scenarios validated (T105) ✅ **2025-11-28** - **86.7% pass, 2 failures remaining**
-- [ ] Acceptance scenario failures fixed (5/7 done: US0-AS4, US3-AS3, US4-AS1, US4-AS4, US4-AS5) (~1-2 hours)
+- [x] All acceptance scenarios validated (T105) ✅ **2025-11-28** - **90% pass rate achieved! 🎉**
+- [ ] Acceptance scenario failures fixed (6/7 done: US0-AS2, US0-AS4, US3-AS3, US4-AS1, US4-AS4, US4-AS5) (~30-60 min)
 - [ ] CI/CD pipeline operational (T111)
 - [ ] PyPI package published (T112)
 
-**Status**: 10/13 release criteria met (77%), ~4-6 hours of work remaining
+**Status**: 10/13 release criteria met (77%), ~3-5 hours of work remaining

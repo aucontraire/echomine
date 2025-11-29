@@ -1,11 +1,11 @@
 # Acceptance Scenario Validation Report
-**Generated**: 2025-11-28T21:39:41.991726
+**Generated**: 2025-11-29T06:24:36.578273
 **Test Data**: tests/fixtures/sample_export.json
 
 ## Summary
 - **Total Scenarios**: 30
-- **PASSED**: 26 (86.7%)
-- **FAILED**: 2 (6.7%)
+- **PASSED**: 27 (90.0%)
+- **FAILED**: 1 (3.3%)
 - **SKIPPED**: 2 (6.7%)
 
 ## Detailed Results
@@ -13,17 +13,17 @@
 | Scenario ID | Description | Status | Notes |
 |------------|-------------|---------|-------|
 | US0-AS1 | List all conversations with metadata | ✅ PASS | All conversations displayed with table format |
-| US0-AS2 | List with --limit flag | ❌ FAIL | Feature not implemented: --limit flag missing |
+| US0-AS2 | List with --limit flag | ✅ PASS | Limit flag works correctly |
 | US0-AS3 | JSON output with metadata fields | ✅ PASS | JSON output includes all required fields |
 | US0-AS4 | Conversations sorted by created_at descending | ✅ PASS | Order is newest-first |
-| US0-AS5 | Large file streaming performance | ✅ PASS | Completed in 0.97s (< 5s requirement) |
+| US0-AS5 | Large file streaming performance | ✅ PASS | Completed in 0.96s (< 5s requirement) |
 | US0-AS6 | Count conversations via pipeline | ✅ PASS | Can count 10 conversations via JSON |
 | US0-AS7 | Empty export file handling | ✅ PASS | Returns exit code 0 with appropriate message |
 | US1-AS1 | Search by keyword returns relevant conversations | ✅ PASS | Found matching conversation with 'algorithm' |
 | US1-AS2 | Multiple keywords with OR logic | ✅ PASS | Accepts comma-separated keywords |
 | US1-AS3 | Limit search results to top N | ✅ PASS | Returned 1 results (≤5) |
 | US1-AS4 | No results found message with exit code 0 | ✅ PASS | Shows appropriate message with exit code 0 |
-| US1-AS5 | Large file search performance (<30s) | ✅ PASS | Completed in 12.96s |
+| US1-AS5 | Large file search performance (<30s) | ✅ PASS | Completed in 13.15s |
 | US1-AS6 | Title exact match filtering | ✅ PASS | Found conversation by exact title |
 | US1-AS7 | Title partial/substring matching | ✅ PASS | Found conversation by partial title |
 | US1-AS8 | Combined title + keywords filtering (AND logic) | ✅ PASS | Combined filters work with AND logic: True |
@@ -45,18 +45,11 @@
 
 ## Failures and Issues
 
-### US0-AS2: List with --limit flag
-**Notes**: Feature not implemented: --limit flag missing
-**Error**: ```
-CLI does not support --limit flag
-```
-
 ### US3-AS1: Export conversation by title
 **Notes**: Feature not implemented: export by title (only by ID)
 
 ## Recommendations
 
-2 scenarios failed validation. These should be addressed before v1.0 release:
+1 scenarios failed validation. These should be addressed before v1.0 release:
 
-- **US0-AS2**: List with --limit flag
 - **US3-AS1**: Export conversation by title

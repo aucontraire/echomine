@@ -61,6 +61,13 @@ def list_conversations(
             case_sensitive=False,
         ),
     ] = "text",
+    limit: Annotated[
+        int | None,
+        typer.Option(
+            help="Limit the number of conversations to display",
+            min=1,
+        ),
+    ] = None,
 ) -> None:
     """List all conversations from export file.
 
@@ -119,6 +126,10 @@ def list_conversations(
 
         # Sort by created_at descending (newest first) per FR-440
         conversations.sort(key=lambda c: c.created_at, reverse=True)
+
+        # Apply limit if specified (FR-443)
+        if limit is not None:
+            conversations = conversations[:limit]
 
         # Format output based on requested format
         if format_lower == "json":
