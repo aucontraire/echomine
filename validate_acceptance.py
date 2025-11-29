@@ -868,16 +868,59 @@ def validate_us3() -> list[ValidationResult]:
     """Validate User Story 3 - Export Conversation to Markdown."""
     results = []
 
-    # US3-AS1: Export by title - NOT SUPPORTED
-    # Spec says export by title, but implementation uses ID
-    results.append(
-        ValidationResult(
-            "US3-AS1",
-            "Export conversation by title",
-            "FAIL",
-            "Feature not implemented: export by title (only by ID)",
+    # US3-AS1: Export by title
+    try:
+        # Test with a known title from sample_export.json
+        test_title = "Performance Optimization"
+        exit_code, stdout, stderr = run_cli(
+            "export",
+            str(SAMPLE_EXPORT),
+            "--title",
+            test_title,
+            "--output",
+            "/tmp/test_export_by_title.md",
         )
-    )
+        if exit_code == 0:
+            # Verify the file was created and contains the title
+            with open("/tmp/test_export_by_title.md", "r") as f:
+                content = f.read()
+                if test_title in content:
+                    results.append(
+                        ValidationResult(
+                            "US3-AS1",
+                            "Export conversation by title",
+                            "PASS",
+                            f"Successfully exported by title: {test_title}",
+                        )
+                    )
+                else:
+                    results.append(
+                        ValidationResult(
+                            "US3-AS1",
+                            "Export conversation by title",
+                            "FAIL",
+                            f"Export succeeded but title not in content",
+                        )
+                    )
+        else:
+            results.append(
+                ValidationResult(
+                    "US3-AS1",
+                    "Export conversation by title",
+                    "FAIL",
+                    f"Exit code: {exit_code}",
+                    stderr,
+                )
+            )
+    except Exception as e:
+        results.append(
+            ValidationResult(
+                "US3-AS1",
+                "Export conversation by title",
+                "FAIL",
+                error=str(e),
+            )
+        )
 
     # US3-AS2: Preserve message tree structure
     try:
