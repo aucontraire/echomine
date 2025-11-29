@@ -88,8 +88,8 @@ class MarkdownExporter:
         # Extract messages from mapping structure
         messages = self._extract_messages(conversation_data)
 
-        # Convert to markdown
-        return self._render_markdown(messages)
+        # Convert to markdown with conversation metadata
+        return self._render_markdown(messages, conversation_data)
 
     def _find_conversation(self, data: Any, conversation_id: str) -> dict[str, Any] | None:
         """Find conversation by ID in OpenAI export data.
@@ -200,16 +200,26 @@ class MarkdownExporter:
         # Unknown content type - return empty
         return "", []
 
-    def _render_markdown(self, messages: list[dict[str, Any]]) -> str:
-        """Render messages as markdown string.
+    def _render_markdown(
+        self,
+        messages: list[dict[str, Any]],
+        conversation_data: dict[str, Any],
+    ) -> str:
+        """Render messages as markdown string with conversation metadata header.
 
         Args:
             messages: List of message dicts
+            conversation_data: Conversation metadata from OpenAI export
 
         Returns:
-            Formatted markdown string
+            Formatted markdown string with metadata header followed by messages
         """
         lines = []
+
+        # Render conversation metadata header (FR-014)
+        metadata_header = self._render_metadata_header(conversation_data, len(messages))
+        lines.append(metadata_header)
+        lines.append("")
 
         for i, msg in enumerate(messages):
             # Render header with emoji and timestamp
@@ -234,6 +244,51 @@ class MarkdownExporter:
                 lines.append("")
                 lines.append("---")
                 lines.append("")
+
+        return "\n".join(lines)
+
+    def _render_metadata_header(
+        self,
+        conversation_data: dict[str, Any],
+        message_count: int,
+    ) -> str:
+        """Render conversation metadata as markdown header.
+
+        Includes title, created date, updated date (if present), and message count
+        per FR-014 requirements.
+
+        Args:
+            conversation_data: OpenAI conversation object with metadata
+            message_count: Number of messages in conversation
+
+        Returns:
+            Formatted metadata header string with title and metadata fields
+        """
+        lines = []
+
+        # Title as H1 heading
+        title = conversation_data.get("title", "Untitled Conversation")
+        lines.append(f"# {title}")
+        lines.append("")
+
+        # Created timestamp
+        create_time = conversation_data.get("create_time")
+        created_str = self._format_timestamp(create_time)
+        lines.append(f"Created: {created_str}")
+
+        # Updated timestamp (optional - only if present and not null)
+        update_time = conversation_data.get("update_time")
+        if update_time is not None:
+            updated_str = self._format_timestamp(update_time)
+            lines.append(f"Updated: {updated_str}")
+
+        # Message count (singular vs plural)
+        message_str = "message" if message_count == 1 else "messages"
+        lines.append(f"Messages: {message_count} {message_str}")
+
+        # Separator line before messages
+        lines.append("")
+        lines.append("---")
 
         return "\n".join(lines)
 

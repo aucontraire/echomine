@@ -239,9 +239,11 @@ class TestExportIntegrationFlow:
 
         content = output_file.read_text(encoding="utf-8")
         assert len(content) > 0, "Output file should not be empty"
-        assert "Python Async Programming" not in content, (
-            "Title should NOT be in message content (MarkdownExporter doesn't include title)"
+        assert "Python Async Programming" in content, (
+            "Title SHOULD be in metadata header (FR-014 requirement)"
         )
+        assert "Created:" in content, "Should include created timestamp in metadata"
+        assert "Messages:" in content, "Should include message count in metadata"
         assert "async/await" in content, "Should contain conversation content"
         assert "##" in content, "Should have markdown headers"
         assert "👤" in content or "🤖" in content, "Should have emoji headers"

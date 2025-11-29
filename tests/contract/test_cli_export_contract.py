@@ -652,6 +652,139 @@ class TestCLIExportCommandContract:
         # Assert: Conversation content present
         assert "AsyncIO" in markdown, "Should include conversation content"
 
+    def test_export_command_includes_conversation_metadata_header(
+        self, cli_command: list[str], export_sample_file: Path, tmp_path: Path
+    ) -> None:
+        """Test that exported markdown includes conversation metadata header.
+
+        Validates:
+        - US3-AS3: Markdown includes conversation metadata
+        - FR-014: Conversation metadata in exported files (title, date, message count)
+        - Metadata appears BEFORE message content
+        - All required fields present: title, created date, message count
+        - Optional field: updated date (when conversation was modified)
+
+        This is the SPECIFIC CONTRACT TEST for US3-AS3 acceptance scenario.
+
+        Expected to FAIL: Metadata header not currently included in exports.
+        Failure reason: "Missing metadata: title=False, date=True"
+        """
+        output_file = tmp_path / "output.md"
+
+        # Export the first conversation
+        result = subprocess.run(
+            [
+                *cli_command,
+                "export",
+                str(export_sample_file),
+                "export-conv-001",
+                "--output",
+                str(output_file),
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        # Assert: Command succeeds
+        assert result.returncode == 0, f"Export command should succeed. stderr: {result.stderr}"
+
+        # Assert: Output file exists
+        assert output_file.exists(), "Output file should be created"
+
+        # Read markdown content
+        markdown = output_file.read_text(encoding="utf-8")
+
+        # Assert: Markdown is not empty
+        assert len(markdown) > 0, "Exported markdown should not be empty"
+
+        # =====================================================================
+        # US3-AS3 VALIDATION: Metadata Header Required
+        # =====================================================================
+
+        # Split markdown into lines for analysis
+        lines = markdown.split("\n")
+
+        # Find first message header (messages start with ## 👤 User or ## 🤖 Assistant)
+        first_message_line_idx = None
+        for i, line in enumerate(lines):
+            if ("👤" in line or "🤖" in line) and line.startswith("##"):
+                first_message_line_idx = i
+                break
+
+        assert first_message_line_idx is not None, (
+            "Export should contain message headers"
+        )
+
+        # Extract metadata section (everything BEFORE first message)
+        metadata_section = "\n".join(lines[:first_message_line_idx])
+
+        # =====================================================================
+        # FR-014 REQUIREMENT 1: Title in Metadata
+        # =====================================================================
+
+        expected_title = "Python AsyncIO Tutorial"
+
+        assert expected_title in metadata_section, (
+            f"FR-014 VIOLATION: Conversation title '{expected_title}' MUST appear "
+            f"in metadata header BEFORE messages. "
+            f"Title not found in metadata section:\n{metadata_section[:300]}\n\n"
+            f"This is US3-AS3 acceptance scenario requirement."
+        )
+
+        # =====================================================================
+        # FR-014 REQUIREMENT 2: Created Date in Metadata
+        # =====================================================================
+
+        # Look for date markers (ISO 8601 format or "Created:" label)
+        has_created_date = any(
+            date_marker in metadata_section
+            for date_marker in ["2024-", "Created:", "Created At:", "Date:"]
+        )
+
+        assert has_created_date, (
+            f"FR-014 VIOLATION: Created date MUST appear in metadata header. "
+            f"Date markers not found in metadata section:\n{metadata_section[:300]}\n\n"
+            f"This is US3-AS3 acceptance scenario requirement."
+        )
+
+        # =====================================================================
+        # FR-014 REQUIREMENT 3: Message Count in Metadata
+        # =====================================================================
+
+        # The fixture has 2 messages, look for message count indicator
+        has_message_count = any(
+            count_marker in metadata_section
+            for count_marker in ["2 message", "Messages:", "Message Count:", "Count:"]
+        )
+
+        assert has_message_count, (
+            f"FR-014 VIOLATION: Message count MUST appear in metadata header. "
+            f"Count indicators not found in metadata section:\n{metadata_section[:300]}\n\n"
+            f"This is US3-AS3 acceptance scenario requirement."
+        )
+
+        # =====================================================================
+        # ADDITIONAL VALIDATION: Metadata Uses Proper Markdown Structure
+        # =====================================================================
+
+        # Metadata should start with a heading or have clear structure
+        assert len(metadata_section.strip()) > 0, (
+            "Metadata section should not be empty"
+        )
+
+        # Metadata should be visually distinct (heading or labeled fields)
+        has_markdown_structure = (
+            metadata_section.startswith("#") or
+            ":" in metadata_section or
+            "-" in metadata_section
+        )
+
+        assert has_markdown_structure, (
+            f"Metadata should use proper markdown structure (headings, lists, or labels). "
+            f"Got:\n{metadata_section[:200]}"
+        )
+
     def test_export_command_preserves_message_order(
         self, cli_command: list[str], export_sample_file: Path, tmp_path: Path
     ) -> None:

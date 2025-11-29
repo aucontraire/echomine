@@ -1,11 +1,11 @@
 # Acceptance Scenario Validation Report
-**Generated**: 2025-11-28T16:01:45.976488
+**Generated**: 2025-11-28T21:09:10.747990
 **Test Data**: tests/fixtures/sample_export.json
 
 ## Summary
 - **Total Scenarios**: 30
-- **PASSED**: 22 (73.3%)
-- **FAILED**: 6 (20.0%)
+- **PASSED**: 23 (76.7%)
+- **FAILED**: 5 (16.7%)
 - **SKIPPED**: 2 (6.7%)
 
 ## Detailed Results
@@ -16,14 +16,14 @@
 | US0-AS2 | List with --limit flag | ❌ FAIL | Feature not implemented: --limit flag missing |
 | US0-AS3 | JSON output with metadata fields | ✅ PASS | JSON output includes all required fields |
 | US0-AS4 | Conversations sorted by created_at descending | ✅ PASS | Order is newest-first |
-| US0-AS5 | Large file streaming performance | ✅ PASS | Completed in 0.97s (< 5s requirement) |
+| US0-AS5 | Large file streaming performance | ✅ PASS | Completed in 1.00s (< 5s requirement) |
 | US0-AS6 | Count conversations via pipeline | ✅ PASS | Can count 10 conversations via JSON |
 | US0-AS7 | Empty export file handling | ✅ PASS | Returns exit code 0 with appropriate message |
 | US1-AS1 | Search by keyword returns relevant conversations | ✅ PASS | Found matching conversation with 'algorithm' |
 | US1-AS2 | Multiple keywords with OR logic | ✅ PASS | Accepts comma-separated keywords |
 | US1-AS3 | Limit search results to top N | ✅ PASS | Returned 1 results (≤5) |
 | US1-AS4 | No results found message with exit code 0 | ✅ PASS | Shows appropriate message with exit code 0 |
-| US1-AS5 | Large file search performance (<30s) | ✅ PASS | Completed in 12.94s |
+| US1-AS5 | Large file search performance (<30s) | ✅ PASS | Completed in 12.93s |
 | US1-AS6 | Title exact match filtering | ✅ PASS | Found conversation by exact title |
 | US1-AS7 | Title partial/substring matching | ✅ PASS | Found conversation by partial title |
 | US1-AS8 | Combined title + keywords filtering (AND logic) | ✅ PASS | Combined filters work with AND logic: True |
@@ -34,7 +34,7 @@
 | US2-AS5 | Properly typed Conversation attributes | ✅ PASS | Conversation has typed attributes (title, messages) |
 | US3-AS1 | Export conversation by title | ❌ FAIL | Feature not implemented: export by title (only by ID) |
 | US3-AS2 | Preserve message tree structure in export | ✅ PASS | Export created, has content: True |
-| US3-AS3 | Markdown includes conversation metadata | ❌ FAIL | Missing metadata: title=False, date=True |
+| US3-AS3 | Markdown includes conversation metadata | ✅ PASS | Export includes title and date |
 | US3-AS4 | Preserve code blocks and formatting | ⏭️ SKIP | Requires specific test data with code blocks |
 | US3-AS5 | Export conversation by ID | ✅ PASS | Successfully exported conversation conv-010 |
 | US4-AS1 | Filter by date range (--from/--to) | ❌ FAIL | Exit code: 2 |
@@ -53,9 +53,6 @@ CLI does not support --limit flag
 
 ### US3-AS1: Export conversation by title
 **Notes**: Feature not implemented: export by title (only by ID)
-
-### US3-AS3: Markdown includes conversation metadata
-**Notes**: Missing metadata: title=False, date=True
 
 ### US4-AS1: Filter by date range (--from/--to)
 **Notes**: Exit code: 2
@@ -80,11 +77,10 @@ Error: At least one of --keywords or --title must be specified
 
 ## Recommendations
 
-6 scenarios failed validation. These should be addressed before v1.0 release:
+5 scenarios failed validation. These should be addressed before v1.0 release:
 
 - **US0-AS2**: List with --limit flag
 - **US3-AS1**: Export conversation by title
-- **US3-AS3**: Markdown includes conversation metadata
 - **US4-AS1**: Filter by date range (--from/--to)
 - **US4-AS4**: Filter with only --from date
 - **US4-AS5**: Filter with only --to date

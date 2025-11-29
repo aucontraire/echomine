@@ -1,3 +1,11 @@
+# Gmail API Management in Java
+
+Created: 2024-12-05T18:06:29+00:00
+Updated: 2024-12-05T20:29:31+00:00
+Messages: 8 messages
+
+---
+
 ## 👤 User · 2024-12-05T18:06:29+00:00
 
 I want to build an app in Java that will help me manage my Gmail. Gmail's features are limited in creating a complex searching and bulk deleting of messages.
