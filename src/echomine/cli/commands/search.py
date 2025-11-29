@@ -245,10 +245,11 @@ def search_conversations(
             )
             raise typer.Exit(code=1)
 
-        # Validate: at least one of keywords or title must be provided (FR-298)
-        if not keywords and not title:
+        # Validate: at least one filter must be provided (FR-298, FR-009)
+        # Accept keywords, title, or date filters (from_date/to_date)
+        if not keywords and not title and not from_date and not to_date:
             typer.echo(
-                "Error: At least one of --keywords or --title must be specified",
+                "Error: At least one filter must be specified (--keywords, --title, --from-date, or --to-date)",
                 err=True,
             )
             raise typer.Exit(code=2)
