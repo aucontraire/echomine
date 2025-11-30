@@ -104,9 +104,17 @@ nav:
       - CLI: api/cli/commands.md
   - Development:
       - Overview: development/index.md
+      - Setup: development/setup.md
       - Workflows: development/workflows.md
+      - Testing: development/testing.md
+      - Type Checking: development/type-checking.md
+      - Documentation: development/documentation.md
+      - ADR - Timestamp Handling: development/adr-timestamp-handling.md
   - Maintaining:
       - Overview: maintaining/index.md
+      - Release Process: maintaining/release-process.md
+      - Versioning: maintaining/versioning.md
+      - PyPI Publishing: maintaining/pypi-publishing.md
   - Contributing: contributing.md
 
 extra:

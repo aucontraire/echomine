@@ -29,7 +29,7 @@ def search(file: Path, query: SearchQuery):
     subprocess.run(["echomine", "search", ...])  # NO!
 ```
 
-### II. CLI Interface Contract
+### II. CLI Interface Contract {#cli-interface-contract}
 
 Results go to stdout, progress and errors go to stderr, with standard exit codes.
 

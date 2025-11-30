@@ -66,6 +66,9 @@ main.py
 # Local data files (real user exports - private)
 data/
 
+# Context file for Claude Code crash recovery
+docs/context.md
+
 # OS
 .DS_Store
 Thumbs.db

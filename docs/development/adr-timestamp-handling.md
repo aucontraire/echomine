@@ -1,4 +1,10 @@
-# Timestamp Handling Guide
+# ADR: Timestamp Handling
+
+**Date**: 2025-11-22
+**Status**: Accepted
+**Decision**: Use semantic optionality (`Optional[datetime]`) instead of Unix epoch fallback for `updated_at`
+
+---
 
 ## Overview
 
