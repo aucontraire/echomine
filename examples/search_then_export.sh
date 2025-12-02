@@ -218,7 +218,7 @@ export_conversations() {
     local -a conversation_ids=("$@")
     local count=${#conversation_ids[@]}
 
-    if [ $count -eq 0 ]; then
+    if [ "$count" -eq 0 ]; then
         log_warning "No conversations found matching search criteria"
         log_info "Try broadening your search filters or keywords"
         exit 0
@@ -286,11 +286,11 @@ main() {
     # Step 2: Extract conversation IDs
     log_info "Step 2/3: Extracting conversation IDs..."
     local conversation_ids
-    mapfile -t conversation_ids < <(extract_conversation_ids "$search_results")
-
-    if [ $? -ne 0 ]; then
+    local extracted_ids
+    if ! extracted_ids=$(extract_conversation_ids "$search_results"); then
         exit 1
     fi
+    mapfile -t conversation_ids <<< "$extracted_ids"
 
     echo ""
 
