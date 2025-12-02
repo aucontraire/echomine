@@ -243,7 +243,7 @@ Single project structure:
 #### Search-Then-Export Workflow (per FR-356 to FR-360)
 
 - [x] T078 [US3] Add conversation_id to JSON search results (already implemented in formatters.py:312, validated by test_cli_contract.py:899)
-- [ ] T079 [P] [US3] Create search-then-export example in examples/search_then_export.sh (demonstrate pipeline workflow)
+- [x] T079 [P] [US3] Create search-then-export example in examples/search_then_export.sh (demonstrate pipeline workflow)
 
 **Checkpoint**: US3 complete - markdown export functional
 
