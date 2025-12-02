@@ -64,7 +64,7 @@ def list_conversations(
     limit: Annotated[
         int | None,
         typer.Option(
-            help="Limit the number of conversations to display",
+            help="Restrict output to the top N most recent conversations",
             min=1,
         ),
     ] = None,
@@ -102,6 +102,15 @@ def list_conversations(
         - FR-018: Human-readable output
         - FR-019: Pipeline-friendly
     """
+    # Validate limit parameter (for direct calls bypassing Typer CLI validation)
+    # Must be outside try block to avoid being caught by Exception handler
+    if limit is not None and limit < 1:
+        typer.echo(
+            f"Error: limit must be greater than 0, got {limit}",
+            err=True,
+        )
+        raise typer.Exit(code=2)
+
     try:
         # Validate format option
         format_lower = format.lower()
