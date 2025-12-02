@@ -358,7 +358,7 @@ Single project structure:
 - [ ] T108 Test installation in clean virtual environment
 - [x] T109 Build distribution packages (wheel, sdist) ✅ **COMPLETE** (2025-11-28: echomine-1.0.0.tar.gz + .whl, twine validation passed)
 - [x] T110 Add LICENSE file (GNU Affero General Public License v3)
-- [ ] T111 Set up GitHub Actions CI/CD (tests, type checking, linting)
+- [x] T111 Set up GitHub Actions CI/CD (tests, type checking, linting) ✅ **COMPLETE** (4 workflows: test.yml, release.yml, docs.yml, security.yml)
 - [ ] T112 Configure project for PyPI submission (test.pypi.org first)
 - [x] T113 Implement get_conversation_by_id as dedicated CLI command (hierarchical: `get conversation`)
 - [x] T114 Implement get_message_by_id as dedicated CLI command (hierarchical: `get message`)
