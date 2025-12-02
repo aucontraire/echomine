@@ -38,6 +38,7 @@ from typer.testing import CliRunner
 from echomine import __version__
 from echomine.cli.app import app
 
+
 # Create CliRunner instance for all tests
 runner = CliRunner()
 

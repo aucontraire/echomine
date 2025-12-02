@@ -23,7 +23,6 @@ Coverage Target:
 import json
 import logging
 from io import StringIO
-from typing import Any
 
 import pytest
 import structlog

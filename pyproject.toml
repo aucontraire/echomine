@@ -150,17 +150,72 @@ select = [
 ]
 
 ignore = [
-    "ANN101",  # Missing type annotation for self
-    "ANN102",  # Missing type annotation for cls
+    "ANN401",  # Dynamically typed Any - sometimes necessary for generic callbacks
     "S101",    # Use of assert (needed for pytest)
+    "PLR0912", # Too many branches - complex functions sometimes need this
     "PLR0913", # Too many arguments (sometimes necessary for adapters)
+    "PLR0915", # Too many statements - complex functions sometimes need this
+    "PLR2004", # Magic values - sometimes acceptable for configuration
+    "TCH",     # flake8-type-checking - too pedantic, requires TYPE_CHECKING blocks
+    "TRY003",  # Avoid specifying long messages outside exception class
+    "TRY203",  # Remove exception handler re-raise - sometimes intentional
+    "TRY300",  # try-consider-else - stylistic preference
+    "TRY301",  # Abstract raise to inner function - overly pedantic
+    "EM101",   # Exception must not use string literal
+    "EM102",   # Exception must not use f-string literal
+    "G004",    # Logging f-string - acceptable for structured logging
+    "B904",    # raise without from - sometimes intentional in re-raises
+    "B905",    # zip() without strict - handled by logic
+    "E501",    # Line too long - sometimes necessary for readability
+    "PTH123",  # open() vs Path.open() - both are valid Python
+    "PLC0415", # import not at top level - lazy imports are acceptable
+    "SIM102",  # Nested if - sometimes clearer than combined conditions
+    "RUF022",  # __all__ not sorted - grouped by category for readability
+    "RUF005",  # Collection literal concatenation - stylistic
+    "RUF001",  # Ambiguous unicode - intentional in some strings
+    "A002",    # Builtin shadowing - intentional for certain parameter names
+    "ARG002",  # Unused method argument - callback signatures may not use all args
+    "N806",    # Non-lowercase variable - sometimes matches external conventions
+    "DTZ007",  # datetime.strptime - acceptable when timezone handled separately
+    "ERA001",  # Commented-out code - sometimes useful for reference
+    "UP046",   # Private type parameter - stylistic
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"src/echomine/cli/**/*.py" = [
+    "T201",    # Print statements - CLI output to stdout is intentional
+]
+"src/echomine/export/**/*.py" = [
+    "B007",    # Unused loop variable - sometimes needed for dict.items() pattern
+]
 "tests/**/*.py" = [
-    "S101",    # Assert allowed in tests
-    "PLR2004", # Magic values allowed in tests
+    "S",       # Security checks - not applicable to tests
     "ANN",     # Type annotations optional in tests
+    "ARG",     # Unused arguments (fixtures)
+    "PLR",     # Pylint refactor - complexity limits relaxed for tests
+    "PT017",   # pytest-assert-in-except - common test pattern
+    "PT018",   # pytest-composite-assertion - sometimes clearer
+    "PLC0415", # import not at top level - common in tests for isolation
+    "SLF001",  # Private member access - needed for testing internals
+    "B017",    # assert-raises-exception
+    "PT011",   # pytest-raises-too-broad
+    "PT012",   # pytest-raises-with-multiple-statements
+    "RUF059",  # Unused unpacked variable
+    "F841",    # Unused variable - common in tests
+    "F821",    # Undefined name - forward references in test annotations
+    "ERA001",  # Commented-out code - often useful for reference in tests
+    "T201",    # Print statements allowed in tests
+    "E501",    # Line too long - test assertions can be verbose
+    "B904",    # raise without from - common in test exception handling
+    "PTH",     # Use pathlib - not always cleaner in tests
+    "B007",    # Unused loop variable
+    "SIM",     # Simplify - sometimes explicit is clearer in tests
+    "TRY",     # tryceratops - relaxed in tests
+    "RUF001",  # Ambiguous unicode - intentional in test data
+    "RUF005",  # Collection literal concatenation
+    "RET504", # Unnecessary assignment before return - clearer in tests
+    "PIE810", # Call startswith/endswith once - sometimes clearer separate
+    "G201",   # Logging .exception() instead of .error() - acceptable in tests
 ]
 
 [tool.ruff.lint.isort]

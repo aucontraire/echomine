@@ -25,9 +25,8 @@ Expected Failure Reason:
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -110,7 +109,7 @@ class TestListLimitParameter:
 
         # Create 10 test conversations with incrementing timestamps
         conversations = []
-        base_time = datetime(2024, 1, 1, tzinfo=timezone.utc)
+        base_time = datetime(2024, 1, 1, tzinfo=UTC)
         for i in range(10):
             # Add i hours to base_time so conv-009 is newest
             created_at = base_time.replace(hour=i)
@@ -167,7 +166,7 @@ class TestListLimitParameter:
 
         # Create 20 test conversations
         conversations = []
-        base_time = datetime(2024, 1, 1, tzinfo=timezone.utc)
+        base_time = datetime(2024, 1, 1, tzinfo=UTC)
         for i in range(20):
             created_at = base_time.replace(hour=i)
             conv = create_test_conversation(
@@ -219,7 +218,7 @@ class TestListLimitParameter:
         test_file.write_text("[]")
 
         conversations = []
-        base_time = datetime(2024, 1, 1, tzinfo=timezone.utc)
+        base_time = datetime(2024, 1, 1, tzinfo=UTC)
         for i in range(5):
             created_at = base_time.replace(hour=i)
             conv = create_test_conversation(
@@ -268,7 +267,7 @@ class TestListLimitParameter:
 
         # Create only 3 conversations
         conversations = []
-        base_time = datetime(2024, 1, 1, tzinfo=timezone.utc)
+        base_time = datetime(2024, 1, 1, tzinfo=UTC)
         for i in range(3):
             created_at = base_time.replace(hour=i)
             conv = create_test_conversation(
@@ -313,7 +312,7 @@ class TestListLimitParameter:
         test_file = tmp_path / "test.json"
         test_file.write_text("[]")
 
-        base_time = datetime(2024, 1, 1, tzinfo=timezone.utc)
+        base_time = datetime(2024, 1, 1, tzinfo=UTC)
 
         # Create in random order: 5, 2, 8, 1, 9, 3, 7, 4, 6, 0
         creation_order = [5, 2, 8, 1, 9, 3, 7, 4, 6, 0]
@@ -505,7 +504,7 @@ class TestListLimitEdgeCases:
         test_file.write_text("[]")
 
         conversations = []
-        base_time = datetime(2024, 1, 1, tzinfo=timezone.utc)
+        base_time = datetime(2024, 1, 1, tzinfo=UTC)
         for i in range(10):
             created_at = base_time.replace(hour=i)
             conv = create_test_conversation(

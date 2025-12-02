@@ -375,7 +375,6 @@ class TestFormatConversationJSON:
         Validates:
         - Unicode characters preserved (not \\uXXXX)
         """
-        import json
 
         # Create conversation with Unicode
         unicode_message = Message(
