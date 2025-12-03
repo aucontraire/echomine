@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial CHANGELOG.md for tracking releases
+- N/A
 
 ### Changed
 - N/A
@@ -24,6 +24,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - N/A
+
+## [1.0.2] - 2025-12-03
+
+### Added
+- JSON export format via `--format json` flag in CLI export command
+- Contract tests for JSON export functionality (5 new tests)
+- GitHub release template for consistent release notes
+
+### Changed
+- Documentation updated with JSON export examples (README, CLI usage, quickstart)
+
+### Fixed
+- Windows CI timing-sensitive performance tests (added platform-specific skips)
+- License consistency across all project files (corrected to AGPL-3.0)
+
+## [1.0.1] - 2025-12-02
+
+### Fixed
+- License declaration corrected from MIT to AGPL-3.0 across all files
+- Removed obsolete REMAINING_WORK.md documentation
 
 ## [1.0.0] - 2025-11-28
 
@@ -90,5 +110,7 @@ Each release includes:
 
 ---
 
-[Unreleased]: https://github.com/echomine/echomine/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/echomine/echomine/releases/tag/v1.0.0
+[Unreleased]: https://github.com/aucontraire/echomine/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/aucontraire/echomine/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/aucontraire/echomine/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/aucontraire/echomine/releases/tag/v1.0.0

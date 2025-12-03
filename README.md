@@ -6,6 +6,7 @@
 [![Type Checked](https://img.shields.io/badge/mypy-strict-blue.svg)](https://mypy.readthedocs.io/)
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![codecov](https://codecov.io/gh/aucontraire/echomine/graph/badge.svg)](https://codecov.io/gh/aucontraire/echomine)
+[![Documentation](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://aucontraire.github.io/echomine/)
 
 ## Overview
 
@@ -201,12 +202,21 @@ echomine/
 
 ## Documentation
 
+**[Full Documentation](https://aucontraire.github.io/echomine/)** - Comprehensive guides, API reference, and examples
+
+### Quick Links
+
+- [Getting Started](https://aucontraire.github.io/echomine/quickstart/)
+- [Library Usage](https://aucontraire.github.io/echomine/library-usage/)
+- [CLI Reference](https://aucontraire.github.io/echomine/cli-usage/)
+- [API Reference](https://aucontraire.github.io/echomine/api/)
+
+### Spec Documents
+
 - [Feature Specification](specs/001-ai-chat-parser/spec.md)
 - [Implementation Plan](specs/001-ai-chat-parser/plan.md)
-- [Quickstart Guide](specs/001-ai-chat-parser/quickstart.md)
 - [CLI Interface Contract](specs/001-ai-chat-parser/contracts/cli_spec.md)
 - [Data Model](specs/001-ai-chat-parser/data-model.md)
-- [Architecture Decisions](specs/001-ai-chat-parser/research.md)
 
 ## Performance
 
