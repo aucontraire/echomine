@@ -64,6 +64,8 @@ jobs:
   performance-benchmarks:
     name: Performance Benchmarks
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required for pushing benchmark results to gh-pages
 
     steps:
       - name: Checkout code
