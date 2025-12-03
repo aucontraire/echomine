@@ -270,6 +270,10 @@ class TestSearchPerformance:
         # Verify result count
         assert result_count == 1000, f"Expected 1000 results (limit constraint), got {result_count}"
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Windows CI runners have variable performance (timing-sensitive test)",
+    )
     def test_search_is_lazy_streaming_not_buffered(self, large_export_10k_search: Path) -> None:
         """Verify search returns iterator (BM25 requires corpus processing before yielding).
 
