@@ -225,7 +225,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 ## License
 
-MIT License - See [LICENSE](LICENSE) file for details
+AGPL-3.0 License - See [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 
