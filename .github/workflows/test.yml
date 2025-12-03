@@ -10,6 +10,8 @@ jobs:
   test:
     name: Test on ${{ matrix.os }} / Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read  # Required for checkout
 
     strategy:
       fail-fast: false
