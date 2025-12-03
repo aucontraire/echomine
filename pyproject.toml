@@ -53,6 +53,7 @@ docs = [
     "mkdocs-material>=9.0.0",
     "mkdocstrings[python]>=1.0.0",
     "pymdown-extensions>=10.0.0",
+    "ruff>=0.1.0",  # Required by mkdocstrings for signature formatting
 ]
 
 [project.scripts]
