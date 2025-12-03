@@ -1,0 +1,76 @@
+# IDE
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+coverage.xml
+coverage.json
+htmlcov/
+.tox/
+
+# Type checking & linting cache
+.mypy_cache/
+.ruff_cache/
+
+# Logs
+*.log
+logs/
+
+# MkDocs generated site
+site/
+
+# Benchmarks and performance data
+.benchmarks/
+performance_baselines.json
+
+# Temporary validation/audit reports
+*_VALIDATION*.md
+*_AUDIT*.md
+*_SUMMARY.txt
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# PyCharm sample files
+main.py
+
+# Local data files (real user exports - private)
+data/
+
+# Context file for Claude Code crash recovery
+docs/context.md
+
+# OS
+.DS_Store
+Thumbs.db

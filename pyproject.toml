@@ -1,0 +1,270 @@
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "echomine"
+version = "1.0.2"
+description = "Library-first tool for parsing AI conversation exports with search, filtering, and markdown export"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "AGPL-3.0-or-later"}
+authors = [
+    {name = "Echomine Contributors"}
+]
+keywords = ["ai", "chatgpt", "conversation", "parser", "export", "search"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    # CHK123: Pydantic v2.6.0+ required for frozen=True, field_validator stability
+    "pydantic>=2.6.0,<3.0.0",
+    # CHK122: ijson 3.2.0+ for streaming performance improvements (60% faster)
+    "ijson>=3.2.0,<4.0",
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "structlog>=23.0.0",
+    "python-slugify>=8.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
+    "pytest-benchmark>=4.0.0",
+    "psutil>=5.9.0",  # For T068 file descriptor tracking in resource cleanup tests
+    "mypy>=1.5.0",
+    "ruff>=0.1.0",
+    "pre-commit>=3.4.0",
+]
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=1.0.0",
+    "pymdown-extensions>=10.0.0",
+    "ruff>=0.1.0",  # Required by mkdocstrings for signature formatting
+]
+
+[project.scripts]
+echomine = "echomine.cli.app:main"
+
+[project.urls]
+Homepage = "https://github.com/echomine/echomine"
+Documentation = "https://github.com/echomine/echomine"
+Repository = "https://github.com/echomine/echomine"
+Issues = "https://github.com/echomine/echomine/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["echomine*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+echomine = ["py.typed"]
+
+# ============================================================================
+# Tool Configurations
+# ============================================================================
+
+[tool.mypy]
+# Strict type checking (Constitution Principle VI)
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+strict_concatenate = true
+
+# Output
+show_error_codes = true
+show_column_numbers = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = "ijson.*"
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "ANN",    # flake8-annotations
+    "ASYNC",  # flake8-async
+    "S",      # flake8-bandit
+    "B",      # flake8-bugbear
+    "A",      # flake8-builtins
+    "C4",     # flake8-comprehensions
+    "DTZ",    # flake8-datetimez
+    "T10",    # flake8-debugger
+    "EM",     # flake8-errmsg
+    "ISC",    # flake8-implicit-str-concat
+    "ICN",    # flake8-import-conventions
+    "G",      # flake8-logging-format
+    "PIE",    # flake8-pie
+    "T20",    # flake8-print
+    "PT",     # flake8-pytest-style
+    "Q",      # flake8-quotes
+    "RSE",    # flake8-raise
+    "RET",    # flake8-return
+    "SLF",    # flake8-self
+    "SIM",    # flake8-simplify
+    "TID",    # flake8-tidy-imports
+    "TCH",    # flake8-type-checking
+    "ARG",    # flake8-unused-arguments
+    "PTH",    # flake8-use-pathlib
+    "ERA",    # eradicate
+    "PL",     # pylint
+    "TRY",    # tryceratops
+    "RUF",    # ruff-specific rules
+]
+
+ignore = [
+    "ANN401",  # Dynamically typed Any - sometimes necessary for generic callbacks
+    "S101",    # Use of assert (needed for pytest)
+    "PLR0912", # Too many branches - complex functions sometimes need this
+    "PLR0913", # Too many arguments (sometimes necessary for adapters)
+    "PLR0915", # Too many statements - complex functions sometimes need this
+    "PLR2004", # Magic values - sometimes acceptable for configuration
+    "TCH",     # flake8-type-checking - too pedantic, requires TYPE_CHECKING blocks
+    "TRY003",  # Avoid specifying long messages outside exception class
+    "TRY203",  # Remove exception handler re-raise - sometimes intentional
+    "TRY300",  # try-consider-else - stylistic preference
+    "TRY301",  # Abstract raise to inner function - overly pedantic
+    "EM101",   # Exception must not use string literal
+    "EM102",   # Exception must not use f-string literal
+    "G004",    # Logging f-string - acceptable for structured logging
+    "B904",    # raise without from - sometimes intentional in re-raises
+    "B905",    # zip() without strict - handled by logic
+    "E501",    # Line too long - sometimes necessary for readability
+    "PTH123",  # open() vs Path.open() - both are valid Python
+    "PLC0415", # import not at top level - lazy imports are acceptable
+    "SIM102",  # Nested if - sometimes clearer than combined conditions
+    "RUF022",  # __all__ not sorted - grouped by category for readability
+    "RUF005",  # Collection literal concatenation - stylistic
+    "RUF001",  # Ambiguous unicode - intentional in some strings
+    "A002",    # Builtin shadowing - intentional for certain parameter names
+    "ARG002",  # Unused method argument - callback signatures may not use all args
+    "N806",    # Non-lowercase variable - sometimes matches external conventions
+    "DTZ007",  # datetime.strptime - acceptable when timezone handled separately
+    "ERA001",  # Commented-out code - sometimes useful for reference
+    "UP046",   # Private type parameter - stylistic
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/echomine/cli/**/*.py" = [
+    "T201",    # Print statements - CLI output to stdout is intentional
+]
+"src/echomine/export/**/*.py" = [
+    "B007",    # Unused loop variable - sometimes needed for dict.items() pattern
+]
+"tests/**/*.py" = [
+    "S",       # Security checks - not applicable to tests
+    "ANN",     # Type annotations optional in tests
+    "ARG",     # Unused arguments (fixtures)
+    "PLR",     # Pylint refactor - complexity limits relaxed for tests
+    "PT017",   # pytest-assert-in-except - common test pattern
+    "PT018",   # pytest-composite-assertion - sometimes clearer
+    "PLC0415", # import not at top level - common in tests for isolation
+    "SLF001",  # Private member access - needed for testing internals
+    "B017",    # assert-raises-exception
+    "PT011",   # pytest-raises-too-broad
+    "PT012",   # pytest-raises-with-multiple-statements
+    "RUF059",  # Unused unpacked variable
+    "F841",    # Unused variable - common in tests
+    "F821",    # Undefined name - forward references in test annotations
+    "ERA001",  # Commented-out code - often useful for reference in tests
+    "T201",    # Print statements allowed in tests
+    "E501",    # Line too long - test assertions can be verbose
+    "B904",    # raise without from - common in test exception handling
+    "PTH",     # Use pathlib - not always cleaner in tests
+    "B007",    # Unused loop variable
+    "SIM",     # Simplify - sometimes explicit is clearer in tests
+    "TRY",     # tryceratops - relaxed in tests
+    "RUF001",  # Ambiguous unicode - intentional in test data
+    "RUF005",  # Collection literal concatenation
+    "RET504", # Unnecessary assignment before return - clearer in tests
+    "PIE810", # Call startswith/endswith once - sometimes clearer separate
+    "G201",   # Logging .exception() instead of .error() - acceptable in tests
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["echomine"]
+force-single-line = false
+lines-after-imports = 2
+
+[tool.pytest.ini_options]
+minversion = "7.4"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=echomine",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "contract: Contract tests for protocols",
+    "performance: Performance benchmarks",
+    "slow: Slow-running stress tests (run explicitly with pytest -m slow)",
+]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+    "@overload",
+]

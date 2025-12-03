@@ -1,0 +1,1676 @@
+{
+  "title": "Gmail API Management in Java",
+  "create_time": 1733421989.327302,
+  "update_time": 1733430571.102635,
+  "mapping": {
+    "aaa17e7d-5995-4c16-9587-97c60ebab3fc": {
+      "id": "aaa17e7d-5995-4c16-9587-97c60ebab3fc",
+      "message": null,
+      "parent": null,
+      "children": [
+        "f2f088de-38ed-4544-8107-4750da3f98a8"
+      ]
+    },
+    "f2f088de-38ed-4544-8107-4750da3f98a8": {
+      "id": "f2f088de-38ed-4544-8107-4750da3f98a8",
+      "message": {
+        "id": "f2f088de-38ed-4544-8107-4750da3f98a8",
+        "author": {
+          "role": "system",
+          "name": null,
+          "metadata": {}
+        },
+        "create_time": null,
+        "update_time": null,
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "status": "finished_successfully",
+        "end_turn": true,
+        "weight": 0.0,
+        "metadata": {
+          "is_visually_hidden_from_conversation": true
+        },
+        "recipient": "all",
+        "channel": null
+      },
+      "parent": "aaa17e7d-5995-4c16-9587-97c60ebab3fc",
+      "children": [
+        "aaa205b2-64fd-468c-815c-246741985c42"
+      ]
+    },
+    "aaa205b2-64fd-468c-815c-246741985c42": {
+      "id": "aaa205b2-64fd-468c-815c-246741985c42",
+      "message": {
+        "id": "aaa205b2-64fd-468c-815c-246741985c42",
+        "author": {
+          "role": "user",
+          "name": null,
+          "metadata": {}
+        },
+        "create_time": 1733421989.330854,
+        "update_time": null,
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "I want to build an app in Java that will help me manage my Gmail. Gmail's features are limited in creating a complex searching and bulk deleting of messages."
+          ]
+        },
+        "status": "finished_successfully",
+        "end_turn": null,
+        "weight": 1.0,
+        "metadata": {
+          "serialization_metadata": {
+            "custom_symbol_offsets": []
+          },
+          "request_id": "8ed5f8679bc12522-SJC",
+          "message_source": null,
+          "timestamp_": "absolute",
+          "message_type": null
+        },
+        "recipient": "all",
+        "channel": null
+      },
+      "parent": "f2f088de-38ed-4544-8107-4750da3f98a8",
+      "children": [
+        "b5bd1f62-840a-435d-a79e-d0238a2ad8cf"
+      ]
+    },
+    "b5bd1f62-840a-435d-a79e-d0238a2ad8cf": {
+      "id": "b5bd1f62-840a-435d-a79e-d0238a2ad8cf",
+      "message": {
+        "id": "b5bd1f62-840a-435d-a79e-d0238a2ad8cf",
+        "author": {
+          "role": "assistant",
+          "name": null,
+          "metadata": {}
+        },
+        "create_time": 1733422007.751569,
+        "update_time": null,
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "status": "finished_successfully",
+        "end_turn": null,
+        "weight": 1.0,
+        "metadata": {
+          "message_type": null,
+          "model_slug": "gpt-4o",
+          "default_model_slug": "gpt-4o",
+          "parent_id": "aaa205b2-64fd-468c-815c-246741985c42",
+          "request_id": "8ed5f8679bc12522-SJC",
+          "timestamp_": "absolute"
+        },
+        "recipient": "all",
+        "channel": null
+      },
+      "parent": "aaa205b2-64fd-468c-815c-246741985c42",
+      "children": [
+        "bdc33ba8-bdf1-4388-957a-c83df732507e"
+      ]
+    },
+    "bdc33ba8-bdf1-4388-957a-c83df732507e": {
+      "id": "bdc33ba8-bdf1-4388-957a-c83df732507e",
+      "message": {
+        "id": "bdc33ba8-bdf1-4388-957a-c83df732507e",
+        "author": {
+          "role": "assistant",
+          "name": null,
+          "metadata": {}
+        },
+        "create_time": 1733422007.751743,
+        "update_time": null,
+        "content": {
+          "content_type": "code",
+          "language": "unknown",
+          "response_format_name": null,
+          "text": "search(\"I want to build an app in Java that will help me manage my Gmail. Gmail's features are limited in creating a complex searching and bulk deleting of messages.\")"
+        },
+        "status": "finished_successfully",
+        "end_turn": null,
+        "weight": 1.0,
+        "metadata": {
+          "sonic_classification_result": {
+            "latency_ms": 1479608354.4862459,
+            "search_prob": 0.5274220562195341
+          },
+          "citations": [],
+          "content_references": [],
+          "message_type": null,
+          "model_slug": "gpt-4o",
+          "default_model_slug": "gpt-4o",
+          "parent_id": "b5bd1f62-840a-435d-a79e-d0238a2ad8cf",
+          "request_id": "8ed5f8679bc12522-SJC",
+          "timestamp_": "absolute"
+        },
+        "recipient": "web",
+        "channel": null
+      },
+      "parent": "b5bd1f62-840a-435d-a79e-d0238a2ad8cf",
+      "children": [
+        "8d615c96-8d50-4a24-9252-47ee6cc64a16"
+      ]
+    },
+    "8d615c96-8d50-4a24-9252-47ee6cc64a16": {
+      "id": "8d615c96-8d50-4a24-9252-47ee6cc64a16",
+      "message": {
+        "id": "8d615c96-8d50-4a24-9252-47ee6cc64a16",
+        "author": {
+          "role": "tool",
+          "name": "web",
+          "metadata": {}
+        },
+        "create_time": 1733422007.751888,
+        "update_time": null,
+        "content": {
+          "content_type": "code",
+          "language": "unknown",
+          "response_format_name": null,
+          "text": ""
+        },
+        "status": "finished_successfully",
+        "end_turn": null,
+        "weight": 0.0,
+        "metadata": {
+          "is_visually_hidden_from_conversation": true,
+          "command": "search",
+          "status": "finished",
+          "is_complete": true,
+          "message_type": null,
+          "model_slug": "gpt-4o",
+          "default_model_slug": "gpt-4o",
+          "parent_id": "bdc33ba8-bdf1-4388-957a-c83df732507e",
+          "request_id": "8ed5f8679bc12522-SJC",
+          "timestamp_": "absolute"
+        },
+        "recipient": "assistant",
+        "channel": null
+      },
+      "parent": "bdc33ba8-bdf1-4388-957a-c83df732507e",
+      "children": [
+        "6a557a21-cadc-4871-b8b7-8265d0645042"
+      ]
+    },
+    "6a557a21-cadc-4871-b8b7-8265d0645042": {
+      "id": "6a557a21-cadc-4871-b8b7-8265d0645042",
+      "message": {
+        "id": "6a557a21-cadc-4871-b8b7-8265d0645042",
+        "author": {
+          "role": "assistant",
+          "name": null,
+          "metadata": {
+            "real_author": "tool:web"
+          }
+        },
+        "create_time": 1733422007.751989,
+        "update_time": null,
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "To enhance your Gmail management capabilities, you can develop a Java application that leverages the Gmail API for advanced searching and bulk deletion of emails. Here's a structured approach to achieve this:\n\n**1. Set Up Your Google Cloud Project and Enable Gmail API:**\n- Navigate to the [Google Cloud Console](https://console.cloud.google.com/).\n- Create a new project or select an existing one.\n- Enable the Gmail API for your project by searching for \"Gmail API\" in the API Library and clicking \"Enable\".\n- Configure OAuth 2.0 credentials to authorize your application. This involves setting up the consent screen and obtaining the client ID and client secret.\n\n**2. Integrate the Gmail API Client Library in Your Java Application:**\n- Add the Gmail API client library to your project dependencies. If you're using Maven, include the following in your `pom.xml`:\n\n  ```xml\n  <dependency>\n    <groupId>com.google.apis</groupId>\n    <artifactId>google-api-services-gmail</artifactId>\n    <version>v1-rev20240520-2.0.0</version>\n  </dependency>\n  ```\n\n- For Gradle, add this to your `build.gradle`:\n\n  ```groovy\n  implementation 'com.google.apis:google-api-services-gmail:v1-rev20240520-2.0.0'\n  ```\n\n**3. Implement OAuth 2.0 Authorization:**\n- Utilize the Google API Client Library to handle OAuth 2.0 authentication. This process will prompt users to grant your application access to their Gmail account.\n- Store the obtained access and refresh tokens securely to manage session persistence and token refreshing.\n\n**4. Perform Advanced Email Searches:**\n- Use the `users.messages.list` method with the `q` parameter to execute complex search queries. The `q` parameter supports advanced search operators similar to those in the Gmail web interface.\n- For example, to find unread emails from a specific sender containing attachments:\n\n  ```java\n  String user = \"me\";\n  String query = \"from:sender@example.com is:unread has:attachment\";\n  ListMessagesResponse response = service.users().messages().list(user).setQ(query).execute();\n  List<Message> messages = response.getMessages();\n  ```\n\n  This approach allows you to filter messages by various criteria such as sender, date range, labels, and more. citeturn0search1\n\n**5. Implement Bulk Deletion of Emails:**\n- After retrieving the list of messages matching your search criteria, you can delete them in bulk using the `users.messages.batchDelete` method.\n- First, collect the message IDs:\n\n  ```java\n  List<String> messageIds = new ArrayList<>();\n  if (messages != null) {\n    for (Message message : messages) {\n      messageIds.add(message.getId());\n    }\n  }\n  ```\n\n- Then, create a `BatchDeleteMessagesRequest` and execute the batch delete:\n\n  ```java\n  BatchDeleteMessagesRequest batchRequest = new BatchDeleteMessagesRequest().setIds(messageIds);\n  service.users().messages().batchDelete(user, batchRequest).execute();\n  ```\n\n  This method allows you to delete multiple messages efficiently. citeturn0search6\n\n**6. Handle API Quotas and Batch Processing:**\n- Be mindful of Gmail API usage limits and implement error handling to manage rate limiting.\n- For large volumes of messages, consider using batch processing to group multiple API calls into a single HTTP request, reducing overhead and improving performance. citeturn0search2\n\n**7. Explore Additional Resources and Examples:**\n- Refer to the [Gmail API Java Quickstart Guide](https://developers.google.com/gmail/api/quickstart/java) for a comprehensive walkthrough of setting up and using the API in a Java application.\n- Examine sample projects, such as the [Gmail API Client with Java Spring Boot](https://github.com/DavidRFerreira/GmailAPIClientSpringBoot), to understand practical implementations of the Gmail API in Java applications.\n\nBy following these steps, you can create a Java application that provides enhanced control over your Gmail account, enabling complex searches and bulk deletions tailored to your specific needs. "
+          ]
+        },
+        "status": "finished_successfully",
+        "end_turn": true,
+        "weight": 1.0,
+        "metadata": {
+          "search_source": "composer_auto",
+          "client_reported_search_source": "composer_auto",
+          "search_result_groups": [
+            {
+              "type": "search_result_group",
+              "domain": "google.com",
+              "entries": [
+                {
+                  "type": "search_result",
+                  "url": "https://developers.google.com/gmail/api/reference/rest/v1/users.messages/delete",
+                  "title": "Method: users.messages.delete | Gmail | Google for Developers",
+                  "snippet": "Parameters; userId: string. The user's email address. The special value me can be used to indicate the authenticated user.. id: string. The ID of the message to delete.",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 0
+                  },
+                  "content_type": null,
+                  "pub_date": 1725408000.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://developers.google.com/gmail/api/guides/filtering",
+                  "title": "Searching for Messages | Gmail | Google for Developers",
+                  "snippet": "You can search or filter files using the messages.list and threads.list methods. These methods accept the q parameter which supports most of the same advanced search syntax as the Gmail web-interface....",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 1
+                  },
+                  "content_type": null,
+                  "pub_date": 1732579200.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://developers.google.com/gmail/api/guides/batch",
+                  "title": "Batching Requests | Gmail | Google for Developers",
+                  "snippet": "Each HTTP connection your client makes results in a certain amount of overhead. The Gmail API supports batching, to allow your client to put several API calls into a single HTTP request. Examples of s...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 2
+                  },
+                  "content_type": null,
+                  "pub_date": 1732579200.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://developers.google.com/gmail/api/quickstart/java",
+                  "title": "Java quickstart | Gmail | Google for Developers",
+                  "snippet": "Your Java application runs and calls the Gmail API. Authorization information is stored in the file system, so the next time you run the sample code, you aren't prompted for authorization. Next steps....",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 3
+                  },
+                  "content_type": null,
+                  "pub_date": 1732579200.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://developers.google.com/gmail/api/reference/rest/v1/users.messages/list",
+                  "title": "Method: users.messages.list | Gmail | Google for Developers",
+                  "snippet": "Supports the same query format as the Gmail search box. For example, \"from:someuser@example.com rfc822msgid:<somemsgid@example.com> is:unread\". Parameter cannot be used when accessing the api using th...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 5
+                  },
+                  "content_type": null,
+                  "pub_date": 1725408000.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://developers.google.com/resources/api-libraries/documentation/gmail/v1/java/latest/com/google/api/services/gmail/Gmail.Users.Messages.BatchDelete.html",
+                  "title": "Gmail API v1 (revision 110) - Google Developers",
+                  "snippet": "All Implemented Interfaces: java.lang.Cloneable, java.util.Map<java.lang.String,java.lang.Object> Enclosing class: Gmail.Users.Messages",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 6
+                  },
+                  "content_type": null,
+                  "pub_date": null,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://developers.google.com/gmail/api/guides/filter_settings",
+                  "title": "Managing Filters | Gmail | Google for Developers",
+                  "snippet": "You can use Filters to configure advanced filtering rules for an account. Filters can automatically add or remove labels or forward emails to verified aliases based on the attributes or content of the...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 16
+                  },
+                  "content_type": null,
+                  "pub_date": 1732579200.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://developers.google.com/resources/api-libraries/documentation/gmail/v1/java/latest/com/google/api/services/gmail/model/BatchDeleteMessagesRequest.html",
+                  "title": "BatchDeleteMessagesRequest (Gmail API v1 (Rev. 110) 1.25.0)",
+                  "snippet": "java.util.AbstractMap<java.lang.String,java.lang.Object> com.google.api.client.util.GenericData; ... model class that specifies how to parse/serialize into the JSON that is transmitted over HTTP when...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 17
+                  },
+                  "content_type": null,
+                  "pub_date": null,
+                  "attributions": null,
+                  "attributions_debug": null
+                }
+              ]
+            },
+            {
+              "type": "search_result_group",
+              "domain": "googleapis.dev",
+              "entries": [
+                {
+                  "type": "search_result",
+                  "url": "https://googleapis.dev/java/google-api-services-gmail/latest/com/google/api/services/gmail/Gmail.Users.Messages.Delete.html",
+                  "title": "Gmail.Users.Messages.Delete (Gmail API v1-rev20240520-2.0.0)",
+                  "snippet": "Create a request for the method \"messages.delete\". This request holds the parameters needed by the the gmail server. After setting any optional parameters, call the AbstractGoogleClientRequest.execute...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 4
+                  },
+                  "content_type": null,
+                  "pub_date": null,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://googleapis.dev/java/google-api-services-gmail/latest/com/google/api/services/gmail/Gmail.Users.Messages.html",
+                  "title": "Gmail.Users.Messages (Gmail API v1-rev20240520-2.0.0) - googleapis.dev",
+                  "snippet": "public Gmail.Users.Messages.GmailImport gmailImport(String userId, Message content, com.google.api.client.http.AbstractInputStreamContent mediaContent) throws IOException Imports a message into only t...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 8
+                  },
+                  "content_type": null,
+                  "pub_date": null,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://googleapis.dev/java/google-api-services-gmail/latest/com/google/api/services/gmail/Gmail.Users.Messages.Get.html",
+                  "title": "Gmail.Users.Messages.Get (Gmail API v1-rev20240520-2.0.0)",
+                  "snippet": "Gmail.initialize(com.google.api.client.googleapis.services.AbstractGoogleClientRequest) must be called to initialize this instance immediately after invoking the constructor. Parameters: userId - The...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 14
+                  },
+                  "content_type": null,
+                  "pub_date": null,
+                  "attributions": null,
+                  "attributions_debug": null
+                }
+              ]
+            },
+            {
+              "type": "search_result_group",
+              "domain": "github.com",
+              "entries": [
+                {
+                  "type": "search_result",
+                  "url": "https://github.com/googleapis/google-api-java-client-services/blob/main/clients/google-api-services-gmail/v1/README.md",
+                  "title": "google-api-java-client-services/clients/google-api-services-gmail/v1 ...",
+                  "snippet": "The Gmail API lets you view and manage Gmail mailbox data like threads, messages, and labels. This page contains information about getting started with the Gmail API using the Google API Client Librar...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 7
+                  },
+                  "content_type": null,
+                  "pub_date": null,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://github.com/DavidRFerreira/GmailAPIClientSpringBoot",
+                  "title": "Gmail API Client with Java Spring Boot - GitHub",
+                  "snippet": "Google's Gmail API lets you view and manage your Gmail inbox and supports features like reading and sending emails, managing drafts and attachments and others.. This repository and its source code pro...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 12
+                  },
+                  "content_type": null,
+                  "pub_date": null,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://github.com/googleworkspace/java-samples/blob/main/gmail/quickstart/src/main/java/GmailQuickstart.java",
+                  "title": "java-samples/gmail/quickstart/src/main/java/GmailQuickstart.java at ...",
+                  "snippet": "Search code, repositories, users, issues, pull requests... Search Clear. ... and take your input very seriously. Include my email address so I can be contacted. Cancel Submit feedback Saved searches U...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 18
+                  },
+                  "content_type": null,
+                  "pub_date": null,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://github.com/googleworkspace/java-samples",
+                  "title": "☕ Java samples for Google Workspace APIs. - GitHub",
+                  "snippet": "You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window.",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 21
+                  },
+                  "content_type": null,
+                  "pub_date": null,
+                  "attributions": null,
+                  "attributions_debug": null
+                }
+              ]
+            },
+            {
+              "type": "search_result_group",
+              "domain": "codejava.net",
+              "entries": [
+                {
+                  "type": "search_result",
+                  "url": "https://www.codejava.net/java-ee/javamail/using-javamail-for-searching-e-mail-messages",
+                  "title": "JavaMail - How to search e-mail messages - CodeJava.net",
+                  "snippet": "As we can see, the match() method above returns true if a message with subject containing the word “Java”. In other words, the search term above will match all messages having the word “Java” in its S...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 9
+                  },
+                  "content_type": null,
+                  "pub_date": 1562630400.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                }
+              ]
+            },
+            {
+              "type": "search_result_group",
+              "domain": "rollout.com",
+              "entries": [
+                {
+                  "type": "search_result",
+                  "url": "https://rollout.com/integration-guides/gmail/sdk/step-by-step-guide-to-building-a-gmail-api-integration-in-java",
+                  "title": "How to build a Gmail API integration - Rollout",
+                  "snippet": "Remember, this is just scratching the surface. The Gmail API offers even more advanced features like batch requests, push notifications, and complex search queries. So keep exploring and happy coding!...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 10
+                  },
+                  "content_type": null,
+                  "pub_date": 1721347200.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                }
+              ]
+            },
+            {
+              "type": "search_result_group",
+              "domain": "freecodecamp.org",
+              "entries": [
+                {
+                  "type": "search_result",
+                  "url": "https://www.freecodecamp.org/news/how-to-batch-delete-emails-in-gmail-delete-multiple-email-messages/",
+                  "title": "How to Batch Delete Emails in Gmail – Delete Multiple Email Messages",
+                  "snippet": "This will select all your unread messages. Step 5: Click the delete icon at the top. Step 6: A pop up will appear asking if you want to bulk delete the messages. Click “Ok”. That’s how you can bulk de...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 11
+                  },
+                  "content_type": null,
+                  "pub_date": 1658188800.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                }
+              ]
+            },
+            {
+              "type": "search_result_group",
+              "domain": "stackoverflow.com",
+              "entries": [
+                {
+                  "type": "search_result",
+                  "url": "https://stackoverflow.com/questions/14561915/query-regarding-how-to-delete-emails-from-gmail-account-using-javamail-using-pop",
+                  "title": "java - Query regarding how to delete emails from gmail account using ...",
+                  "snippet": "Gmail doesn't let you delete messages via the POP3 protocol. Deleting messages in Gmail after POP downloads. ... Java Mail Api, delete mails from gmail. 5. How to delete email permanently in Gmail usi...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 13
+                  },
+                  "content_type": null,
+                  "pub_date": 1359331200.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                }
+              ]
+            },
+            {
+              "type": "search_result_group",
+              "domain": "mailtrap.io",
+              "entries": [
+                {
+                  "type": "search_result",
+                  "url": "https://mailtrap.io/blog/send-emails-with-gmail-api/",
+                  "title": "How to Send and Read Emails with Gmail API | Mailtrap Blog",
+                  "snippet": "Gmail API uses open authentication (Oauth2), which only lets you request the scope of access you need. SMTP provides full access to the account using client login and password SMTP authentication. Quo...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 15
+                  },
+                  "content_type": null,
+                  "pub_date": 1694390400.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                },
+                {
+                  "type": "search_result",
+                  "url": "https://mailtrap.io/blog/java-send-email-gmail/",
+                  "title": "How to Send Email in Java using Gmail SMTP and Gmail API - Mailtrap",
+                  "snippet": "Sending email in Java with Gmail API. Now that you’re familiar with sending email via Gmail’s SMTP server, let me show you how to do it with Gmail’s API. Step 1: Create a project. The first thing we h...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 19
+                  },
+                  "content_type": null,
+                  "pub_date": 1709683200.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                }
+              ]
+            },
+            {
+              "type": "search_result_group",
+              "domain": "howtogeek.com",
+              "entries": [
+                {
+                  "type": "search_result",
+                  "url": "https://www.howtogeek.com/854071/how-to-mass-delete-emails-in-gmail/",
+                  "title": "How to Mass Delete Emails in Gmail - How-To Geek",
+                  "snippet": "If you prefer the Gmail mobile apps for Android and iPhone, you should know you can mass delete emails from the inbox view, but you can only remove 50 at a time. To do this, tap on the image that appe...",
+                  "ref_id": {
+                    "turn_index": 0,
+                    "ref_type": "search",
+                    "ref_index": 20
+                  },
+                  "content_type": null,
+                  "pub_date": 1731542400.0,
+                  "attributions": null,
+                  "attributions_debug": null
+                }
+              ]
+            }
+          ],
+          "safe_urls": [
+            "https://developers.google.com/resources/api-libraries/documentation/gmail/v1/java/latest/com/google/api/services/gmail/Gmail.Users.Messages.BatchDelete.html?utm_source=chatgpt.com",
+            "https://developers.google.com/gmail/api/guides/batch?utm_source=chatgpt.com",
+            "https://developers.google.com/gmail/api/guides/filtering?utm_source=chatgpt.com"
+          ],
+          "message_type": null,
+          "model_slug": "gpt-4o",
+          "default_model_slug": "gpt-4o",
+          "parent_id": "8d615c96-8d50-4a24-9252-47ee6cc64a16",
+          "message_locale": "en-US",
+          "image_results": [],
+          "content_references": [
+            {
+              "matched_text": "",
+              "start_idx": 0,
+              "end_idx": 1,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 163,
+              "end_idx": 164,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 276,
+              "end_idx": 277,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 351,
+              "end_idx": 352,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 355,
+              "end_idx": 356,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 403,
+              "end_idx": 404,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 407,
+              "end_idx": 408,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 516,
+              "end_idx": 517,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 520,
+              "end_idx": 521,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 674,
+              "end_idx": 675,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 751,
+              "end_idx": 752,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 878,
+              "end_idx": 879,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 883,
+              "end_idx": 884,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1065,
+              "end_idx": 1066,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1070,
+              "end_idx": 1071,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1115,
+              "end_idx": 1116,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1120,
+              "end_idx": 1121,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1218,
+              "end_idx": 1219,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1265,
+              "end_idx": 1266,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1427,
+              "end_idx": 1428,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1431,
+              "end_idx": 1432,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1537,
+              "end_idx": 1538,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1582,
+              "end_idx": 1583,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1775,
+              "end_idx": 1776,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1779,
+              "end_idx": 1780,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1861,
+              "end_idx": 1862,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 1866,
+              "end_idx": 1867,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2117,
+              "end_idx": 2118,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2122,
+              "end_idx": 2123,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2232,
+              "end_idx": 2233,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "citeturn0search1",
+              "start_idx": 2234,
+              "end_idx": 2253,
+              "alt": "([Google Developers](https://developers.google.com/gmail/api/guides/filtering?utm_source=chatgpt.com))",
+              "prompt_text": null,
+              "type": "webpage",
+              "title": "Searching for Messages | Gmail | Google for Developers",
+              "url": "https://developers.google.com/gmail/api/guides/filtering?utm_source=chatgpt.com",
+              "pub_date": 1732579200.0,
+              "snippet": "You can search or filter files using the messages.list and threads.list methods. These methods accept the q parameter which supports most of the same advanced search syntax as the Gmail web-interface. For a list of search and filter differences between the Gmail UI and Gmail API, see Search filter differences: Gmail UI versus Gmail API. This advanced syntax allows you to use search queries to ...",
+              "attributions": null,
+              "attributions_debug": null,
+              "attribution": "Google Developers"
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2299,
+              "end_idx": 2300,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2443,
+              "end_idx": 2444,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2447,
+              "end_idx": 2448,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2479,
+              "end_idx": 2480,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2484,
+              "end_idx": 2485,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2659,
+              "end_idx": 2660,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2664,
+              "end_idx": 2665,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2738,
+              "end_idx": 2739,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2743,
+              "end_idx": 2744,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2926,
+              "end_idx": 2927,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2931,
+              "end_idx": 2932,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 2995,
+              "end_idx": 2996,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "citeturn0search6",
+              "start_idx": 2997,
+              "end_idx": 3016,
+              "alt": "([Google Developers](https://developers.google.com/resources/api-libraries/documentation/gmail/v1/java/latest/com/google/api/services/gmail/Gmail.Users.Messages.BatchDelete.html?utm_source=chatgpt.com))",
+              "prompt_text": null,
+              "type": "webpage",
+              "title": "Gmail API v1 (revision 110) - Google Developers",
+              "url": "https://developers.google.com/resources/api-libraries/documentation/gmail/v1/java/latest/com/google/api/services/gmail/Gmail.Users.Messages.BatchDelete.html?utm_source=chatgpt.com",
+              "pub_date": null,
+              "snippet": "All Implemented Interfaces: java.lang.Cloneable, java.util.Map<java.lang.String,java.lang.Object> Enclosing class: Gmail.Users.Messages",
+              "attributions": null,
+              "attributions_debug": null,
+              "attribution": "Google Developers"
+            },
+            {
+              "matched_text": "",
+              "start_idx": 3067,
+              "end_idx": 3068,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 3158,
+              "end_idx": 3159,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 3162,
+              "end_idx": 3163,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 3326,
+              "end_idx": 3327,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "citeturn0search2",
+              "start_idx": 3328,
+              "end_idx": 3347,
+              "alt": "([Google Developers](https://developers.google.com/gmail/api/guides/batch?utm_source=chatgpt.com))",
+              "prompt_text": null,
+              "type": "webpage",
+              "title": "Batching Requests | Gmail | Google for Developers",
+              "url": "https://developers.google.com/gmail/api/guides/batch?utm_source=chatgpt.com",
+              "pub_date": 1732579200.0,
+              "snippet": "Each HTTP connection your client makes results in a certain amount of overhead. The Gmail API supports batching, to allow your client to put several API calls into a single HTTP request. Examples of situations when you might want to use batching: You've just started using the API and you have a lot of data to upload.",
+              "attributions": null,
+              "attributions_debug": null,
+              "attribution": "Google Developers"
+            },
+            {
+              "matched_text": "",
+              "start_idx": 3401,
+              "end_idx": 3402,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 3592,
+              "end_idx": 3593,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 3596,
+              "end_idx": 3597,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 3814,
+              "end_idx": 3815,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 3817,
+              "end_idx": 3818,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": "",
+              "start_idx": 4011,
+              "end_idx": 4012,
+              "alt": null,
+              "prompt_text": null,
+              "type": "hidden",
+              "invalid": false
+            },
+            {
+              "matched_text": " ",
+              "start_idx": 4012,
+              "end_idx": 4012,
+              "alt": "",
+              "prompt_text": null,
+              "type": "sources_footnote",
+              "sources": [
+                {
+                  "title": "Searching for Messages | Gmail | Google for Developers",
+                  "url": "https://developers.google.com/gmail/api/guides/filtering?utm_source=chatgpt.com",
+                  "attribution": "Google Developers"
+                }
+              ],
+              "has_images": false
+            }
+          ],
+          "citations": [
+            {
+              "start_ix": 0,
+              "end_ix": 1,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 163,
+              "end_ix": 164,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 276,
+              "end_ix": 277,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 351,
+              "end_ix": 352,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 355,
+              "end_ix": 356,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 403,
+              "end_ix": 404,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 407,
+              "end_ix": 408,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 516,
+              "end_ix": 517,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 520,
+              "end_ix": 521,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 674,
+              "end_ix": 675,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 751,
+              "end_ix": 752,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 878,
+              "end_ix": 879,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 883,
+              "end_ix": 884,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1065,
+              "end_ix": 1066,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1070,
+              "end_ix": 1071,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1115,
+              "end_ix": 1116,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1120,
+              "end_ix": 1121,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1218,
+              "end_ix": 1219,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1265,
+              "end_ix": 1266,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1427,
+              "end_ix": 1428,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1431,
+              "end_ix": 1432,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1537,
+              "end_ix": 1538,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1582,
+              "end_ix": 1583,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1775,
+              "end_ix": 1776,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1779,
+              "end_ix": 1780,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1861,
+              "end_ix": 1862,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 1866,
+              "end_ix": 1867,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2117,
+              "end_ix": 2118,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2122,
+              "end_ix": 2123,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2232,
+              "end_ix": 2233,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2234,
+              "end_ix": 2253,
+              "metadata": {
+                "type": "webpage",
+                "title": "Searching for Messages | Gmail | Google for Developers",
+                "url": "https://developers.google.com/gmail/api/guides/filtering?utm_source=chatgpt.com",
+                "text": "You can search or filter files using the messages.list and threads.list methods. These methods accept the q parameter which supports most of the same advanced search syntax as the Gmail web-interface. For a list of search and filter differences between the Gmail UI and Gmail API, see Search filter differences: Gmail UI versus Gmail API. This advanced syntax allows you to use search queries to ...",
+                "pub_date": "2024-11-26T00:00:00+00:00",
+                "extra": null,
+                "og_tags": null
+              }
+            },
+            {
+              "start_ix": 2299,
+              "end_ix": 2300,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2443,
+              "end_ix": 2444,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2447,
+              "end_ix": 2448,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2479,
+              "end_ix": 2480,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2484,
+              "end_ix": 2485,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2659,
+              "end_ix": 2660,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2664,
+              "end_ix": 2665,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2738,
+              "end_ix": 2739,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2743,
+              "end_ix": 2744,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2926,
+              "end_ix": 2927,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2931,
+              "end_ix": 2932,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2995,
+              "end_ix": 2996,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 2997,
+              "end_ix": 3016,
+              "metadata": {
+                "type": "webpage",
+                "title": "Gmail API v1 (revision 110) - Google Developers",
+                "url": "https://developers.google.com/resources/api-libraries/documentation/gmail/v1/java/latest/com/google/api/services/gmail/Gmail.Users.Messages.BatchDelete.html?utm_source=chatgpt.com",
+                "text": "All Implemented Interfaces: java.lang.Cloneable, java.util.Map<java.lang.String,java.lang.Object> Enclosing class: Gmail.Users.Messages",
+                "pub_date": null,
+                "extra": null,
+                "og_tags": null
+              }
+            },
+            {
+              "start_ix": 3067,
+              "end_ix": 3068,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 3158,
+              "end_ix": 3159,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 3162,
+              "end_ix": 3163,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 3326,
+              "end_ix": 3327,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 3328,
+              "end_ix": 3347,
+              "metadata": {
+                "type": "webpage",
+                "title": "Batching Requests | Gmail | Google for Developers",
+                "url": "https://developers.google.com/gmail/api/guides/batch?utm_source=chatgpt.com",
+                "text": "Each HTTP connection your client makes results in a certain amount of overhead. The Gmail API supports batching, to allow your client to put several API calls into a single HTTP request. Examples of situations when you might want to use batching: You've just started using the API and you have a lot of data to upload.",
+                "pub_date": "2024-11-26T00:00:00+00:00",
+                "extra": null,
+                "og_tags": null
+              }
+            },
+            {
+              "start_ix": 3401,
+              "end_ix": 3402,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 3592,
+              "end_ix": 3593,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 3596,
+              "end_ix": 3597,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 3814,
+              "end_ix": 3815,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 3817,
+              "end_ix": 3818,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 4011,
+              "end_ix": 4012,
+              "invalid_reason": "Unsupported, please upgrade"
+            },
+            {
+              "start_ix": 4012,
+              "end_ix": 4012,
+              "invalid_reason": "Unsupported, please upgrade"
+            }
+          ],
+          "request_id": "8ed5f8679bc12522-SJC",
+          "timestamp_": "absolute"
+        },
+        "recipient": "all",
+        "channel": null
+      },
+      "parent": "8d615c96-8d50-4a24-9252-47ee6cc64a16",
+      "children": [
+        "aaa27b98-4916-4cf7-ace3-0d01fcac687a"
+      ]
+    },
+    "aaa27b98-4916-4cf7-ace3-0d01fcac687a": {
+      "id": "aaa27b98-4916-4cf7-ace3-0d01fcac687a",
+      "message": {
+        "id": "aaa27b98-4916-4cf7-ace3-0d01fcac687a",
+        "author": {
+          "role": "user",
+          "name": null,
+          "metadata": {}
+        },
+        "create_time": 1733429873.03003,
+        "update_time": null,
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "I'm interested in how this is done:\n3. Implement OAuth 2.0 Authorization:\n\n"
+          ]
+        },
+        "status": "finished_successfully",
+        "end_turn": null,
+        "weight": 1.0,
+        "metadata": {
+          "serialization_metadata": {
+            "custom_symbol_offsets": []
+          },
+          "request_id": "8ed6b8e0ca07ed36-SJC",
+          "message_source": null,
+          "timestamp_": "absolute",
+          "message_type": null
+        },
+        "recipient": "all",
+        "channel": null
+      },
+      "parent": "6a557a21-cadc-4871-b8b7-8265d0645042",
+      "children": [
+        "13153e93-ed94-4381-90e8-fcd6c66689a6"
+      ]
+    },
+    "13153e93-ed94-4381-90e8-fcd6c66689a6": {
+      "id": "13153e93-ed94-4381-90e8-fcd6c66689a6",
+      "message": {
+        "id": "13153e93-ed94-4381-90e8-fcd6c66689a6",
+        "author": {
+          "role": "assistant",
+          "name": null,
+          "metadata": {}
+        },
+        "create_time": 1733429940.063056,
+        "update_time": null,
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "Implementing OAuth 2.0 authorization in a Java application involves several steps to allow your app to access the Gmail API on behalf of a user. Here’s how to set it up:\n\n---\n\n### **Step 1: Configure Google Cloud Project**\n1. **Create a Google Cloud Project**: Go to the [Google Cloud Console](https://console.cloud.google.com/), create a new project or select an existing one.\n2. **Enable Gmail API**: In the API Library, search for \"Gmail API\" and enable it for your project.\n3. **Create OAuth 2.0 Credentials**:\n   - Navigate to **Credentials** in the Google Cloud Console.\n   - Click **Create Credentials** > **OAuth Client ID**.\n   - Configure the consent screen:\n     - Set application name, email, and scopes.\n   - Choose **Web Application** and add your app’s redirect URIs (e.g., `http://localhost:8080/oauth2callback` for local development).\n   - Download the JSON file containing your `client_id` and `client_secret`.\n\n---\n\n### **Step 2: Add Required Dependencies**\nAdd the following dependencies to your `pom.xml` (if using Maven):\n\n```xml\n<dependency>\n    <groupId>com.google.api-client</groupId>\n    <artifactId>google-api-client</artifactId>\n    <version>1.34.0</version>\n</dependency>\n<dependency>\n    <groupId>com.google.oauth-client</groupId>\n    <artifactId>google-oauth-client-jetty</artifactId>\n    <version>1.34.0</version>\n</dependency>\n<dependency>\n    <groupId>com.google.apis</groupId>\n    <artifactId>google-api-services-gmail</artifactId>\n    <version>v1-rev20240520-2.0.0</version>\n</dependency>\n```\n\n---\n\n### **Step 3: Write Code for OAuth 2.0 Authorization**\nHere’s a step-by-step implementation:\n\n#### **1. Set Up Authorization Flow**\nCreate a method to configure and launch the OAuth 2.0 flow:\n\n```java\nimport com.google.api.client.auth.oauth2.Credential;\nimport com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;\nimport com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;\nimport com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow.Builder;\nimport com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;\nimport com.google.api.client.http.javanet.NetHttpTransport;\nimport com.google.api.client.json.JsonFactory;\nimport com.google.api.client.json.jackson2.JacksonFactory;\nimport com.google.api.services.gmail.GmailScopes;\n\nimport java.io.FileReader;\nimport java.io.IOException;\nimport java.util.Collections;\nimport java.util.List;\n\npublic class GmailAuthorization {\n\n    private static final String CLIENT_SECRET_FILE = \"path/to/your/client_secret.json\";\n    private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_READONLY);\n    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();\n    private static final String TOKENS_DIRECTORY_PATH = \"tokens\";\n\n    public static Credential authorize(final NetHttpTransport httpTransport) throws IOException {\n        // Load client secrets\n        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new FileReader(CLIENT_SECRET_FILE));\n\n        // Build flow and trigger user authorization request\n        GoogleAuthorizationCodeFlow flow = new Builder(\n                httpTransport, JSON_FACTORY, clientSecrets, SCOPES)\n                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))\n                .setAccessType(\"offline\")\n                .build();\n\n        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();\n        return new AuthorizationCodeInstalledApp(flow, receiver).authorize(\"user\");\n    }\n}\n```\n\n#### **2. Use the Credential Object**\nOnce authorized, the returned `Credential` object can be used to authenticate Gmail API requests.\n\n---\n\n### **Step 4: Handle Tokens**\nOAuth 2.0 provides an access token and a refresh token. The `Credential` object manages token refreshing for you. Store tokens securely in the specified `TOKENS_DIRECTORY_PATH` to reuse them across sessions.\n\n---\n\n### **Step 5: Integrate Gmail API with Authorized Credential**\nUse the `Credential` to create an instance of the Gmail service:\n\n```java\nimport com.google.api.services.gmail.Gmail;\nimport com.google.api.services.gmail.Gmail.Builder;\n\npublic class GmailService {\n    public static Gmail getGmailService(Credential credential, NetHttpTransport httpTransport) {\n        return new Builder(httpTransport, JacksonFactory.getDefaultInstance(), credential)\n                .setApplicationName(\"Your App Name\")\n                .build();\n    }\n}\n```\n\n---\n\n### **Step 6: Run the Application**\n1. Start the application.\n2. The user will be prompted to log in and grant permissions via their browser.\n3. After granting permissions, the app redirects to `http://localhost:8888/` and retrieves the authorization code to complete the flow.\n\n---\n\n### **Step 7: Test Gmail API Calls**\nFor example, list labels in the user’s inbox:\n\n```java\nimport com.google.api.services.gmail.model.ListLabelsResponse;\nimport com.google.api.services.gmail.model.Label;\n\nimport java.io.IOException;\n\npublic class GmailExample {\n    public static void main(String[] args) throws Exception {\n        final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();\n        Credential credential = GmailAuthorization.authorize(httpTransport);\n        Gmail service = GmailService.getGmailService(credential, httpTransport);\n\n        // Get the labels\n        ListLabelsResponse response = service.users().labels().list(\"me\").execute();\n        for (Label label : response.getLabels()) {\n            System.out.printf(\"- %s\\n\", label.getName());\n        }\n    }\n}\n```\n\n---\n\nBy following this setup, you’ll have a fully functional OAuth 2.0 implementation to interact with Gmail API!"
+          ]
+        },
+        "status": "finished_successfully",
+        "end_turn": true,
+        "weight": 1.0,
+        "metadata": {
+          "finish_details": {
+            "type": "stop",
+            "stop_tokens": [
+              200002
+            ]
+          },
+          "is_complete": true,
+          "sonic_classification_result": {
+            "latency_ms": 18127341209.880688,
+            "search_prob": 0.03776489228511331
+          },
+          "citations": [],
+          "content_references": [],
+          "message_type": null,
+          "model_slug": "gpt-4o",
+          "default_model_slug": "gpt-4o",
+          "parent_id": "aaa27b98-4916-4cf7-ace3-0d01fcac687a",
+          "request_id": "8ed6b8e0ca07ed36-SJC",
+          "timestamp_": "absolute"
+        },
+        "recipient": "all",
+        "channel": null
+      },
+      "parent": "aaa27b98-4916-4cf7-ace3-0d01fcac687a",
+      "children": [
+        "aaa21630-5f3f-4d5d-80c6-8faf7e8fe0cf"
+      ]
+    },
+    "aaa21630-5f3f-4d5d-80c6-8faf7e8fe0cf": {
+      "id": "aaa21630-5f3f-4d5d-80c6-8faf7e8fe0cf",
+      "message": {
+        "id": "aaa21630-5f3f-4d5d-80c6-8faf7e8fe0cf",
+        "author": {
+          "role": "user",
+          "name": null,
+          "metadata": {}
+        },
+        "create_time": 1733430318.895766,
+        "update_time": null,
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "What dependencies should I add to the Spring Initializr?"
+          ]
+        },
+        "status": "finished_successfully",
+        "end_turn": null,
+        "weight": 1.0,
+        "metadata": {
+          "serialization_metadata": {
+            "custom_symbol_offsets": []
+          },
+          "request_id": "8ed6c3c10c16ed36-SJC",
+          "message_source": null,
+          "timestamp_": "absolute",
+          "message_type": null
+        },
+        "recipient": "all",
+        "channel": null
+      },
+      "parent": "13153e93-ed94-4381-90e8-fcd6c66689a6",
+      "children": [
+        "8de74db8-2048-49c7-bfdc-40963bac9940"
+      ]
+    },
+    "8de74db8-2048-49c7-bfdc-40963bac9940": {
+      "id": "8de74db8-2048-49c7-bfdc-40963bac9940",
+      "message": {
+        "id": "8de74db8-2048-49c7-bfdc-40963bac9940",
+        "author": {
+          "role": "assistant",
+          "name": null,
+          "metadata": {}
+        },
+        "create_time": 1733430360.269175,
+        "update_time": null,
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "When setting up a **Spring Boot application** for your Gmail management app using **Spring Initializr**, you’ll need the following dependencies to handle Gmail API interactions and OAuth 2.0 authorization effectively.\n\n### **Essential Dependencies**\n\n#### **1. Spring Web**\n- For creating RESTful endpoints and managing HTTP requests and responses.\n- **Dependency Name**: `spring-boot-starter-web`\n\n#### **2. Spring Boot DevTools**\n- For hot reloading and faster development.\n- **Dependency Name**: `spring-boot-devtools`\n\n#### **3. OAuth2 Client**\n- For handling OAuth 2.0 authorization flow.\n- **Dependency Name**: `spring-boot-starter-oauth2-client`\n\n#### **4. Google API Client**\n- Required for accessing Gmail APIs.\n- Add this manually after generating the project, as it’s not available directly in Spring Initializr:\n  - Maven:\n    ```xml\n    <dependency>\n        <groupId>com.google.api-client</groupId>\n        <artifactId>google-api-client</artifactId>\n        <version>1.34.0</version>\n    </dependency>\n    <dependency>\n        <groupId>com.google.oauth-client</groupId>\n        <artifactId>google-oauth-client-jetty</artifactId>\n        <version>1.34.0</version>\n    </dependency>\n    <dependency>\n        <groupId>com.google.apis</groupId>\n        <artifactId>google-api-services-gmail</artifactId>\n        <version>v1-rev20240520-2.0.0</version>\n    </dependency>\n    ```\n  - Gradle:\n    ```groovy\n    implementation 'com.google.api-client:google-api-client:1.34.0'\n    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.34.0'\n    implementation 'com.google.apis:google-api-services-gmail:v1-rev20240520-2.0.0'\n    ```\n\n---\n\n### **Optional Dependencies (for Additional Features)**\n\n#### **1. Spring Data JPA**\n- If you plan to store metadata or token information in a database.\n- **Dependency Name**: `spring-boot-starter-data-jpa`\n\n#### **2. PostgreSQL Driver**\n- If you’re using PostgreSQL for persistent storage.\n- **Dependency Name**: `postgresql`\n\n#### **3. Spring Security**\n- For securing your application’s endpoints if you expose them publicly.\n- **Dependency Name**: `spring-boot-starter-security`\n\n---\n\n### **Steps to Add in Spring Initializr**\n1. Go to [Spring Initializr](https://start.spring.io/).\n2. **Project Settings**:\n   - Project: Maven or Gradle\n   - Language: Java\n   - Spring Boot: Select the latest version.\n3. Add the following **dependencies**:\n   - Spring Web\n   - OAuth2 Client\n   - Spring Boot DevTools\n   - (Optional) Spring Security, Spring Data JPA, PostgreSQL Driver.\n4. Generate the project and download the zip file.\n\n---\n\nAfter downloading the project, add the **Google API dependencies** manually in the `pom.xml` or `build.gradle` as shown above. This will give you all the required dependencies for managing Gmail with Spring Boot."
+          ]
+        },
+        "status": "finished_successfully",
+        "end_turn": true,
+        "weight": 1.0,
+        "metadata": {
+          "finish_details": {
+            "type": "stop",
+            "stop_tokens": [
+              200002
+            ]
+          },
+          "is_complete": true,
+          "sonic_classification_result": {
+            "latency_ms": 4267042911.9969106,
+            "search_prob": 0.048708639109372474
+          },
+          "citations": [],
+          "content_references": [],
+          "message_type": null,
+          "model_slug": "gpt-4o",
+          "default_model_slug": "gpt-4o",
+          "parent_id": "aaa21630-5f3f-4d5d-80c6-8faf7e8fe0cf",
+          "request_id": "8ed6c3c10c16ed36-SJC",
+          "timestamp_": "absolute"
+        },
+        "recipient": "all",
+        "channel": null
+      },
+      "parent": "aaa21630-5f3f-4d5d-80c6-8faf7e8fe0cf",
+      "children": []
+    }
+  },
+  "moderation_results": [],
+  "current_node": "8de74db8-2048-49c7-bfdc-40963bac9940",
+  "plugin_ids": null,
+  "conversation_id": "6751eba5-2428-8005-ac4d-63619dbfb902",
+  "conversation_template_id": null,
+  "gizmo_id": null,
+  "gizmo_type": null,
+  "is_archived": false,
+  "is_starred": null,
+  "safe_urls": [
+    "https://developers.google.com/gmail/api/guides/batch?utm_source=chatgpt.com",
+    "https://console.cloud.google.com/",
+    "https://github.com/DavidRFerreira/GmailAPIClientSpringBoot",
+    "https://developers.google.com/resources/api-libraries/documentation/gmail/v1/java/latest/com/google/api/services/gmail/Gmail.Users.Messages.BatchDelete.html?utm_source=chatgpt.com",
+    "https://developers.google.com/gmail/api/guides/filtering",
+    "https://start.spring.io/",
+    "https://developers.google.com/gmail/api/guides/filtering?utm_source=chatgpt.com",
+    "https://developers.google.com/gmail/api/guides/batch",
+    "https://developers.google.com/resources/api-libraries/documentation/gmail/v1/java/latest/com/google/api/services/gmail/Gmail.Users.Messages.BatchDelete.html"
+  ],
+  "blocked_urls": [],
+  "default_model_slug": "gpt-4o",
+  "conversation_origin": null,
+  "is_read_only": null,
+  "voice": null,
+  "async_status": null,
+  "disabled_tool_ids": [],
+  "is_do_not_remember": null,
+  "memory_scope": "global_enabled",
+  "context_scopes": null,
+  "sugar_item_id": null,
+  "sugar_item_visible": false,
+  "is_study_mode": false,
+  "owner": null,
+  "id": "6751eba5-2428-8005-ac4d-63619dbfb902"
+}

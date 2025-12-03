@@ -1,0 +1,14 @@
+[
+  {
+    "id": "conv-001",
+    "title": "Valid Conversation",
+    "create_time": 1700000000.0,
+    "update_time": 1700001000.0,
+    "mapping": {},
+    "moderation_results": [],
+    "current_node": null
+  },
+  {
+    "id": "conv-002",
+    "title": "Invalid JSON - missing closing brace",
+    "create_time": 1700100000.0

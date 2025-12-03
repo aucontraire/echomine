@@ -1,0 +1,11 @@
+[
+  {
+    "id": "conv-001",
+    "title": "Invalid Timestamp",
+    "create_time": "not-a-timestamp",
+    "update_time": 1700001000.0,
+    "mapping": {},
+    "moderation_results": [],
+    "current_node": null
+  }
+]
