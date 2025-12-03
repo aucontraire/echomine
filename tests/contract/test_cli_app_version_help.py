@@ -13,6 +13,7 @@ Constitution Compliance:
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -47,6 +48,7 @@ class TestCLIAppVersionAndHelp:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -74,6 +76,7 @@ class TestCLIAppVersionAndHelp:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -97,6 +100,7 @@ class TestCLIAppVersionAndHelp:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -125,6 +129,7 @@ class TestCLIAppVersionAndHelp:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (showing help is not an error)
@@ -149,6 +154,7 @@ class TestCLIAppVersionAndHelp:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (invalid argument)
@@ -183,6 +189,7 @@ class TestCLIAppVersionAndHelp:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -212,6 +219,7 @@ class TestCLIAppExceptionHandling:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1 (operational error)
@@ -239,6 +247,7 @@ class TestCLIAppExceptionHandling:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -266,6 +275,7 @@ class TestCLIAppStdoutStderrSeparation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: stdout has version
@@ -289,6 +299,7 @@ class TestCLIAppStdoutStderrSeparation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: stdout has help text

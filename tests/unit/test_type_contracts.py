@@ -29,6 +29,7 @@ Expected State: FAILING (imports will fail until exports added to __init__.py)
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import tempfile
@@ -221,6 +222,7 @@ def generic_adapter_usage(adapter: ConversationProvider[Conversation]) -> None:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
             timeout=30,
         )
 

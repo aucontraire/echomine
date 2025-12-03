@@ -32,6 +32,7 @@ Requirements Validated:
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -331,6 +332,7 @@ class TestUS3AS1ExportByTitleCore:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -375,6 +377,7 @@ class TestUS3AS1ExportByTitleCore:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -418,6 +421,7 @@ class TestUS3AS1ExportByTitleCore:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -458,6 +462,7 @@ class TestUS3AS1ExportByTitleCore:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -523,6 +528,7 @@ class TestUS3AS1ExportByTitleErrors:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1 (operational error)
@@ -569,6 +575,7 @@ class TestUS3AS1ExportByTitleErrors:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1 (operational error)
@@ -616,6 +623,7 @@ class TestUS3AS1ExportByTitleErrors:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (invalid arguments)
@@ -656,6 +664,7 @@ class TestUS3AS1ExportByTitleErrors:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (invalid arguments)
@@ -718,6 +727,7 @@ class TestUS3AS1ExportByTitleEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -761,6 +771,7 @@ class TestUS3AS1ExportByTitleEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -804,6 +815,7 @@ class TestUS3AS1ExportByTitleEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -847,6 +859,7 @@ class TestUS3AS1ExportByTitleEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -892,6 +905,7 @@ class TestUS3AS1ExportByTitleEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Non-zero exit code (error)
@@ -948,6 +962,7 @@ class TestUS3AS1ExportByTitleOutputValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -991,6 +1006,7 @@ class TestUS3AS1ExportByTitleOutputValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -1051,6 +1067,7 @@ class TestUS3AS1ExportByTitleOutputValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -1117,6 +1134,7 @@ class TestUS3AS1ExportByTitleWorkflow:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Validate: Success

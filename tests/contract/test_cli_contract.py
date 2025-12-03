@@ -23,6 +23,7 @@ Architectural Coverage:
 """
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -214,6 +215,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 for success
@@ -252,6 +254,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: stdout should ONLY contain conversation data
@@ -278,6 +281,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         assert result.returncode == 0, (
@@ -302,6 +306,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -332,6 +337,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 for invalid arguments
@@ -362,6 +368,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -390,6 +397,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         stdout = result.stdout
@@ -425,6 +433,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert head_proc.returncode == 0, "Should work with head"
         assert len(head_proc.stdout) > 0
@@ -437,6 +446,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert grep_proc.returncode == 0, "Should work with grep"
         assert "Alpha" in grep_proc.stdout
@@ -449,6 +459,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert wc_proc.returncode == 0, "Should work with wc"
         line_count = int(wc_proc.stdout.strip())
@@ -469,6 +480,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         assert result.returncode == 0, f"JSON output failed: {result.stderr}"
@@ -514,6 +526,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (success)
@@ -540,6 +553,7 @@ class TestCLIListCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -610,6 +624,7 @@ class TestCLIContractEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Should not crash and should display Unicode
@@ -634,6 +649,7 @@ class TestCLIContractEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert result_abs.returncode == 0
 
@@ -644,6 +660,7 @@ class TestCLIContractEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
             cwd=sample_cli_export.parent,
         )
         assert result_rel.returncode == 0
@@ -682,6 +699,7 @@ class TestCLIContractEdgeCases:
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
+                env={**os.environ, "PYTHONUTF8": "1"},
             )
 
             # Assert: Exit code 1
@@ -737,6 +755,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 for success
@@ -776,6 +795,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -805,6 +825,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -840,6 +861,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -875,6 +897,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -910,6 +933,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -986,6 +1010,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -1020,6 +1045,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: stdout contains ONLY data (no progress indicators)
@@ -1047,6 +1073,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         assert result.returncode == 0, (
@@ -1078,6 +1105,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (success, even with zero results)
@@ -1107,6 +1135,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -1137,6 +1166,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (invalid arguments)
@@ -1182,6 +1212,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -1213,6 +1244,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert grep_proc.returncode == 0, "Search output should work with grep"
         assert "Alpha" in grep_proc.stdout
@@ -1225,6 +1257,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert head_proc.returncode == 0, "Search output should work with head"
 
@@ -1245,6 +1278,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         stdout = result.stdout
@@ -1283,6 +1317,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert result_abs.returncode == 0
 
@@ -1293,6 +1328,7 @@ class TestCLISearchCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
             cwd=sample_cli_export.parent,
         )
         assert result_rel.returncode == 0
@@ -1399,6 +1435,7 @@ class TestCLIDateFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -1488,6 +1525,7 @@ class TestCLIDateFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -1602,6 +1640,7 @@ class TestCLIDateFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -1645,6 +1684,7 @@ class TestCLIDateFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (invalid argument)
@@ -1691,6 +1731,7 @@ class TestCLIDateFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (invalid argument)
@@ -1736,6 +1777,7 @@ class TestCLIDateFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (success - date accepted)
@@ -1776,6 +1818,7 @@ class TestCLIDateFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (invalid date)

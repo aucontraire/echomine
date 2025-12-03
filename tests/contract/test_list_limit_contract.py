@@ -29,6 +29,7 @@ Expected Failure Reason:
 """
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -140,6 +141,7 @@ class TestListLimitFlagContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 for success
@@ -190,6 +192,7 @@ class TestListLimitFlagContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -251,6 +254,7 @@ class TestListLimitFlagContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -292,6 +296,7 @@ class TestListLimitFlagContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -323,6 +328,7 @@ class TestListLimitFlagContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (usage error)
@@ -357,6 +363,7 @@ class TestListLimitFlagContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (usage error)
@@ -390,6 +397,7 @@ class TestListLimitFlagContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (usage error)
@@ -417,6 +425,7 @@ class TestListLimitFlagContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -459,6 +468,7 @@ class TestListLimitFlagContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -525,6 +535,7 @@ class TestListLimitEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (success, not error)
@@ -593,6 +604,7 @@ class TestListLimitEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -628,6 +640,7 @@ class TestListLimitEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Pipeline succeeds

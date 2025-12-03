@@ -15,6 +15,7 @@ Constitution Compliance:
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -130,6 +131,7 @@ class TestExportCommandValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -164,6 +166,7 @@ class TestExportCommandValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -200,6 +203,7 @@ class TestExportCommandByTitle:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -232,6 +236,7 @@ class TestExportCommandByTitle:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -264,6 +269,7 @@ class TestExportCommandByTitle:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -299,6 +305,7 @@ class TestExportCommandByID:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -329,6 +336,7 @@ class TestExportCommandByID:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -369,6 +377,7 @@ class TestExportCommandOutputFile:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -413,6 +422,7 @@ class TestExportCommandOutputFile:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -467,6 +477,7 @@ class TestExportCommandOutputFile:
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
+                env={**os.environ, "PYTHONUTF8": "1"},
             )
 
             # Assert: Exit code 1
@@ -517,6 +528,7 @@ class TestExportCommandOutputFile:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # May succeed or fail depending on OS, but should not crash
@@ -551,6 +563,7 @@ class TestExportCommandStdoutOutput:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -590,6 +603,7 @@ class TestExportCommandErrorHandling:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -637,6 +651,7 @@ class TestExportCommandErrorHandling:
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
+                env={**os.environ, "PYTHONUTF8": "1"},
             )
 
             # Assert: Exit code 1
@@ -672,6 +687,7 @@ class TestExportCommandErrorHandling:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -720,6 +736,7 @@ class TestExportCommandTitleLookup:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success (matches "JavaScript Basics")
@@ -747,6 +764,7 @@ class TestExportCommandTitleLookup:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success

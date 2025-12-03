@@ -14,6 +14,7 @@ Constitution Compliance:
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -83,6 +84,7 @@ class TestSearchCommandValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -117,6 +119,7 @@ class TestSearchCommandValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -149,6 +152,7 @@ class TestSearchCommandValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -181,6 +185,7 @@ class TestSearchCommandValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -220,6 +225,7 @@ class TestSearchCommandDateValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -251,6 +257,7 @@ class TestSearchCommandDateValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -283,6 +290,7 @@ class TestSearchCommandDateValidation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -337,6 +345,7 @@ class TestSearchCommandErrorHandling:
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
+                env={**os.environ, "PYTHONUTF8": "1"},
             )
 
             # Assert: Exit code 1
@@ -368,6 +377,7 @@ class TestSearchCommandErrorHandling:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -403,6 +413,7 @@ class TestSearchCommandZeroResults:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (success, not error)
@@ -434,6 +445,7 @@ class TestSearchCommandZeroResults:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # In non-TTY mode (subprocess), suggestions should NOT appear
@@ -473,6 +485,7 @@ class TestSearchCommandKeywordHandling:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success (keywords parsed correctly)
@@ -501,6 +514,7 @@ class TestSearchCommandKeywordHandling:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -534,6 +548,7 @@ class TestSearchCommandQuietFlag:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -580,6 +595,7 @@ class TestSearchCommandJSONOutput:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -620,6 +636,7 @@ class TestSearchCommandJSONOutput:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         data = json.loads(result.stdout)
@@ -663,6 +680,7 @@ class TestSearchCommandStdoutStderrSeparation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: stdout contains ONLY data (no progress indicators)
@@ -693,6 +711,7 @@ class TestSearchCommandStdoutStderrSeparation:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Error (exit code 1)

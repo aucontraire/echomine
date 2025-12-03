@@ -26,6 +26,7 @@ Coverage Target:
 """
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -193,6 +194,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -234,6 +236,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -272,6 +275,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -331,6 +335,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -365,6 +370,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -394,6 +400,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -427,6 +434,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -451,6 +459,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -478,6 +487,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -503,6 +513,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success (no crash)
@@ -538,6 +549,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -573,6 +585,7 @@ class TestCLIGetConversationContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -613,6 +626,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -654,6 +668,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -686,6 +701,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -719,6 +735,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -764,6 +781,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -798,6 +816,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -827,6 +846,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -859,6 +879,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -881,6 +902,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -906,6 +928,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -964,6 +987,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -990,6 +1014,7 @@ class TestCLIGetMessageContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -1029,6 +1054,7 @@ class TestCLIGetCommandParent:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (Typer's no_args_is_help behavior)
@@ -1052,6 +1078,7 @@ class TestCLIGetCommandParent:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0

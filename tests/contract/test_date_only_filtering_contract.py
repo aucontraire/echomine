@@ -36,6 +36,7 @@ Constitution Compliance:
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -199,6 +200,7 @@ class TestDateRangeFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (success, not invalid args)
@@ -250,6 +252,7 @@ class TestDateRangeFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -333,6 +336,7 @@ class TestFromDateOnlyFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (success)
@@ -379,6 +383,7 @@ class TestFromDateOnlyFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -426,6 +431,7 @@ class TestFromDateOnlyFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -485,6 +491,7 @@ class TestToDateOnlyFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (success)
@@ -531,6 +538,7 @@ class TestToDateOnlyFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -582,6 +590,7 @@ class TestToDateOnlyFilteringContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -641,6 +650,7 @@ class TestDateOnlyFilteringEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (success, not error)
@@ -682,6 +692,7 @@ class TestDateOnlyFilteringEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (invalid argument)
@@ -726,6 +737,7 @@ class TestDateOnlyFilteringEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (invalid argument)
@@ -771,6 +783,7 @@ class TestDateOnlyFilteringEdgeCases:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (success)

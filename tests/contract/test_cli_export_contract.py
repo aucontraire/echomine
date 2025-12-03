@@ -26,6 +26,7 @@ Architectural Coverage:
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -266,6 +267,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         assert result.returncode == 0, (
@@ -300,6 +302,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -342,6 +345,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1
@@ -395,6 +399,7 @@ class TestCLIExportCommandContract:
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
+                env={**os.environ, "PYTHONUTF8": "1"},
             )
 
             # Assert: Exit code 1
@@ -432,6 +437,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -476,6 +482,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2 (invalid arguments)
@@ -509,6 +516,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -547,6 +555,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -587,6 +596,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -636,6 +646,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -695,6 +706,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Command succeeds
@@ -816,6 +828,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         assert result.returncode == 0
@@ -855,6 +868,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         assert result.returncode == 0
@@ -890,6 +904,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         assert result.returncode == 0
@@ -961,6 +976,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Should not crash and should succeed
@@ -1027,6 +1043,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Should succeed
@@ -1066,6 +1083,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Should succeed (overwrite allowed)
@@ -1104,6 +1122,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -1143,6 +1162,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 1 (error)
@@ -1179,6 +1199,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
             cwd=str(tmp_path),
         )
 
@@ -1206,6 +1227,7 @@ class TestCLIExportCommandContract:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0

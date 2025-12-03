@@ -26,6 +26,7 @@ Coverage Target:
 - Command registration and help display
 """
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -84,6 +85,7 @@ class TestCLIAppEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -115,6 +117,7 @@ class TestCLIAppEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -140,6 +143,7 @@ class TestCLIAppEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0 (help, not error)
@@ -173,6 +177,7 @@ class TestCLIAppEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 0
@@ -199,6 +204,7 @@ class TestCLIAppEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Examples section present
@@ -219,6 +225,7 @@ class TestCLIAppEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Exit code 2
@@ -249,6 +256,7 @@ class TestCLIAppEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Command executes (exit code 0 for empty file)
@@ -270,6 +278,7 @@ class TestCLIAppEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Shows help with subcommands (in stderr for no_args_is_help)
@@ -290,6 +299,7 @@ class TestCLIAppEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -313,6 +323,7 @@ class TestCLIAppEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -356,6 +367,7 @@ class TestCLIAppEntryPoint:
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
+                env={**os.environ, "PYTHONUTF8": "1"},
             )
 
             # Assert: Success
@@ -396,6 +408,7 @@ class TestCLIMainEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Success
@@ -425,6 +438,7 @@ class TestCLIMainEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert result_error.returncode == 1
 
@@ -435,6 +449,7 @@ class TestCLIMainEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert result_invalid.returncode == 2
 
@@ -451,6 +466,7 @@ class TestCLIMainEntryPoint:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert result_success.returncode == 0
 
@@ -484,6 +500,7 @@ class TestCLIOutputFormatting:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Error occurred
@@ -510,6 +527,7 @@ class TestCLIOutputFormatting:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: No Rich exception formatting
@@ -533,6 +551,7 @@ class TestCLIOutputFormatting:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
 
         # Assert: Help is plain text (no required ANSI codes for readability)
@@ -573,6 +592,7 @@ class TestCLISmokeTests:
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
+                env={**os.environ, "PYTHONUTF8": "1"},
             )
 
             # Assert: No crash (exit 0 or 2, not 1)
@@ -593,6 +613,7 @@ class TestCLISmokeTests:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert result_version.returncode == 0
 
@@ -603,6 +624,7 @@ class TestCLISmokeTests:
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
         assert result_help.returncode == 0
 
