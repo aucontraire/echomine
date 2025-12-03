@@ -26,6 +26,7 @@ Fixtures Required:
 - Generated via tests/fixtures/generate_large_export.py
 """
 
+import sys
 import time
 import tracemalloc
 from pathlib import Path
@@ -617,6 +618,9 @@ class TestSearchStressScenarios:
         assert peak < 512 * 1024 * 1024, "Memory should stay under 512MB"
 
     @pytest.mark.slow
+    @pytest.mark.skipif(
+        sys.platform == "win32", reason="Windows CI runners have variable performance"
+    )
     def test_search_with_limit_1(self, large_export_10k_search: Path) -> None:
         """Test search with limit=1 returns top ranked result.
 

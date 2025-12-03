@@ -615,6 +615,9 @@ class TestListLimitEdgeCases:
         assert len(data) == 1, "Should return the 1 available conversation"
         assert data[0]["id"] == "single-conv"
 
+    @pytest.mark.skipif(
+        sys.platform == "win32", reason="Unix shell pipeline not supported on Windows"
+    )
     def test_limit_flag_output_pipelineable_with_jq(
         self, cli_command: list[str], large_export_file: Path
     ) -> None:

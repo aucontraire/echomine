@@ -30,6 +30,7 @@ Expected State: FAILING (imports will fail until exports added to __init__.py)
 from __future__ import annotations
 
 import gc
+import sys
 from pathlib import Path
 
 import psutil
@@ -546,6 +547,9 @@ def test_iterator_cleanup_without_del_method(
 # ============================================================================
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32", reason="chmod permission removal not supported on Windows"
+)
 def test_file_handle_cleanup_on_permission_error(
     tmp_path: Path,
     open_fds_before: set[int],
