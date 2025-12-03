@@ -331,6 +331,9 @@ class TestSearchPerformance:
         remaining_count = sum(1 for _ in iterator)
         assert remaining_count > 0, "Should have more results after first"
 
+    @pytest.mark.skipif(
+        sys.platform == "win32", reason="Windows CI runners have variable performance"
+    )
     def test_search_with_limit_early_termination(self, large_export_10k_search: Path) -> None:
         """Test that limit parameter enables early termination optimization.
 
