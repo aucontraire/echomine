@@ -1,11 +1,11 @@
 """Export command implementation.
 
 This module implements the 'export' command for exporting conversations
-to markdown format.
+to markdown or JSON format.
 
 Constitution Compliance:
-    - Principle I: Library-first (delegates to MarkdownExporter)
-    - CHK031: Data on stdout (markdown), progress/errors on stderr
+    - Principle I: Library-first (delegates to MarkdownExporter / Pydantic serialization)
+    - CHK031: Data on stdout (markdown/JSON), progress/errors on stderr
     - CHK032: Exit codes 0 (success), 1 (error), 2 (invalid arguments)
     - FR-018: Export command with file path, conversation ID, --output flag
     - FR-016: Support --title as alternative to conversation ID
@@ -20,14 +20,15 @@ Command Contract:
     Options:
         --title, -t: Export by conversation title (mutually exclusive with ID)
         --output, -o: Output file path (default: stdout)
+        --format, -f: Output format: markdown (default) or json
 
     Exit Codes:
         0: Success
         1: File not found, conversation not found, permission denied, validation error
-        2: Invalid arguments (both ID and --title, or neither provided)
+        2: Invalid arguments (both ID and --title, or neither provided, or invalid format)
 
     Output Streams:
-        stdout: Markdown content (if no --output) OR empty
+        stdout: Markdown/JSON content (if no --output) OR empty
         stderr: Progress indicators, success messages, error messages
 """
 
@@ -35,11 +36,12 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 import typer
 from rich.console import Console
 
+from echomine.adapters import OpenAIAdapter
 from echomine.export import MarkdownExporter
 
 
@@ -130,30 +132,47 @@ def export_conversation(
             help="Output file path (default: stdout)",
         ),
     ] = None,
+    format: Annotated[
+        Literal["markdown", "json"],
+        typer.Option(
+            "--format",
+            "-f",
+            help="Output format: markdown (default) or json",
+            case_sensitive=False,
+        ),
+    ] = "markdown",
 ) -> None:
-    """Export conversation to markdown format.
+    """Export conversation to markdown or JSON format.
 
-    Exports a single conversation from an OpenAI export file to markdown format,
-    either to stdout (default) or to a specified output file.
+    Exports a single conversation from an OpenAI export file to either markdown
+    or JSON format, either to stdout (default) or to a specified output file.
 
     Examples:
-        # Export to stdout by conversation ID
+        # Export to stdout by conversation ID (markdown default)
         $ echomine export export.json abc-123
+
+        # Export to JSON format
+        $ echomine export export.json abc-123 --format json
 
         # Export to file by conversation ID
         $ echomine export export.json abc-123 --output conversation.md
+
+        # Export as JSON to file
+        $ echomine export export.json abc-123 -f json -o conversation.json
 
         # Export by title
         $ echomine export export.json --title "Python Tutorial" -o output.md
 
         # Pipe to other tools
         $ echomine export export.json abc-123 | pandoc -o output.pdf
+        $ echomine export export.json abc-123 -f json | jq '.messages[0]'
 
     Args:
         file_path: Path to OpenAI export JSON file
         conversation_id: Conversation ID to export (mutually exclusive with --title)
         title: Conversation title to search for (mutually exclusive with ID)
         output: Output file path (default: stdout)
+        format: Output format: "markdown" (default) or "json"
 
     Exit Codes:
         0: Success
@@ -209,26 +228,48 @@ def export_conversation(
             # Use provided conversation ID
             actual_conversation_id = conversation_id  # type: ignore[assignment]
 
-        # Export conversation using MarkdownExporter
-        exporter = MarkdownExporter()
+        # Load conversation using OpenAIAdapter
+        adapter = OpenAIAdapter()
+        conversation = None
 
         # Show progress indicator (only if writing to file, not stdout)
         if output:
-            with console.status("[bold green]Exporting conversation..."):
+            with console.status("[bold green]Finding conversation..."):
                 try:
-                    markdown = exporter.export_conversation(file_path, actual_conversation_id)
-                except ValueError as e:
-                    # Conversation not found
-                    console.print(f"[red]Error: {e}[/red]")
+                    for conv in adapter.stream_conversations(file_path):
+                        if conv.id == actual_conversation_id:
+                            conversation = conv
+                            break
+                except Exception as e:
+                    console.print(f"[red]Error: Failed to parse export file: {e}[/red]")
                     raise typer.Exit(code=1)
         else:
             # No progress indicator when writing to stdout (keeps stdout clean)
             try:
-                markdown = exporter.export_conversation(file_path, actual_conversation_id)
-            except ValueError as e:
-                # Conversation not found
-                console.print(f"[red]Error: {e}[/red]")
+                for conv in adapter.stream_conversations(file_path):
+                    if conv.id == actual_conversation_id:
+                        conversation = conv
+                        break
+            except Exception as e:
+                console.print(f"[red]Error: Failed to parse export file: {e}[/red]")
                 raise typer.Exit(code=1)
+
+        # Check if conversation was found
+        if conversation is None:
+            console.print(
+                f"[red]Error: Conversation {actual_conversation_id} not found in {file_path}[/red]"
+            )
+            raise typer.Exit(code=1)
+
+        # Generate output based on format
+        output_content: str
+        if format == "json":
+            # Export as JSON using Pydantic serialization
+            output_content = conversation.model_dump_json(indent=2)
+        else:
+            # Export as markdown using MarkdownExporter
+            exporter = MarkdownExporter()
+            output_content = exporter.export_conversation(file_path, actual_conversation_id)
 
         # Write output
         if output:
@@ -238,7 +279,7 @@ def export_conversation(
 
             # Write to file
             try:
-                output.write_text(markdown, encoding="utf-8")
+                output.write_text(output_content, encoding="utf-8")
                 console.print(f"[green]✓ Exported to {output}[/green]")
             except PermissionError:
                 console.print(f"[red]Error: Permission denied: {output}[/red]")
@@ -248,8 +289,8 @@ def export_conversation(
                 raise typer.Exit(code=1)
         else:
             # Write to stdout (use print, not console, to go to stdout)
-            # This allows piping: echomine export ... | pandoc
-            print(markdown)
+            # This allows piping: echomine export ... | pandoc / jq
+            print(output_content)
 
         # Success - return normally for exit code 0
         return
