@@ -559,9 +559,7 @@ class TestExportCommandStdoutOutput:
 class TestExportCommandErrorHandling:
     """Contract tests for export command error handling."""
 
-    def test_export_file_not_found_exits_code_1(
-        self, cli_command: list[str]
-    ) -> None:
+    def test_export_file_not_found_exits_code_1(self, cli_command: list[str]) -> None:
         """Test export with non-existent file exits code 1.
 
         Validates:
@@ -638,9 +636,7 @@ class TestExportCommandErrorHandling:
             # Restore permissions for cleanup
             no_read_file.chmod(stat.S_IRUSR | stat.S_IWUSR)
 
-    def test_export_invalid_json_exits_code_1(
-        self, cli_command: list[str], tmp_path: Path
-    ) -> None:
+    def test_export_invalid_json_exits_code_1(self, cli_command: list[str], tmp_path: Path) -> None:
         """Test export with malformed JSON exits code 1.
 
         Validates:

@@ -69,7 +69,7 @@ def sample_conversations() -> list[Conversation]:
             content=f"Message {i}",
             role="user" if i % 2 == 0 else "assistant",
             timestamp=datetime(2024, 3, 15, 14, 23, i, tzinfo=UTC),
-            parent_id=None if i == 0 else f"msg-{i-1}",
+            parent_id=None if i == 0 else f"msg-{i - 1}",
         )
         for i in range(47)
     ]
@@ -80,7 +80,7 @@ def sample_conversations() -> list[Conversation]:
             content=f"Message {i}",
             role="user" if i % 2 == 0 else "assistant",
             timestamp=datetime(2024, 3, 14, 9, 15, i, tzinfo=UTC),
-            parent_id=None if i == 0 else f"msg2-{i-1}",
+            parent_id=None if i == 0 else f"msg2-{i - 1}",
         )
         for i in range(12)
     ]
@@ -268,7 +268,7 @@ class TestFormatTextTable:
 
         # Find message count in data line (should be near same position)
         # Account for right-alignment by checking nearby area
-        message_count_area = data_line[messages_pos:messages_pos + 10]
+        message_count_area = data_line[messages_pos : messages_pos + 10]
         assert "1" in message_count_area  # sample_conversation has 1 message
 
 
@@ -293,9 +293,7 @@ class TestFormatJSON:
         assert isinstance(data, list)
         assert len(data) == 2
 
-    def test_format_json_includes_required_fields(
-        self, sample_conversation: Conversation
-    ) -> None:
+    def test_format_json_includes_required_fields(self, sample_conversation: Conversation) -> None:
         """Test format_json() includes all required fields.
 
         Validates:
@@ -314,9 +312,7 @@ class TestFormatJSON:
         assert "updated_at" in conv
         assert "message_count" in conv
 
-    def test_format_json_uses_iso8601_timestamps(
-        self, sample_conversation: Conversation
-    ) -> None:
+    def test_format_json_uses_iso8601_timestamps(self, sample_conversation: Conversation) -> None:
         """Test format_json() uses ISO 8601 timestamp format.
 
         Validates:
@@ -353,9 +349,7 @@ class TestFormatJSON:
         # For array, might be multiple lines but no indentation
         assert len(lines) <= 5  # Not pretty-printed (would be many lines)
 
-    def test_format_json_ends_with_newline(
-        self, sample_conversations: list[Conversation]
-    ) -> None:
+    def test_format_json_ends_with_newline(self, sample_conversations: list[Conversation]) -> None:
         """Test format_json() ends with newline (Unix convention).
 
         Validates:

@@ -173,9 +173,7 @@ class TestSearchQueryDateOnlySupport:
         original = SearchQuery(from_date=date(2024, 1, 1))
 
         # Act: Copy with modification
-        modified = original.model_copy(
-            update={"to_date": date(2024, 12, 31)}
-        )
+        modified = original.model_copy(update={"to_date": date(2024, 12, 31)})
 
         # Assert: Original unchanged
         assert original.from_date == date(2024, 1, 1)

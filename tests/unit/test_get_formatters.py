@@ -127,9 +127,7 @@ class TestFormatConversationTable:
         assert "Messages:" in output
         assert "3 messages" in output
 
-    def test_table_format_message_summary_by_role(
-        self, sample_conversation: Conversation
-    ) -> None:
+    def test_table_format_message_summary_by_role(self, sample_conversation: Conversation) -> None:
         """Test message summary section shows role counts.
 
         Validates:
@@ -153,9 +151,7 @@ class TestFormatConversationTable:
         # Count should be 1 for each role
         assert "1" in summary_section
 
-    def test_table_format_verbose_shows_messages(
-        self, sample_conversation: Conversation
-    ) -> None:
+    def test_table_format_verbose_shows_messages(self, sample_conversation: Conversation) -> None:
         """Test verbose mode displays message details.
 
         Validates:
@@ -511,14 +507,10 @@ class TestFormatMessageTable:
 
         # Test child message (has parent)
         child_message = sample_messages[1]
-        output_child = _format_message_table(
-            child_message, sample_conversation, verbose=False
-        )
+        output_child = _format_message_table(child_message, sample_conversation, verbose=False)
         assert "msg-1" in output_child  # parent_id value
 
-    def test_message_table_truncates_long_content(
-        self, sample_conversation: Conversation
-    ) -> None:
+    def test_message_table_truncates_long_content(self, sample_conversation: Conversation) -> None:
         """Test content truncation in non-verbose mode.
 
         Validates:
@@ -739,9 +731,7 @@ class TestFormatMessageJSON:
         assert data["conversation"]["created_at"].endswith("Z")
         assert data["conversation"]["updated_at"].endswith("Z")
 
-    def test_message_json_unicode_preserved(
-        self, sample_conversation: Conversation
-    ) -> None:
+    def test_message_json_unicode_preserved(self, sample_conversation: Conversation) -> None:
         """Test Unicode is not ASCII-escaped.
 
         Validates:

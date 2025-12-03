@@ -203,9 +203,7 @@ class TestListLimitParameter:
         assert data[0]["id"] == "conv-019", "First should be newest"
         assert data[9]["id"] == "conv-010", "Last should be 10th from top"
 
-    def test_limit_parameter_value_1_returns_single_conversation(
-        self, tmp_path: Path
-    ) -> None:
+    def test_limit_parameter_value_1_returns_single_conversation(self, tmp_path: Path) -> None:
         """Test limit=1 returns only the newest conversation.
 
         Validates:
@@ -251,9 +249,7 @@ class TestListLimitParameter:
         assert len(data) == 1, f"Expected exactly 1 conversation. Got {len(data)}"
         assert data[0]["id"] == "conv-004", "Should return newest conversation"
 
-    def test_limit_parameter_greater_than_total_returns_all(
-        self, tmp_path: Path
-    ) -> None:
+    def test_limit_parameter_greater_than_total_returns_all(self, tmp_path: Path) -> None:
         """Test limit > total conversations returns all conversations.
 
         Validates:
@@ -367,9 +363,7 @@ class TestListLimitParameterValidation:
     - limit parameter doesn't exist yet, so validation doesn't exist
     """
 
-    def test_limit_parameter_rejects_zero_with_typer_exit_2(
-        self, tmp_path: Path
-    ) -> None:
+    def test_limit_parameter_rejects_zero_with_typer_exit_2(self, tmp_path: Path) -> None:
         """Test limit=0 raises typer.Exit(2) with error message.
 
         Validates:
@@ -388,9 +382,7 @@ class TestListLimitParameterValidation:
 
         assert exc_info.value.exit_code == 2, "Should exit with code 2 for invalid limit"
 
-    def test_limit_parameter_rejects_negative_with_typer_exit_2(
-        self, tmp_path: Path
-    ) -> None:
+    def test_limit_parameter_rejects_negative_with_typer_exit_2(self, tmp_path: Path) -> None:
         """Test negative limit raises typer.Exit(2).
 
         Validates:
@@ -409,9 +401,7 @@ class TestListLimitParameterValidation:
 
         assert exc_info.value.exit_code == 2
 
-    def test_limit_parameter_error_message_written_to_stderr(
-        self, tmp_path: Path
-    ) -> None:
+    def test_limit_parameter_error_message_written_to_stderr(self, tmp_path: Path) -> None:
         """Test invalid limit writes error message to stderr.
 
         Validates:
@@ -452,9 +442,7 @@ class TestListLimitParameterValidation:
 class TestListLimitEdgeCases:
     """Edge case unit tests for limit parameter."""
 
-    def test_limit_parameter_with_empty_file_returns_empty(
-        self, tmp_path: Path
-    ) -> None:
+    def test_limit_parameter_with_empty_file_returns_empty(self, tmp_path: Path) -> None:
         """Test limit with empty file returns empty array (not error).
 
         Validates:
@@ -488,9 +476,7 @@ class TestListLimitEdgeCases:
         data = json.loads(output)
         assert data == [], "Empty file should return empty array"
 
-    def test_limit_parameter_none_returns_all_conversations(
-        self, tmp_path: Path
-    ) -> None:
+    def test_limit_parameter_none_returns_all_conversations(self, tmp_path: Path) -> None:
         """Test limit=None (default) returns all conversations (no limit).
 
         Validates:

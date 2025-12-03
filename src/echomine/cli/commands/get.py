@@ -357,9 +357,7 @@ def get_conversation(
 
         # Check if conversation was found
         if conversation is None:
-            console.print(
-                f"[red]Error: Conversation not found with ID: {conversation_id}[/red]"
-            )
+            console.print(f"[red]Error: Conversation not found with ID: {conversation_id}[/red]")
             raise typer.Exit(code=1)
 
         # Format output based on requested format
@@ -525,9 +523,7 @@ def get_message(
                     f"in conversation {conversation_id}[/red]"
                 )
             else:
-                console.print(
-                    f"[red]Error: Message not found with ID: {message_id}[/red]"
-                )
+                console.print(f"[red]Error: Message not found with ID: {message_id}[/red]")
             raise typer.Exit(code=1)
 
         # Unpack result tuple

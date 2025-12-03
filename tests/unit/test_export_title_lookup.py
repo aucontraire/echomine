@@ -142,9 +142,7 @@ def duplicate_title_file(tmp_path: Path) -> Path:
 class TestFindConversationByTitleExactMatch:
     """Unit tests for exact title matching."""
 
-    def test_exact_title_match_returns_id_and_title(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_exact_title_match_returns_id_and_title(self, sample_export_file: Path) -> None:
         """Test exact title match returns tuple of (id, exact_title).
 
         Validates:
@@ -164,9 +162,7 @@ class TestFindConversationByTitleExactMatch:
         assert conversation_id == "conv-001", "Should return correct conversation ID"
         assert exact_title == "Python AsyncIO Tutorial", "Should return exact title"
 
-    def test_exact_match_case_sensitive_title(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_exact_match_case_sensitive_title(self, sample_export_file: Path) -> None:
         """Test that exact title is returned with original casing.
 
         Validates:
@@ -191,9 +187,7 @@ class TestFindConversationByTitleExactMatch:
 class TestFindConversationByTitleCaseInsensitive:
     """Unit tests for case-insensitive matching."""
 
-    def test_case_insensitive_lowercase_search(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_case_insensitive_lowercase_search(self, sample_export_file: Path) -> None:
         """Test lowercase search matches title with mixed case."""
         result = _find_conversation_by_title(sample_export_file, "python asyncio tutorial")
 
@@ -201,9 +195,7 @@ class TestFindConversationByTitleCaseInsensitive:
         conversation_id, _ = result
         assert conversation_id == "conv-001", "Lowercase search should match"
 
-    def test_case_insensitive_uppercase_search(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_case_insensitive_uppercase_search(self, sample_export_file: Path) -> None:
         """Test uppercase search matches title with mixed case."""
         result = _find_conversation_by_title(sample_export_file, "PYTHON ASYNCIO TUTORIAL")
 
@@ -211,9 +203,7 @@ class TestFindConversationByTitleCaseInsensitive:
         conversation_id, _ = result
         assert conversation_id == "conv-001", "Uppercase search should match"
 
-    def test_case_insensitive_mixed_case_search(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_case_insensitive_mixed_case_search(self, sample_export_file: Path) -> None:
         """Test mixed case search matches title."""
         result = _find_conversation_by_title(sample_export_file, "PyThOn AsynCIO tUtOrIaL")
 
@@ -225,9 +215,7 @@ class TestFindConversationByTitleCaseInsensitive:
 class TestFindConversationByTitleSubstringMatch:
     """Unit tests for substring/partial matching."""
 
-    def test_substring_match_returns_conversation(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_substring_match_returns_conversation(self, sample_export_file: Path) -> None:
         """Test substring match returns conversation containing the substring.
 
         Validates:
@@ -241,9 +229,7 @@ class TestFindConversationByTitleSubstringMatch:
         assert conversation_id == "conv-001"
         assert "AsyncIO" in exact_title
 
-    def test_substring_at_beginning(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_substring_at_beginning(self, sample_export_file: Path) -> None:
         """Test substring at beginning of title matches.
 
         Note: "Python" matches MULTIPLE conversations:
@@ -255,9 +241,7 @@ class TestFindConversationByTitleSubstringMatch:
         with pytest.raises(ValueError, match="Multiple conversations"):
             _find_conversation_by_title(sample_export_file, "Python")
 
-    def test_substring_at_end(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_substring_at_end(self, sample_export_file: Path) -> None:
         """Test substring at end of title matches.
 
         Note: "Tutorial" appears in multiple titles:
@@ -269,9 +253,7 @@ class TestFindConversationByTitleSubstringMatch:
         with pytest.raises(ValueError, match="Multiple conversations"):
             _find_conversation_by_title(sample_export_file, "Tutorial")
 
-    def test_substring_in_middle(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_substring_in_middle(self, sample_export_file: Path) -> None:
         """Test substring in middle of title matches."""
         result = _find_conversation_by_title(sample_export_file, "Getting Started")
 
@@ -280,9 +262,7 @@ class TestFindConversationByTitleSubstringMatch:
         assert conversation_id == "conv-002"
         assert "Getting Started" in exact_title
 
-    def test_unique_substring_returns_single_match(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_unique_substring_returns_single_match(self, sample_export_file: Path) -> None:
         """Test unique substring returns single match (no ambiguity)."""
         # "AsyncIO" only appears in one conversation
         result = _find_conversation_by_title(sample_export_file, "AsyncIO")
@@ -295,9 +275,7 @@ class TestFindConversationByTitleSubstringMatch:
 class TestFindConversationByTitleNoMatch:
     """Unit tests for no match scenarios."""
 
-    def test_nonexistent_title_returns_none(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_nonexistent_title_returns_none(self, sample_export_file: Path) -> None:
         """Test that non-matching title returns None.
 
         Validates:
@@ -318,9 +296,7 @@ class TestFindConversationByTitleNoMatch:
 
         assert result is None, "Empty export should return None"
 
-    def test_partial_match_not_found_returns_none(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_partial_match_not_found_returns_none(self, sample_export_file: Path) -> None:
         """Test substring that doesn't match any title returns None."""
         result = _find_conversation_by_title(sample_export_file, "Nonexistent Substring")
 
@@ -330,9 +306,7 @@ class TestFindConversationByTitleNoMatch:
 class TestFindConversationByTitleMultipleMatches:
     """Unit tests for multiple match scenarios (ambiguous titles)."""
 
-    def test_duplicate_exact_titles_raises_error(
-        self, duplicate_title_file: Path
-    ) -> None:
+    def test_duplicate_exact_titles_raises_error(self, duplicate_title_file: Path) -> None:
         """Test that duplicate exact titles raise ValueError.
 
         Validates:
@@ -343,9 +317,7 @@ class TestFindConversationByTitleMultipleMatches:
         with pytest.raises(ValueError, match="Multiple conversations"):
             _find_conversation_by_title(duplicate_title_file, "Python Tutorial")
 
-    def test_multiple_substring_matches_raises_error(
-        self, duplicate_title_file: Path
-    ) -> None:
+    def test_multiple_substring_matches_raises_error(self, duplicate_title_file: Path) -> None:
         """Test that substring matching multiple titles raises ValueError.
 
         "Python Tutorial" appears in:
@@ -356,9 +328,7 @@ class TestFindConversationByTitleMultipleMatches:
         with pytest.raises(ValueError, match="Multiple conversations"):
             _find_conversation_by_title(duplicate_title_file, "Python Tutorial")
 
-    def test_error_message_includes_match_count(
-        self, duplicate_title_file: Path
-    ) -> None:
+    def test_error_message_includes_match_count(self, duplicate_title_file: Path) -> None:
         """Test that error message includes number of matches."""
         try:
             _find_conversation_by_title(duplicate_title_file, "Python Tutorial")
@@ -370,9 +340,7 @@ class TestFindConversationByTitleMultipleMatches:
             # Should include count (3 matches in this case)
             assert "3" in error_message, "Error should mention match count"
 
-    def test_error_suggests_using_id(
-        self, duplicate_title_file: Path
-    ) -> None:
+    def test_error_suggests_using_id(self, duplicate_title_file: Path) -> None:
         """Test that error message suggests using conversation ID instead."""
         try:
             _find_conversation_by_title(duplicate_title_file, "Python Tutorial")
@@ -388,9 +356,7 @@ class TestFindConversationByTitleMultipleMatches:
 class TestFindConversationByTitleEdgeCases:
     """Unit tests for edge cases."""
 
-    def test_unicode_title_matching(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_unicode_title_matching(self, sample_export_file: Path) -> None:
         """Test matching titles with Unicode (CJK) characters."""
         result = _find_conversation_by_title(sample_export_file, "机器学习")
 
@@ -399,9 +365,7 @@ class TestFindConversationByTitleEdgeCases:
         assert conversation_id == "conv-003"
         assert "机器学习" in exact_title
 
-    def test_emoji_in_title_matching(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_emoji_in_title_matching(self, sample_export_file: Path) -> None:
         """Test matching titles containing emoji."""
         result = _find_conversation_by_title(sample_export_file, "🚀")
 
@@ -410,9 +374,7 @@ class TestFindConversationByTitleEdgeCases:
         assert conversation_id == "conv-003"
         assert "🚀" in exact_title
 
-    def test_special_characters_in_title(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_special_characters_in_title(self, sample_export_file: Path) -> None:
         """Test matching titles with special characters and punctuation."""
         result = _find_conversation_by_title(sample_export_file, "What's the difference")
 
@@ -421,9 +383,7 @@ class TestFindConversationByTitleEdgeCases:
         assert conversation_id == "conv-004"
         assert "What's the difference" in exact_title
 
-    def test_colon_in_title_matching(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_colon_in_title_matching(self, sample_export_file: Path) -> None:
         """Test matching titles with colon character."""
         result = _find_conversation_by_title(sample_export_file, "var vs let")
 
@@ -431,9 +391,7 @@ class TestFindConversationByTitleEdgeCases:
         conversation_id, exact_title = result
         assert conversation_id == "conv-004"
 
-    def test_whitespace_in_search_query(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_whitespace_in_search_query(self, sample_export_file: Path) -> None:
         """Test search query with extra whitespace."""
         # Extra spaces should still match
         result = _find_conversation_by_title(sample_export_file, "Python  AsyncIO  Tutorial")
@@ -443,9 +401,7 @@ class TestFindConversationByTitleEdgeCases:
         # This documents current behavior
         assert result is None, "Extra whitespace should not match (no normalization)"
 
-    def test_leading_trailing_whitespace(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_leading_trailing_whitespace(self, sample_export_file: Path) -> None:
         """Test search query with leading/trailing whitespace."""
         # Leading/trailing whitespace
         result = _find_conversation_by_title(sample_export_file, "  AsyncIO  ")
@@ -454,9 +410,7 @@ class TestFindConversationByTitleEdgeCases:
         # This will not match because of leading/trailing spaces
         assert result is None, "Leading/trailing whitespace should not match (no stripping)"
 
-    def test_empty_title_search(
-        self, sample_export_file: Path
-    ) -> None:
+    def test_empty_title_search(self, sample_export_file: Path) -> None:
         """Test empty string title search."""
         # Empty string should match all titles (substring of everything)
         # OR could return None as invalid input

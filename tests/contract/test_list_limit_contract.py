@@ -330,8 +330,7 @@ class TestListLimitFlagContract:
         assert len(stderr) > 0, "Error message should be on stderr"
         # Error should mention limit or positive or valid value
         assert any(
-            keyword in stderr.lower()
-            for keyword in ["limit", "positive", "greater", "invalid"]
+            keyword in stderr.lower() for keyword in ["limit", "positive", "greater", "invalid"]
         ), f"Error should mention invalid limit value. Got: {stderr}"
 
     def test_limit_flag_negative_value_shows_usage_error_exit_code_2(
@@ -363,8 +362,7 @@ class TestListLimitFlagContract:
         stderr = result.stderr
         assert len(stderr) > 0, "Error message should be on stderr"
         assert any(
-            keyword in stderr.lower()
-            for keyword in ["limit", "positive", "greater", "invalid"]
+            keyword in stderr.lower() for keyword in ["limit", "positive", "greater", "invalid"]
         ), f"Error should mention invalid limit value. Got: {stderr}"
 
     def test_limit_flag_non_integer_value_shows_usage_error_exit_code_2(
@@ -423,8 +421,7 @@ class TestListLimitFlagContract:
         # Assert: Help describes what --limit does
         # Should mention "limit" or "restrict" or "top N" or similar
         assert any(
-            keyword in stdout.lower()
-            for keyword in ["restrict", "top", "maximum", "first"]
+            keyword in stdout.lower() for keyword in ["restrict", "top", "maximum", "first"]
         ), "Help should describe what --limit does"
 
     def test_limit_flag_respects_sort_order_newest_first(
@@ -611,10 +608,7 @@ class TestListLimitEdgeCases:
         import shlex
 
         cmd_str = " ".join(shlex.quote(arg) for arg in cli_command)
-        pipeline = (
-            f"{cmd_str} list {large_export_file} --limit 3 --format json | "
-            f"jq -r '.[].title'"
-        )
+        pipeline = f"{cmd_str} list {large_export_file} --limit 3 --format json | jq -r '.[].title'"
 
         result = subprocess.run(
             pipeline,

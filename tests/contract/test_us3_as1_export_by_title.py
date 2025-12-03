@@ -164,7 +164,10 @@ def title_export_file(tmp_path: Path) -> Path:
                     "message": {
                         "id": "msg-5",
                         "author": {"role": "user"},
-                        "content": {"content_type": "text", "parts": ["Explain JavaScript scoping"]},
+                        "content": {
+                            "content_type": "text",
+                            "parts": ["Explain JavaScript scoping"],
+                        },
                         "create_time": 1710300000.0,
                         "update_time": None,
                         "metadata": {},
@@ -229,7 +232,10 @@ def duplicate_title_export_file(tmp_path: Path) -> Path:
                     "message": {
                         "id": "msg-2",
                         "author": {"role": "user"},
-                        "content": {"content_type": "text", "parts": ["Question 2 about advanced topics"]},
+                        "content": {
+                            "content_type": "text",
+                            "parts": ["Question 2 about advanced topics"],
+                        },
                         "create_time": 1710100000.0,
                         "update_time": None,
                         "metadata": {},
@@ -252,7 +258,10 @@ def duplicate_title_export_file(tmp_path: Path) -> Path:
                     "message": {
                         "id": "msg-3",
                         "author": {"role": "user"},
-                        "content": {"content_type": "text", "parts": ["Question 3 about decorators"]},
+                        "content": {
+                            "content_type": "text",
+                            "parts": ["Question 3 about decorators"],
+                        },
                         "create_time": 1710200000.0,
                         "update_time": None,
                         "metadata": {},
@@ -875,9 +884,7 @@ class TestUS3AS1ExportByTitleEdgeCases:
         )
 
         # Assert: Non-zero exit code (error)
-        assert result.returncode != 0, (
-            f"Empty title should fail. Got exit code {result.returncode}"
-        )
+        assert result.returncode != 0, f"Empty title should fail. Got exit code {result.returncode}"
 
         # Assert: Error message on stderr
         stderr = result.stderr
@@ -943,9 +950,7 @@ class TestUS3AS1ExportByTitleOutputValidation:
         )
 
         # Should NOT contain content from "Python Tutorial: Getting Started"
-        assert "Getting Started" not in markdown, (
-            "Should NOT export wrong conversation"
-        )
+        assert "Getting Started" not in markdown, "Should NOT export wrong conversation"
 
     def test_export_by_title_includes_conversation_metadata(
         self, cli_command: list[str], title_export_file: Path, tmp_path: Path
@@ -998,14 +1003,12 @@ class TestUS3AS1ExportByTitleOutputValidation:
         assert "Python AsyncIO Tutorial" in metadata_section, (
             "Metadata should include conversation title"
         )
-        assert any(
-            marker in metadata_section
-            for marker in ["2024-", "Created:", "Date:"]
-        ), "Metadata should include created date"
-        assert any(
-            marker in metadata_section
-            for marker in ["2 message", "Messages:", "Count:"]
-        ), "Metadata should include message count"
+        assert any(marker in metadata_section for marker in ["2024-", "Created:", "Date:"]), (
+            "Metadata should include created date"
+        )
+        assert any(marker in metadata_section for marker in ["2 message", "Messages:", "Count:"]), (
+            "Metadata should include message count"
+        )
 
     def test_export_by_title_stderr_shows_matched_title(
         self, cli_command: list[str], title_export_file: Path
@@ -1108,9 +1111,7 @@ class TestUS3AS1ExportByTitleWorkflow:
         )
 
         # Validate: Output file created
-        assert output_file.exists(), (
-            "US3-AS1 FAILURE: Output file should be created"
-        )
+        assert output_file.exists(), "US3-AS1 FAILURE: Output file should be created"
 
         # Validate: Correct conversation exported
         markdown = output_file.read_text(encoding="utf-8")

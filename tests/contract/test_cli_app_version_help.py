@@ -165,9 +165,7 @@ class TestCLIAppVersionAndHelp:
         """
         pytest.skip("KeyboardInterrupt handling requires manual verification")
 
-    def test_version_flag_takes_precedence_over_commands(
-        self, cli_command: list[str]
-    ) -> None:
+    def test_version_flag_takes_precedence_over_commands(self, cli_command: list[str]) -> None:
         """Test --version flag works even with command specified.
 
         Validates:
@@ -195,9 +193,7 @@ class TestCLIAppVersionAndHelp:
 class TestCLIAppExceptionHandling:
     """Contract tests for main() exception handling in app.py."""
 
-    def test_file_not_found_error_exits_with_code_1(
-        self, cli_command: list[str]
-    ) -> None:
+    def test_file_not_found_error_exits_with_code_1(self, cli_command: list[str]) -> None:
         """Test file not found error from command exits with code 1.
 
         Validates:
@@ -218,9 +214,7 @@ class TestCLIAppExceptionHandling:
         assert len(result.stderr) > 0, "Error should be on stderr"
         assert "not found" in result.stderr.lower()
 
-    def test_malformed_json_exits_with_code_1(
-        self, cli_command: list[str], tmp_path: Path
-    ) -> None:
+    def test_malformed_json_exits_with_code_1(self, cli_command: list[str], tmp_path: Path) -> None:
         """Test malformed JSON file exits with code 1.
 
         Validates:

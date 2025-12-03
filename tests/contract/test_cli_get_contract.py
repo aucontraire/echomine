@@ -341,9 +341,7 @@ class TestCLIGetConversationContract:
         # Assert: stdout empty on error
         assert len(result.stdout) == 0, "stdout should be empty on error"
 
-    def test_get_conversation_file_not_found_exits_1(
-        self, cli_command: list[str]
-    ) -> None:
+    def test_get_conversation_file_not_found_exits_1(self, cli_command: list[str]) -> None:
         """Test missing file returns exit code 1.
 
         Validates:
@@ -685,9 +683,7 @@ class TestCLIGetMessageContract:
         # Should show multiple messages from conv-get-002
         assert "msg-get-002-1" in stdout or "msg-get-002-2" in stdout
 
-    def test_get_message_json_format(
-        self, cli_command: list[str], get_test_export: Path
-    ) -> None:
+    def test_get_message_json_format(self, cli_command: list[str], get_test_export: Path) -> None:
         """Test --format json produces valid JSON with message and conversation.
 
         Validates:

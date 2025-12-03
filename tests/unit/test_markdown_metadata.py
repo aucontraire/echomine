@@ -207,9 +207,7 @@ class TestMarkdownMetadataHeaderPresence:
         conversation_id = "conv-updated-001"
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_with_updated_at, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_with_updated_at, conversation_id)
 
         # Assert: Metadata header exists
         assert "# " in markdown or "## " in markdown, (
@@ -226,9 +224,7 @@ class TestMarkdownMetadataHeaderPresence:
                 first_message_header_idx = i
                 break
 
-        assert first_message_header_idx is not None, (
-            "Markdown should contain message headers"
-        )
+        assert first_message_header_idx is not None, "Markdown should contain message headers"
 
         # Assert: Metadata should appear BEFORE first message header
         # Look for metadata keywords in lines BEFORE first message
@@ -263,9 +259,7 @@ class TestMarkdownMetadataHeaderPresence:
         expected_title = "Python Best Practices"
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_with_updated_at, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_with_updated_at, conversation_id)
 
         # Assert: Title appears in markdown
         # This will FAIL - title is NOT currently in export
@@ -311,15 +305,12 @@ class TestMarkdownMetadataHeaderPresence:
         # Expected created_at: 1710000000.0 = 2024-03-09 16:00:00 UTC
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_with_updated_at, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_with_updated_at, conversation_id)
 
         # Assert: Created date appears in markdown
         # Look for ISO 8601 format or readable date
         assert any(
-            date_marker in markdown
-            for date_marker in ["2024-03-09", "Created:", "Created At:"]
+            date_marker in markdown for date_marker in ["2024-03-09", "Created:", "Created At:"]
         ), (
             "Exported markdown should include created_at date in metadata. "
             f"Date markers not found. First 300 chars:\n{markdown[:300]}"
@@ -363,9 +354,7 @@ class TestMarkdownMetadataHeaderPresence:
         # Expected updated_at: 1710086400.0 = 2024-03-10 16:00:00 UTC (24h later)
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_with_updated_at, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_with_updated_at, conversation_id)
 
         # Assert: Updated date appears in markdown
         assert any(
@@ -401,9 +390,7 @@ class TestMarkdownMetadataHeaderPresence:
         # This conversation has update_time: None
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_without_updated_at, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_without_updated_at, conversation_id)
 
         # Assert: Created date is present
         assert "2024-03-11" in markdown or "Created" in markdown, (
@@ -429,8 +416,7 @@ class TestMarkdownMetadataHeaderPresence:
         if has_updated_field:
             # If field is present, it should indicate null/never
             assert any(
-                indicator in metadata_text
-                for indicator in ["Never", "N/A", "None", "not updated"]
+                indicator in metadata_text for indicator in ["Never", "N/A", "None", "not updated"]
             ), (
                 "When updated_at is null, metadata should indicate this clearly. "
                 f"Metadata section:\n{metadata_text}"
@@ -454,9 +440,7 @@ class TestMarkdownMetadataHeaderPresence:
         expected_count = 15
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_with_many_messages, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_with_many_messages, conversation_id)
 
         # Assert: Message count appears in markdown
         # Look for patterns like "15 messages", "Messages: 15", "Message Count: 15"
@@ -506,9 +490,7 @@ class TestMarkdownMetadataHeaderFormat:
         conversation_id = "conv-updated-001"
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_with_updated_at, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_with_updated_at, conversation_id)
 
         # Assert: First non-empty line should be metadata header
         lines = [line for line in markdown.split("\n") if line.strip()]
@@ -519,8 +501,7 @@ class TestMarkdownMetadataHeaderFormat:
 
         # First line should be a heading (title or "Conversation Metadata")
         assert first_line.startswith("#"), (
-            f"First line should be a markdown heading (metadata header). "
-            f"Got: {first_line}"
+            f"First line should be a markdown heading (metadata header). Got: {first_line}"
         )
 
         # Should be h1 (#) or h2 (##) level
@@ -545,9 +526,7 @@ class TestMarkdownMetadataHeaderFormat:
         conversation_id = "conv-updated-001"
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_with_updated_at, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_with_updated_at, conversation_id)
 
         # Assert: Metadata uses consistent label format
         # Extract metadata section (before first message)
@@ -565,14 +544,10 @@ class TestMarkdownMetadataHeaderFormat:
         # Option 1: "Label: Value" format
         # Option 2: Markdown list with "- Label: Value"
         has_label_colon_format = (
-            "Title:" in metadata_text or
-            "Created:" in metadata_text or
-            "Messages:" in metadata_text
+            "Title:" in metadata_text or "Created:" in metadata_text or "Messages:" in metadata_text
         )
 
-        has_markdown_list_format = any(
-            line.strip().startswith("- ") for line in metadata_lines
-        )
+        has_markdown_list_format = any(line.strip().startswith("- ") for line in metadata_lines)
 
         assert has_label_colon_format or has_markdown_list_format, (
             "Metadata should use consistent label format "
@@ -597,9 +572,7 @@ class TestMarkdownMetadataHeaderFormat:
         conversation_id = "conv-updated-001"
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_with_updated_at, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_with_updated_at, conversation_id)
 
         # Assert: Find metadata section and first message
         lines = markdown.split("\n")
@@ -617,12 +590,8 @@ class TestMarkdownMetadataHeaderFormat:
         # Should have at least one blank line OR horizontal rule (---)
         lines_before_message = lines[:first_message_idx]
 
-        has_blank_separator = any(
-            line.strip() == "" for line in lines_before_message[-3:]
-        )
-        has_hr_separator = any(
-            line.strip() == "---" for line in lines_before_message
-        )
+        has_blank_separator = any(line.strip() == "" for line in lines_before_message[-3:])
+        has_hr_separator = any(line.strip() == "---" for line in lines_before_message)
 
         assert has_blank_separator or has_hr_separator, (
             "Metadata header should be separated from messages by blank line "
@@ -663,9 +632,7 @@ class TestMarkdownMetadataValuesAccuracy:
         conversation_id = "conv-updated-001"
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_with_updated_at, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_with_updated_at, conversation_id)
 
         # Assert: ISO 8601 format present
         # Expected: 1710000000.0 = 2024-03-09T16:00:00+00:00
@@ -691,9 +658,7 @@ class TestMarkdownMetadataValuesAccuracy:
         conversation_id = "conv-updated-001"
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_with_updated_at, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_with_updated_at, conversation_id)
 
         # Assert: ISO 8601 format for updated date
         # Expected: 1710086400.0 = 2024-03-10T16:00:00+00:00
@@ -720,9 +685,7 @@ class TestMarkdownMetadataValuesAccuracy:
         expected_count = 15
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_with_many_messages, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_with_many_messages, conversation_id)
 
         # Assert: Count appears and is correct
         # Count message headers in export to verify
@@ -764,9 +727,7 @@ class TestMarkdownMetadataEdgeCases:
     Expected to FAIL: Metadata functionality doesn't exist yet.
     """
 
-    def test_metadata_handles_unicode_in_title(
-        self, tmp_path: Path
-    ) -> None:
+    def test_metadata_handles_unicode_in_title(self, tmp_path: Path) -> None:
         """Test that metadata preserves Unicode characters in title.
 
         Validates:
@@ -821,9 +782,7 @@ class TestMarkdownMetadataEdgeCases:
             f"Not found in: {markdown[:400]}"
         )
 
-    def test_metadata_handles_very_long_title(
-        self, tmp_path: Path
-    ) -> None:
+    def test_metadata_handles_very_long_title(self, tmp_path: Path) -> None:
         """Test that metadata handles very long conversation titles.
 
         Validates:
@@ -868,9 +827,7 @@ class TestMarkdownMetadataEdgeCases:
         exporter = MarkdownExporter()
 
         # Act
-        markdown = exporter.export_conversation(
-            long_title_file, "conv-long-title-001"
-        )
+        markdown = exporter.export_conversation(long_title_file, "conv-long-title-001")
 
         # Assert: Title appears (truncated or full)
         # Either full title or truncated with "..."
@@ -899,9 +856,7 @@ class TestMarkdownMetadataEdgeCases:
         # This fixture has only 1 message
 
         # Act
-        markdown = exporter.export_conversation(
-            conversation_without_updated_at, conversation_id
-        )
+        markdown = exporter.export_conversation(conversation_without_updated_at, conversation_id)
 
         # Assert: Shows "1 message" (singular form)
         assert any(

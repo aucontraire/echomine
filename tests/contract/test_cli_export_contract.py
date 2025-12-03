@@ -712,9 +712,7 @@ class TestCLIExportCommandContract:
                 first_message_line_idx = i
                 break
 
-        assert first_message_line_idx is not None, (
-            "Export should contain message headers"
-        )
+        assert first_message_line_idx is not None, "Export should contain message headers"
 
         # Extract metadata section (everything BEFORE first message)
         metadata_section = "\n".join(lines[:first_message_line_idx])
@@ -769,15 +767,11 @@ class TestCLIExportCommandContract:
         # =====================================================================
 
         # Metadata should start with a heading or have clear structure
-        assert len(metadata_section.strip()) > 0, (
-            "Metadata section should not be empty"
-        )
+        assert len(metadata_section.strip()) > 0, "Metadata section should not be empty"
 
         # Metadata should be visually distinct (heading or labeled fields)
         has_markdown_structure = (
-            metadata_section.startswith("#") or
-            ":" in metadata_section or
-            "-" in metadata_section
+            metadata_section.startswith("#") or ":" in metadata_section or "-" in metadata_section
         )
 
         assert has_markdown_structure, (

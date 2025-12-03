@@ -342,9 +342,7 @@ class TestSearchCommandErrorHandling:
             # Restore permissions for cleanup
             no_read_file.chmod(stat.S_IRUSR | stat.S_IWUSR)
 
-    def test_search_parse_error_exits_code_1(
-        self, cli_command: list[str], tmp_path: Path
-    ) -> None:
+    def test_search_parse_error_exits_code_1(self, cli_command: list[str], tmp_path: Path) -> None:
         """Test search with invalid JSON exits code 1.
 
         Validates:
@@ -656,13 +654,10 @@ class TestSearchCommandStdoutStderrSeparation:
 
         for keyword in progress_keywords:
             assert keyword not in stdout, (
-                f"Progress indicator '{keyword}' found in stdout. "
-                "Should be on stderr per CHK031"
+                f"Progress indicator '{keyword}' found in stdout. Should be on stderr per CHK031"
             )
 
-    def test_search_errors_on_stderr_not_stdout(
-        self, cli_command: list[str]
-    ) -> None:
+    def test_search_errors_on_stderr_not_stdout(self, cli_command: list[str]) -> None:
         """Test search errors go to stderr, not stdout.
 
         Validates:

@@ -75,9 +75,7 @@ class TestGetConversationById:
         )
 
         # Assert: Correct conversation returned
-        assert result.id == "conv-001", (
-            f"Expected conversation ID 'conv-001', got '{result.id}'"
-        )
+        assert result.id == "conv-001", f"Expected conversation ID 'conv-001', got '{result.id}'"
         assert result.title == "Test Conversation", (
             f"Expected title 'Test Conversation', got '{result.title}'"
         )
@@ -96,14 +94,11 @@ class TestGetConversationById:
         adapter = OpenAIAdapter()
 
         # Act: Get conversation with non-existent ID
-        result = adapter.get_conversation_by_id(
-            tmp_export_file, "nonexistent-conversation-id"
-        )
+        result = adapter.get_conversation_by_id(tmp_export_file, "nonexistent-conversation-id")
 
         # Assert: Returns None, not exception
         assert result is None, (
-            "get_conversation_by_id should return None for non-existent ID, "
-            "not raise exception"
+            "get_conversation_by_id should return None for non-existent ID, not raise exception"
         )
 
     def test_get_conversation_by_id_returns_correct_conversation_from_multiple(
@@ -223,9 +218,7 @@ class TestGetConversationById:
         with pytest.raises(FileNotFoundError):
             adapter.get_conversation_by_id(non_existent, "conv-001")
 
-    def test_get_conversation_by_id_with_empty_export_file(
-        self, tmp_path: Path
-    ) -> None:
+    def test_get_conversation_by_id_with_empty_export_file(self, tmp_path: Path) -> None:
         """Test that get_conversation_by_id handles empty export file gracefully.
 
         Validates:
@@ -244,9 +237,7 @@ class TestGetConversationById:
         result = adapter.get_conversation_by_id(empty_file, "conv-001")
 
         # Assert: Returns None
-        assert result is None, (
-            "get_conversation_by_id should return None for empty export file"
-        )
+        assert result is None, "get_conversation_by_id should return None for empty export file"
 
 
 # ============================================================================
@@ -280,9 +271,7 @@ class TestGetMessageById:
         assert hasattr(adapter, "get_message_by_id"), (
             "OpenAIAdapter must have get_message_by_id method"
         )
-        assert callable(adapter.get_message_by_id), (
-            "get_message_by_id must be callable"
-        )
+        assert callable(adapter.get_message_by_id), "get_message_by_id must be callable"
 
     def test_get_message_by_id_returns_tuple_when_found_with_conversation_hint(
         self, tmp_export_file: Path
@@ -300,20 +289,14 @@ class TestGetMessageById:
 
         # Act: Get message by ID with conversation_id hint
         # tmp_export_file has conv-001 with msg-001 and msg-002
-        result = adapter.get_message_by_id(
-            tmp_export_file, "msg-001", conversation_id="conv-001"
-        )
+        result = adapter.get_message_by_id(tmp_export_file, "msg-001", conversation_id="conv-001")
 
         # Assert: Returns tuple of (Message, Conversation)
-        assert result is not None, (
-            "get_message_by_id should return tuple when message exists"
-        )
+        assert result is not None, "get_message_by_id should return tuple when message exists"
         assert isinstance(result, tuple), (
             f"get_message_by_id should return tuple, got {type(result)}"
         )
-        assert len(result) == 2, (
-            f"get_message_by_id should return 2-tuple, got {len(result)} items"
-        )
+        assert len(result) == 2, f"get_message_by_id should return 2-tuple, got {len(result)} items"
 
         message, conversation = result
 
@@ -384,14 +367,10 @@ class TestGetMessageById:
         adapter = OpenAIAdapter()
 
         # Act: Get message with non-existent ID
-        result = adapter.get_message_by_id(
-            tmp_export_file, "nonexistent-message-id"
-        )
+        result = adapter.get_message_by_id(tmp_export_file, "nonexistent-message-id")
 
         # Assert: Returns None
-        assert result is None, (
-            "get_message_by_id should return None for non-existent message ID"
-        )
+        assert result is None, "get_message_by_id should return None for non-existent message ID"
 
     def test_get_message_by_id_returns_none_when_conversation_not_found_with_hint(
         self, tmp_export_file: Path
@@ -488,9 +467,7 @@ class TestGetMessageById:
         adapter = OpenAIAdapter()
 
         # Act: Search for msg-002 but hint wrong conversation (conv-001)
-        result = adapter.get_message_by_id(
-            export_file, "msg-002", conversation_id="conv-001"
-        )
+        result = adapter.get_message_by_id(export_file, "msg-002", conversation_id="conv-001")
 
         # Assert: Returns None (message exists but not in hinted conversation)
         assert result is None, (
@@ -595,9 +572,7 @@ class TestGetMessageById:
         with pytest.raises(FileNotFoundError):
             adapter.get_message_by_id(non_existent, "msg-001")
 
-    def test_get_message_by_id_with_empty_export_file(
-        self, tmp_path: Path
-    ) -> None:
+    def test_get_message_by_id_with_empty_export_file(self, tmp_path: Path) -> None:
         """Test get_message_by_id handles empty export file gracefully.
 
         Validates:
@@ -616,6 +591,4 @@ class TestGetMessageById:
         result = adapter.get_message_by_id(empty_file, "msg-001")
 
         # Assert: Returns None
-        assert result is None, (
-            "get_message_by_id should return None for empty export file"
-        )
+        assert result is None, "get_message_by_id should return None for empty export file"

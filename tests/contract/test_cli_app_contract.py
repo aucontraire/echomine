@@ -222,9 +222,7 @@ class TestCLIAppEntryPoint:
         stderr = result.stderr
         assert len(stderr) > 0, "Error message should be on stderr"
 
-    def test_cli_list_command_registered(
-        self, cli_command: list[str], tmp_path: Path
-    ) -> None:
+    def test_cli_list_command_registered(self, cli_command: list[str], tmp_path: Path) -> None:
         """Test 'list' command is registered and accessible.
 
         Validates:
@@ -314,9 +312,7 @@ class TestCLIAppEntryPoint:
         stdout = result.stdout
         assert "export" in stdout.lower()
 
-    def test_cli_keyboard_interrupt_exits_cleanly(
-        self, cli_command: list[str]
-    ) -> None:
+    def test_cli_keyboard_interrupt_exits_cleanly(self, cli_command: list[str]) -> None:
         """Test Ctrl+C (KeyboardInterrupt) exits cleanly with code 1.
 
         Validates:

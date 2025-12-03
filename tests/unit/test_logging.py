@@ -80,9 +80,7 @@ def reset_logging(captured_logs: StringIO) -> None:
 class TestConfigureLogging:
     """Unit tests for configure_logging() function."""
 
-    def test_configure_logging_sets_json_renderer(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_configure_logging_sets_json_renderer(self, captured_logs: StringIO) -> None:
         """Test JSON renderer is configured.
 
         Validates:
@@ -107,9 +105,7 @@ class TestConfigureLogging:
         assert isinstance(log_data, dict)
         assert "event" in log_data or "message" in log_data
 
-    def test_configure_logging_includes_timestamp(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_configure_logging_includes_timestamp(self, captured_logs: StringIO) -> None:
         """Test ISO 8601 timestamp is added to logs.
 
         Validates:
@@ -130,9 +126,7 @@ class TestConfigureLogging:
         assert "T" in log_data["timestamp"]
         assert log_data["timestamp"].endswith("Z") or "+" in log_data["timestamp"]
 
-    def test_configure_logging_includes_log_level(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_configure_logging_includes_log_level(self, captured_logs: StringIO) -> None:
         """Test log level is included in output.
 
         Validates:
@@ -151,9 +145,7 @@ class TestConfigureLogging:
         assert "level" in log_data
         assert log_data["level"] == "info"
 
-    def test_configure_logging_respects_log_level(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_configure_logging_respects_log_level(self, captured_logs: StringIO) -> None:
         """Test log level filtering works.
 
         Validates:
@@ -185,9 +177,7 @@ class TestConfigureLogging:
         log_data = json.loads(log_lines[0])
         assert log_data["level"] == "info"
 
-    def test_configure_logging_supports_debug_level(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_configure_logging_supports_debug_level(self, captured_logs: StringIO) -> None:
         """Test DEBUG level captures debug logs.
 
         Validates:
@@ -205,9 +195,7 @@ class TestConfigureLogging:
 
         assert log_data["level"] == "debug"
 
-    def test_configure_logging_formats_exceptions(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_configure_logging_formats_exceptions(self, captured_logs: StringIO) -> None:
         """Test exception info is formatted in logs.
 
         Validates:
@@ -271,9 +259,7 @@ class TestGetLogger:
         assert logger1 is not None
         assert logger2 is not None
 
-    def test_get_logger_supports_contextual_fields(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_get_logger_supports_contextual_fields(self, captured_logs: StringIO) -> None:
         """Test logger supports arbitrary contextual fields.
 
         Validates:
@@ -332,9 +318,7 @@ class TestGetLogger:
 class TestProgressLogger:
     """Unit tests for ProgressLogger class."""
 
-    def test_progress_logger_logs_first_item(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_progress_logger_logs_first_item(self, captured_logs: StringIO) -> None:
         """Test first item is always logged (count=1).
 
         Validates:
@@ -356,9 +340,7 @@ class TestProgressLogger:
         assert log_data["count"] == 1
         assert log_data["operation"] == "test_op"
 
-    def test_progress_logger_respects_interval(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_progress_logger_respects_interval(self, captured_logs: StringIO) -> None:
         """Test logging interval is respected.
 
         Validates:
@@ -390,9 +372,7 @@ class TestProgressLogger:
         counts = [json.loads(line)["count"] for line in log_lines]
         assert counts == [1, 101, 201]
 
-    def test_progress_logger_includes_extra_context(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_progress_logger_includes_extra_context(self, captured_logs: StringIO) -> None:
         """Test extra context fields are included in logs.
 
         Validates:
@@ -417,9 +397,7 @@ class TestProgressLogger:
         assert log_data["file_name"] == "test.json"
         assert log_data["conversation_id"] == "conv-123"
 
-    def test_progress_logger_log_complete(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_progress_logger_log_complete(self, captured_logs: StringIO) -> None:
         """Test log_complete() emits completion log.
 
         Validates:
@@ -441,9 +419,7 @@ class TestProgressLogger:
         assert log_data["total"] == 1234
         assert log_data["operation"] == "test_op"
 
-    def test_progress_logger_custom_interval(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_progress_logger_custom_interval(self, captured_logs: StringIO) -> None:
         """Test custom interval parameter works.
 
         Validates:
@@ -481,9 +457,7 @@ class TestProgressLogger:
 class TestSkipLogger:
     """Unit tests for SkipLogger class."""
 
-    def test_skip_logger_logs_with_warning_level(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_skip_logger_logs_with_warning_level(self, captured_logs: StringIO) -> None:
         """Test skips are logged at WARNING level.
 
         Validates:
@@ -505,9 +479,7 @@ class TestSkipLogger:
 
         assert log_data["level"] == "warning"
 
-    def test_skip_logger_includes_conversation_id_and_reason(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_skip_logger_includes_conversation_id_and_reason(self, captured_logs: StringIO) -> None:
         """Test skip log includes conversation_id and reason.
 
         Validates:
@@ -530,9 +502,7 @@ class TestSkipLogger:
         assert log_data["conversation_id"] == "conv-123"
         assert log_data["reason"] == "Invalid timestamp format"
 
-    def test_skip_logger_handles_none_conversation_id(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_skip_logger_handles_none_conversation_id(self, captured_logs: StringIO) -> None:
         """Test None conversation_id is handled as 'unknown'.
 
         Validates:
@@ -579,9 +549,7 @@ class TestSkipLogger:
         skip_log.log_skip("conv-3", "reason3")
         assert skip_log.get_skip_count() == 3
 
-    def test_skip_logger_includes_skip_count_in_log(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_skip_logger_includes_skip_count_in_log(self, captured_logs: StringIO) -> None:
         """Test skip_count field is included in log output.
 
         Validates:
@@ -603,9 +571,7 @@ class TestSkipLogger:
         second_log = json.loads(log_lines[1])
         assert second_log["skip_count"] == 2
 
-    def test_skip_logger_includes_extra_context(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_skip_logger_includes_extra_context(self, captured_logs: StringIO) -> None:
         """Test extra context fields are included in skip logs.
 
         Validates:
@@ -631,9 +597,7 @@ class TestSkipLogger:
         assert log_data["file_name"] == "export.json"
         assert log_data["line_number"] == 42
 
-    def test_skip_logger_message_format(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_skip_logger_message_format(self, captured_logs: StringIO) -> None:
         """Test skip log message is consistent.
 
         Validates:
@@ -663,9 +627,7 @@ class TestSkipLogger:
 class TestLoggingIntegration:
     """Integration tests for logging components working together."""
 
-    def test_progress_and_skip_loggers_together(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_progress_and_skip_loggers_together(self, captured_logs: StringIO) -> None:
         """Test ProgressLogger and SkipLogger can be used together.
 
         Validates:
@@ -696,9 +658,7 @@ class TestLoggingIntegration:
         levels = [json.loads(line)["level"] for line in log_lines]
         assert levels == ["info", "warning", "info"]
 
-    def test_multiple_operations_logged_distinctly(
-        self, captured_logs: StringIO
-    ) -> None:
+    def test_multiple_operations_logged_distinctly(self, captured_logs: StringIO) -> None:
         """Test logs from different operations are distinguishable.
 
         Validates:

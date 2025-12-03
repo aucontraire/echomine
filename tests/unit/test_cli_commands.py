@@ -82,9 +82,7 @@ def sample_export(tmp_path: Path) -> Path:
                         "author": {"role": "assistant"},
                         "content": {
                             "content_type": "text",
-                            "parts": [
-                                "AsyncIO is Python's library for asynchronous programming."
-                            ],
+                            "parts": ["AsyncIO is Python's library for asynchronous programming."],
                         },
                         "create_time": 1700000010.0,
                         "update_time": None,
@@ -532,9 +530,7 @@ class TestSearchCommand:
         - search.py lines 359-360: limit application
         """
         # Act
-        result = runner.invoke(
-            app, ["search", str(sample_export), "-k", "python", "--limit", "1"]
-        )
+        result = runner.invoke(app, ["search", str(sample_export), "-k", "python", "--limit", "1"])
 
         # Assert: Success
         assert result.exit_code == 0
@@ -561,9 +557,7 @@ class TestSearchCommand:
         - Exit code 2
         """
         # Act
-        result = runner.invoke(
-            app, ["search", str(sample_export), "-k", "python", "--limit", "0"]
-        )
+        result = runner.invoke(app, ["search", str(sample_export), "-k", "python", "--limit", "0"])
 
         # Assert: Exit code 2
         assert result.exit_code == 2
@@ -658,9 +652,7 @@ class TestSearchCommand:
         - FR-310: --quiet flag
         """
         # Act
-        result = runner.invoke(
-            app, ["search", str(sample_export), "-k", "python", "--quiet"]
-        )
+        result = runner.invoke(app, ["search", str(sample_export), "-k", "python", "--quiet"])
 
         # Assert: Success
         assert result.exit_code == 0
@@ -722,9 +714,7 @@ class TestExportCommand:
         - FR-016: --title as alternative to ID
         """
         # Act
-        result = runner.invoke(
-            app, ["export", str(sample_export), "--title", "Algorithm"]
-        )
+        result = runner.invoke(app, ["export", str(sample_export), "--title", "Algorithm"])
 
         # Assert: Success
         assert result.exit_code == 0
@@ -738,9 +728,7 @@ class TestExportCommand:
         - Exit code 2
         """
         # Act
-        result = runner.invoke(
-            app, ["export", str(sample_export), "conv-001", "--title", "Test"]
-        )
+        result = runner.invoke(app, ["export", str(sample_export), "conv-001", "--title", "Test"])
 
         # Assert: Exit code 2
         assert result.exit_code == 2
@@ -781,9 +769,7 @@ class TestExportCommand:
         - Exit code 1
         """
         # Act
-        result = runner.invoke(
-            app, ["export", str(sample_export), "--title", "NonexistentTitle"]
-        )
+        result = runner.invoke(app, ["export", str(sample_export), "--title", "NonexistentTitle"])
 
         # Assert: Exit code 1
         assert result.exit_code == 1
@@ -836,9 +822,7 @@ class TestGetConversationCommand:
         - Table output contains conversation details
         """
         # Act
-        result = runner.invoke(
-            app, ["get", "conversation", str(sample_export), "conv-001"]
-        )
+        result = runner.invoke(app, ["get", "conversation", str(sample_export), "conv-001"])
 
         # Assert: Success
         assert result.exit_code == 0
@@ -891,9 +875,7 @@ class TestGetConversationCommand:
         - Exit code 1
         """
         # Act
-        result = runner.invoke(
-            app, ["get", "conversation", str(sample_export), "nonexistent-id"]
-        )
+        result = runner.invoke(app, ["get", "conversation", str(sample_export), "nonexistent-id"])
 
         # Assert: Exit code 1
         assert result.exit_code == 1
@@ -1027,9 +1009,7 @@ class TestGetMessageCommand:
         - Exit code 1
         """
         # Act
-        result = runner.invoke(
-            app, ["get", "message", str(sample_export), "nonexistent-msg-id"]
-        )
+        result = runner.invoke(app, ["get", "message", str(sample_export), "nonexistent-msg-id"])
 
         # Assert: Exit code 1
         assert result.exit_code == 1
