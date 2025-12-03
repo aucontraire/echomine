@@ -220,6 +220,7 @@ def generic_adapter_usage(adapter: ConversationProvider[Conversation]) -> None:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
             timeout=30,
         )
 

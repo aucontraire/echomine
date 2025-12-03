@@ -330,6 +330,7 @@ class TestUS3AS1ExportByTitleCore:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -373,6 +374,7 @@ class TestUS3AS1ExportByTitleCore:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -415,6 +417,7 @@ class TestUS3AS1ExportByTitleCore:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -454,6 +457,7 @@ class TestUS3AS1ExportByTitleCore:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -518,6 +522,7 @@ class TestUS3AS1ExportByTitleErrors:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1 (operational error)
@@ -563,6 +568,7 @@ class TestUS3AS1ExportByTitleErrors:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1 (operational error)
@@ -609,6 +615,7 @@ class TestUS3AS1ExportByTitleErrors:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2 (invalid arguments)
@@ -648,6 +655,7 @@ class TestUS3AS1ExportByTitleErrors:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2 (invalid arguments)
@@ -795,6 +803,7 @@ class TestUS3AS1ExportByTitleEdgeCases:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -837,6 +846,7 @@ class TestUS3AS1ExportByTitleEdgeCases:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -881,6 +891,7 @@ class TestUS3AS1ExportByTitleEdgeCases:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Non-zero exit code (error)
@@ -936,6 +947,7 @@ class TestUS3AS1ExportByTitleOutputValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -978,6 +990,7 @@ class TestUS3AS1ExportByTitleOutputValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -1037,6 +1050,7 @@ class TestUS3AS1ExportByTitleOutputValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -1102,6 +1116,7 @@ class TestUS3AS1ExportByTitleWorkflow:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Validate: Success

@@ -82,6 +82,7 @@ class TestSearchCommandValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -115,6 +116,7 @@ class TestSearchCommandValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -146,6 +148,7 @@ class TestSearchCommandValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -177,6 +180,7 @@ class TestSearchCommandValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -215,6 +219,7 @@ class TestSearchCommandDateValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -245,6 +250,7 @@ class TestSearchCommandDateValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -276,6 +282,7 @@ class TestSearchCommandDateValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -329,6 +336,7 @@ class TestSearchCommandErrorHandling:
                 check=False,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
             )
 
             # Assert: Exit code 1
@@ -359,6 +367,7 @@ class TestSearchCommandErrorHandling:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -393,6 +402,7 @@ class TestSearchCommandZeroResults:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0 (success, not error)
@@ -423,6 +433,7 @@ class TestSearchCommandZeroResults:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # In non-TTY mode (subprocess), suggestions should NOT appear
@@ -461,6 +472,7 @@ class TestSearchCommandKeywordHandling:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success (keywords parsed correctly)
@@ -488,6 +500,7 @@ class TestSearchCommandKeywordHandling:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -520,6 +533,7 @@ class TestSearchCommandQuietFlag:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -565,6 +579,7 @@ class TestSearchCommandJSONOutput:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -604,6 +619,7 @@ class TestSearchCommandJSONOutput:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         data = json.loads(result.stdout)
@@ -646,6 +662,7 @@ class TestSearchCommandStdoutStderrSeparation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: stdout contains ONLY data (no progress indicators)
@@ -675,6 +692,7 @@ class TestSearchCommandStdoutStderrSeparation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Error (exit code 1)

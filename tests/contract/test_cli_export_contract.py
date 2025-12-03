@@ -265,6 +265,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         assert result.returncode == 0, (
@@ -298,6 +299,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -339,6 +341,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -391,6 +394,7 @@ class TestCLIExportCommandContract:
                 check=False,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
             )
 
             # Assert: Exit code 1
@@ -427,6 +431,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -470,6 +475,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2 (invalid arguments)
@@ -502,6 +508,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -539,6 +546,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -578,6 +586,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -626,6 +635,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -684,6 +694,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Command succeeds
@@ -804,6 +815,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         assert result.returncode == 0
@@ -842,6 +854,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         assert result.returncode == 0
@@ -876,6 +889,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         assert result.returncode == 0
@@ -1012,6 +1026,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Should succeed
@@ -1050,6 +1065,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Should succeed (overwrite allowed)
@@ -1087,6 +1103,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -1125,6 +1142,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1 (error)
@@ -1160,6 +1178,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
             cwd=str(tmp_path),
         )
 
@@ -1186,6 +1205,7 @@ class TestCLIExportCommandContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0

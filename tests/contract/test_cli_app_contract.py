@@ -83,6 +83,7 @@ class TestCLIAppEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -113,6 +114,7 @@ class TestCLIAppEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -137,6 +139,7 @@ class TestCLIAppEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0 (help, not error)
@@ -169,6 +172,7 @@ class TestCLIAppEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -194,6 +198,7 @@ class TestCLIAppEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Examples section present
@@ -213,6 +218,7 @@ class TestCLIAppEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -242,6 +248,7 @@ class TestCLIAppEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Command executes (exit code 0 for empty file)
@@ -262,6 +269,7 @@ class TestCLIAppEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Shows help with subcommands (in stderr for no_args_is_help)
@@ -281,6 +289,7 @@ class TestCLIAppEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -303,6 +312,7 @@ class TestCLIAppEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -345,6 +355,7 @@ class TestCLIAppEntryPoint:
                 check=False,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
             )
 
             # Assert: Success
@@ -384,6 +395,7 @@ class TestCLIMainEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -412,6 +424,7 @@ class TestCLIMainEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
         assert result_error.returncode == 1
 
@@ -421,6 +434,7 @@ class TestCLIMainEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
         assert result_invalid.returncode == 2
 
@@ -436,6 +450,7 @@ class TestCLIMainEntryPoint:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
         assert result_success.returncode == 0
 
@@ -468,6 +483,7 @@ class TestCLIOutputFormatting:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Error occurred
@@ -493,6 +509,7 @@ class TestCLIOutputFormatting:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: No Rich exception formatting
@@ -515,6 +532,7 @@ class TestCLIOutputFormatting:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Help is plain text (no required ANSI codes for readability)
@@ -554,6 +572,7 @@ class TestCLISmokeTests:
                 check=False,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
             )
 
             # Assert: No crash (exit 0 or 2, not 1)
@@ -573,6 +592,7 @@ class TestCLISmokeTests:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
         assert result_version.returncode == 0
 
@@ -582,6 +602,7 @@ class TestCLISmokeTests:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
         assert result_help.returncode == 0
 

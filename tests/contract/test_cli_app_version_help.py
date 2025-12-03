@@ -46,6 +46,7 @@ class TestCLIAppVersionAndHelp:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -72,6 +73,7 @@ class TestCLIAppVersionAndHelp:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -94,6 +96,7 @@ class TestCLIAppVersionAndHelp:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -121,6 +124,7 @@ class TestCLIAppVersionAndHelp:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0 (showing help is not an error)
@@ -144,6 +148,7 @@ class TestCLIAppVersionAndHelp:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2 (invalid argument)
@@ -177,6 +182,7 @@ class TestCLIAppVersionAndHelp:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -205,6 +211,7 @@ class TestCLIAppExceptionHandling:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1 (operational error)
@@ -231,6 +238,7 @@ class TestCLIAppExceptionHandling:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -257,6 +265,7 @@ class TestCLIAppStdoutStderrSeparation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: stdout has version
@@ -279,6 +288,7 @@ class TestCLIAppStdoutStderrSeparation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: stdout has help text

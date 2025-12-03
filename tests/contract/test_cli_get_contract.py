@@ -192,6 +192,7 @@ class TestCLIGetConversationContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -232,6 +233,7 @@ class TestCLIGetConversationContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -269,6 +271,7 @@ class TestCLIGetConversationContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -327,6 +330,7 @@ class TestCLIGetConversationContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -360,6 +364,7 @@ class TestCLIGetConversationContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -388,6 +393,7 @@ class TestCLIGetConversationContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -420,6 +426,7 @@ class TestCLIGetConversationContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -443,6 +450,7 @@ class TestCLIGetConversationContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -494,6 +502,7 @@ class TestCLIGetConversationContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success (no crash)
@@ -528,6 +537,7 @@ class TestCLIGetConversationContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -562,6 +572,7 @@ class TestCLIGetConversationContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -601,6 +612,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -641,6 +653,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -672,6 +685,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -704,6 +718,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -748,6 +763,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -781,6 +797,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -809,6 +826,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -840,6 +858,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -861,6 +880,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -885,6 +905,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -942,6 +963,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -967,6 +989,7 @@ class TestCLIGetMessageContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -1005,6 +1028,7 @@ class TestCLIGetCommandParent:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2 (Typer's no_args_is_help behavior)
@@ -1027,6 +1051,7 @@ class TestCLIGetCommandParent:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0

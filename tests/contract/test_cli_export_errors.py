@@ -129,6 +129,7 @@ class TestExportCommandValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -162,6 +163,7 @@ class TestExportCommandValidation:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2
@@ -197,6 +199,7 @@ class TestExportCommandByTitle:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -228,6 +231,7 @@ class TestExportCommandByTitle:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -259,6 +263,7 @@ class TestExportCommandByTitle:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -293,6 +298,7 @@ class TestExportCommandByID:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -322,6 +328,7 @@ class TestExportCommandByID:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -361,6 +368,7 @@ class TestExportCommandOutputFile:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -404,6 +412,7 @@ class TestExportCommandOutputFile:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -457,6 +466,7 @@ class TestExportCommandOutputFile:
                 check=False,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
             )
 
             # Assert: Exit code 1
@@ -506,6 +516,7 @@ class TestExportCommandOutputFile:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # May succeed or fail depending on OS, but should not crash
@@ -539,6 +550,7 @@ class TestExportCommandStdoutOutput:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -577,6 +589,7 @@ class TestExportCommandErrorHandling:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -623,6 +636,7 @@ class TestExportCommandErrorHandling:
                 check=False,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
             )
 
             # Assert: Exit code 1
@@ -657,6 +671,7 @@ class TestExportCommandErrorHandling:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 1
@@ -704,6 +719,7 @@ class TestExportCommandTitleLookup:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success (matches "JavaScript Basics")
@@ -730,6 +746,7 @@ class TestExportCommandTitleLookup:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success

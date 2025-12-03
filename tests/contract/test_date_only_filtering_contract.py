@@ -198,6 +198,7 @@ class TestDateRangeFilteringContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0 (success, not invalid args)
@@ -248,6 +249,7 @@ class TestDateRangeFilteringContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -330,6 +332,7 @@ class TestFromDateOnlyFilteringContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0 (success)
@@ -375,6 +378,7 @@ class TestFromDateOnlyFilteringContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -421,6 +425,7 @@ class TestFromDateOnlyFilteringContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -479,6 +484,7 @@ class TestToDateOnlyFilteringContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0 (success)
@@ -524,6 +530,7 @@ class TestToDateOnlyFilteringContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -574,6 +581,7 @@ class TestToDateOnlyFilteringContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -632,6 +640,7 @@ class TestDateOnlyFilteringEdgeCases:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0 (success, not error)
@@ -672,6 +681,7 @@ class TestDateOnlyFilteringEdgeCases:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2 (invalid argument)
@@ -715,6 +725,7 @@ class TestDateOnlyFilteringEdgeCases:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2 (invalid argument)
@@ -759,6 +770,7 @@ class TestDateOnlyFilteringEdgeCases:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0 (success)

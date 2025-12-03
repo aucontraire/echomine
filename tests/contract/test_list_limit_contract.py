@@ -139,6 +139,7 @@ class TestListLimitFlagContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0 for success
@@ -188,6 +189,7 @@ class TestListLimitFlagContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -248,6 +250,7 @@ class TestListLimitFlagContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -288,6 +291,7 @@ class TestListLimitFlagContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -318,6 +322,7 @@ class TestListLimitFlagContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2 (usage error)
@@ -351,6 +356,7 @@ class TestListLimitFlagContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2 (usage error)
@@ -383,6 +389,7 @@ class TestListLimitFlagContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 2 (usage error)
@@ -409,6 +416,7 @@ class TestListLimitFlagContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0
@@ -450,6 +458,7 @@ class TestListLimitFlagContract:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -515,6 +524,7 @@ class TestListLimitEdgeCases:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Exit code 0 (success, not error)
@@ -582,6 +592,7 @@ class TestListLimitEdgeCases:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Success
@@ -616,6 +627,7 @@ class TestListLimitEdgeCases:
             shell=True,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
 
         # Assert: Pipeline succeeds
