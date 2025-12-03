@@ -41,22 +41,6 @@ jobs:
       - name: Run pip-audit
         run: pip-audit --desc || true
 
-  codeql-analysis:
-    name: CodeQL Security Analysis
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: python
-          queries: security-and-quality
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+  # CodeQL analysis is handled by GitHub's Default Setup
+  # See: Settings → Security → Code scanning → Default setup
+  # Removed custom job to avoid conflict with default setup
