@@ -80,7 +80,7 @@ for result in adapter.search(file_path, query):
 
 ### export
 
-Export a specific conversation to markdown format.
+Export a specific conversation to markdown or JSON format.
 
 **Usage:**
 
@@ -88,19 +88,30 @@ Export a specific conversation to markdown format.
 echomine export [OPTIONS] FILE_PATH CONVERSATION_ID
 ```
 
+**Options:**
+
+- `--output PATH`: Output file path (if not specified, prints to stdout)
+- `--format TEXT`: Export format: `markdown` (default) or `json`
+
 **Library Equivalent:**
 
 ```python
 from echomine import OpenAIAdapter
-from echomine.exporters import MarkdownExporter
+from echomine.exporters import MarkdownExporter, JSONExporter
 
 adapter = OpenAIAdapter()
 conversation = adapter.get_conversation_by_id(file_path, conversation_id)
 
 if conversation:
-    exporter = MarkdownExporter()
-    markdown = exporter.export(conversation)
+    # Markdown export (default)
+    markdown_exporter = MarkdownExporter()
+    markdown = markdown_exporter.export(conversation)
     print(markdown)
+
+    # JSON export
+    json_exporter = JSONExporter()
+    json_output = json_exporter.export(conversation)
+    print(json_output)
 ```
 
 **See:** [CLI Usage - export](../../cli-usage.md#export)

@@ -110,10 +110,16 @@ echomine get conversation export.json conv-abc123
 # Get message by ID (with conversation hint for performance)
 echomine get message export.json msg-def456 -c conv-abc123
 
-# Export conversation to markdown
+# Export conversation to markdown (default)
 echomine export export.json conv-abc123 --output algo.md
 
-# JSON output for piping
+# Export as JSON
+echomine export export.json conv-abc123 --format json --output algo.json
+
+# JSON to stdout for piping
+echomine export export.json conv-abc123 -f json | jq '.messages | length'
+
+# JSON output for search results
 echomine search export.json --keywords "python" --json | jq '.results[].title'
 
 # Version info

@@ -79,10 +79,13 @@ echomine search export.json --title "Project"
 # Filter by date range
 echomine search export.json --from-date "2024-01-01" --to-date "2024-03-31"
 
-# Export conversation to markdown
+# Export conversation to markdown (default)
 echomine export export.json conv-abc123 --output algo.md
 
-# JSON output for piping
+# Export as JSON for piping
+echomine export export.json conv-abc123 -f json | jq '.messages | length'
+
+# JSON output for search results
 echomine search export.json --keywords "python" --json | jq '.results[].title'
 ```
 

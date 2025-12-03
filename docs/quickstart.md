@@ -122,14 +122,17 @@ echomine search export.json \
   --limit 5
 ```
 
-### Export to Markdown
+### Export to Markdown or JSON
 
 ```bash
-# Export specific conversation
+# Export specific conversation as markdown (default)
 echomine export export.json conv-abc123 --output algo.md
 
-# JSON output (for programmatic use)
-echomine export export.json conv-abc123 --json > conversation.json
+# Export as JSON (for programmatic use)
+echomine export export.json conv-abc123 --format json --output conversation.json
+
+# Export JSON to stdout for piping
+echomine export export.json conv-abc123 -f json | jq '.messages[0].content'
 ```
 
 ### JSON Output for Piping

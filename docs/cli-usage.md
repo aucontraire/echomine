@@ -374,7 +374,7 @@ When using `get message` without the `--conversation-id` hint, the command searc
 
 ### export
 
-Export a specific conversation to markdown format.
+Export a specific conversation to markdown or JSON format.
 
 **Usage:**
 
@@ -390,22 +390,28 @@ echomine export [OPTIONS] FILE_PATH CONVERSATION_ID
 **Options:**
 
 - `--output PATH`: Output file path (if not specified, prints to stdout)
-- `--json`: Output conversation as JSON instead of markdown
+- `--format TEXT`: Export format: `markdown` (default) or `json`
 - `--help`: Show help message
 
 **Examples:**
 
 ```bash
-# Export to stdout (markdown)
+# Export to stdout (markdown, default)
 echomine export export.json conv-abc123
 
-# Export to file
+# Export to markdown file
 echomine export export.json conv-abc123 --output algorithm.md
 
-# Export as JSON
-echomine export export.json conv-abc123 --json
+# Export as JSON to file
+echomine export export.json conv-abc123 --format json --output algo.json
 
-# Pipe to file
+# Export JSON to stdout for piping
+echomine export export.json conv-abc123 -f json | jq '.messages | length'
+
+# Count user messages in a conversation
+echomine export export.json conv-abc123 -f json | jq '[.messages[] | select(.role == "user")] | length'
+
+# Pipe markdown to file
 echomine export export.json conv-abc123 > conversation.md
 
 # Export multiple conversations with bash loop
