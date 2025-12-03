@@ -26,6 +26,7 @@ Fixtures Required:
 - Generated via tests/fixtures/generate_large_export.py
 """
 
+import platform
 import sys
 import time
 import tracemalloc
