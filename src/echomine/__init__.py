@@ -51,10 +51,10 @@ Type Safety:
 All public APIs are strictly typed with Pydantic models and mypy --strict compliance.
 
 License:
-    MIT License - See LICENSE file for details
+    AGPL-3.0 License - See LICENSE file for details
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "Echomine Contributors"
 
 # Public API imports (T061-T062)

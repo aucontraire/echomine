@@ -634,4 +634,4 @@ def stream_conversations(file_path: Path) -> Iterator[Conversation]:
 
 ## License
 
-By contributing to Echomine, you agree that your contributions will be licensed under the MIT License.
+By contributing to Echomine, you agree that your contributions will be licensed under the AGPL-3.0 License.

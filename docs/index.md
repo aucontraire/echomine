@@ -127,7 +127,7 @@ pre-commit install
 
 ## License
 
-MIT License - See [LICENSE](https://github.com/echomine/echomine/blob/master/LICENSE) file for details
+AGPL-3.0 License - See [LICENSE](https://github.com/echomine/echomine/blob/master/LICENSE) file for details
 
 ## Acknowledgments
 

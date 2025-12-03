@@ -40,7 +40,7 @@
 ### Packaging & CI/CD (90% Complete)
 - ✅ pyproject.toml metadata configured
 - ✅ Python >=3.12 constraint
-- ✅ LICENSE file (MIT)
+- ✅ LICENSE file (AGPL-3.0)
 - ✅ Ruff/mypy/pytest configuration
 - ✅ GitHub Actions CI/CD (test, docs, release, security workflows)
 - ✅ Dependabot for automated dependency updates
