@@ -48,7 +48,8 @@ class TestRoleFlagBasic:
                 "--role",
                 "user",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=30,
         )
@@ -69,7 +70,8 @@ class TestRoleFlagBasic:
                 "--role",
                 "assistant",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=30,
         )
@@ -89,7 +91,8 @@ class TestRoleFlagBasic:
                 "--role",
                 "system",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=30,
         )
@@ -109,7 +112,8 @@ class TestRoleFlagBasic:
                 "--role",
                 "invalid_role",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=30,
         )
@@ -137,7 +141,8 @@ class TestRoleFlagJsonOutput:
                 "--format",
                 "json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=30,
         )
@@ -164,7 +169,8 @@ class TestRoleFlagJsonOutput:
                 "--format",
                 "json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=30,
         )

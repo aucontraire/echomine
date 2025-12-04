@@ -380,9 +380,7 @@ class OpenAIAdapter:
                 else:
                     # Default 'any' mode: regular BM25 scoring
                     score = scorer.score(conv_text, query.keywords)
-                    matched_message_ids = self._find_matched_messages(
-                        filtered_msgs, query.keywords
-                    )
+                    matched_message_ids = self._find_matched_messages(filtered_msgs, query.keywords)
                     if score > 0.0:
                         has_keyword_match = True
 
@@ -592,9 +590,7 @@ class OpenAIAdapter:
         # Not found in any conversation
         return None
 
-    def _find_matched_messages(
-        self, messages: list[Message], keywords: list[str]
-    ) -> list[str]:
+    def _find_matched_messages(self, messages: list[Message], keywords: list[str]) -> list[str]:
         """Find message IDs containing any of the keywords.
 
         Uses word-boundary matching to find keywords as complete tokens,

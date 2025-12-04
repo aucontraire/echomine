@@ -123,9 +123,7 @@ def match_mode_export(tmp_path: Path) -> Path:
 class TestMatchModeFlagAccepted:
     """Contract tests for --match-mode flag acceptance (FR-007)."""
 
-    def test_match_mode_all_accepted(
-        self, cli_command: list[str], match_mode_export: Path
-    ) -> None:
+    def test_match_mode_all_accepted(self, cli_command: list[str], match_mode_export: Path) -> None:
         """--match-mode all is accepted by search command."""
         result = subprocess.run(
             [
@@ -137,7 +135,8 @@ class TestMatchModeFlagAccepted:
                 "--match-mode",
                 "all",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -145,9 +144,7 @@ class TestMatchModeFlagAccepted:
         assert "Error: Unknown option" not in result.stderr
         assert result.returncode in (0, 1)
 
-    def test_match_mode_any_accepted(
-        self, cli_command: list[str], match_mode_export: Path
-    ) -> None:
+    def test_match_mode_any_accepted(self, cli_command: list[str], match_mode_export: Path) -> None:
         """--match-mode any is accepted by search command."""
         result = subprocess.run(
             [
@@ -159,7 +156,8 @@ class TestMatchModeFlagAccepted:
                 "--match-mode",
                 "any",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -180,7 +178,8 @@ class TestMatchModeFlagAccepted:
                 "--match-mode",
                 "invalid",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -207,7 +206,8 @@ class TestMatchModeDefault:
                 "java",
                 "--json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -238,7 +238,8 @@ class TestMatchModeAllBehavior:
                 "all",
                 "--json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -268,7 +269,8 @@ class TestMatchModeJsonOutput:
                 "all",
                 "--json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 

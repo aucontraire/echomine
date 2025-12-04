@@ -141,9 +141,7 @@ def match_mode_export_file(tmp_path: Path) -> Path:
 class TestMatchModeAcceptance:
     """Acceptance tests from spec.md User Story 2."""
 
-    def test_us2_as1_match_mode_any_default(
-        self, match_mode_export_file: Path
-    ) -> None:
+    def test_us2_as1_match_mode_any_default(self, match_mode_export_file: Path) -> None:
         """AS1: Default match_mode='any' returns conversations with ANY keyword.
 
         Given an export with conversations containing different keywords,
@@ -165,9 +163,7 @@ class TestMatchModeAcceptance:
         assert "conv-neither" not in result_ids
         assert len(results) == 3
 
-    def test_us2_as2_match_mode_all_requires_all(
-        self, match_mode_export_file: Path
-    ) -> None:
+    def test_us2_as2_match_mode_all_requires_all(self, match_mode_export_file: Path) -> None:
         """AS2: match_mode='all' returns only conversations with ALL keywords.
 
         Given an export with conversations containing different keywords,
@@ -188,9 +184,7 @@ class TestMatchModeAcceptance:
         assert "conv-neither" not in result_ids
         assert len(results) == 1
 
-    def test_us2_as3_match_mode_all_no_matches(
-        self, match_mode_export_file: Path
-    ) -> None:
+    def test_us2_as3_match_mode_all_no_matches(self, match_mode_export_file: Path) -> None:
         """AS3: match_mode='all' returns empty when no conversation has all keywords.
 
         Given keywords that don't all appear together in any conversation,
@@ -205,9 +199,7 @@ class TestMatchModeAcceptance:
         # No conversation has both python AND rust
         assert len(results) == 0
 
-    def test_us2_as4_single_keyword_both_modes_same(
-        self, match_mode_export_file: Path
-    ) -> None:
+    def test_us2_as4_single_keyword_both_modes_same(self, match_mode_export_file: Path) -> None:
         """AS4: Single keyword behaves the same in both modes.
 
         Given a single keyword,

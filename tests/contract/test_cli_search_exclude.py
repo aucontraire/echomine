@@ -137,7 +137,8 @@ class TestExcludeFlagAccepted:
                 "--exclude",
                 "django",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -161,7 +162,8 @@ class TestExcludeFlagAccepted:
                 "--exclude",
                 "flask",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -188,7 +190,8 @@ class TestExcludeBehavior:
                 "django",
                 "--json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -220,7 +223,8 @@ class TestExcludeBehavior:
                 "flask",
                 "--json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -240,9 +244,7 @@ class TestExcludeBehavior:
 class TestExcludeJsonOutput:
     """Contract tests for exclude_keywords in JSON output."""
 
-    def test_exclude_in_json_query(
-        self, cli_command: list[str], exclude_export: Path
-    ) -> None:
+    def test_exclude_in_json_query(self, cli_command: list[str], exclude_export: Path) -> None:
         """JSON output includes exclude_keywords in query section."""
         result = subprocess.run(
             [
@@ -255,7 +257,8 @@ class TestExcludeJsonOutput:
                 "django",
                 "--json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -281,7 +284,8 @@ class TestExcludeJsonOutput:
                 "flask",
                 "--json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 

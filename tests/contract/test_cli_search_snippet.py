@@ -49,7 +49,8 @@ class TestSnippetJsonOutput:
                 "--format",
                 "json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=30,
         )
@@ -76,7 +77,8 @@ class TestSnippetJsonOutput:
                 "--format",
                 "json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=30,
         )
@@ -92,12 +94,9 @@ class TestSnippetJsonOutput:
                 if r.get("snippet") and "python" in r["snippet"].lower()
             ]
             # Either snippet has keyword OR it's "[Content unavailable]" fallback
-            assert (
-                len(snippets_with_keyword) > 0
-                or all(
-                    r.get("snippet") in ["[Content unavailable]", "[No content matched]"]
-                    for r in output["results"]
-                )
+            assert len(snippets_with_keyword) > 0 or all(
+                r.get("snippet") in ["[Content unavailable]", "[No content matched]"]
+                for r in output["results"]
             )
 
     def test_snippet_length_approximately_100_chars(
@@ -114,7 +113,8 @@ class TestSnippetJsonOutput:
                 "--format",
                 "json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=30,
         )
@@ -149,7 +149,8 @@ class TestSnippetTextOutput:
                 "--format",
                 "text",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=30,
         )
@@ -175,7 +176,8 @@ class TestSnippetTextOutput:
                 "--format",
                 "text",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=30,
         )

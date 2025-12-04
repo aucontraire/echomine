@@ -141,9 +141,7 @@ def exclude_export_file(tmp_path: Path) -> Path:
 class TestExcludeAcceptance:
     """Acceptance tests from spec.md User Story 3."""
 
-    def test_us3_as1_exclude_single_term(
-        self, exclude_export_file: Path
-    ) -> None:
+    def test_us3_as1_exclude_single_term(self, exclude_export_file: Path) -> None:
         """AS1: Exclude single term filters out matching conversations.
 
         Given an export with conversations about different frameworks,
@@ -163,9 +161,7 @@ class TestExcludeAcceptance:
         assert "conv-python-django" not in result_ids
         assert len(results) == 2
 
-    def test_us3_as2_exclude_multiple_terms(
-        self, exclude_export_file: Path
-    ) -> None:
+    def test_us3_as2_exclude_multiple_terms(self, exclude_export_file: Path) -> None:
         """AS2: Exclude multiple terms filters out all matching.
 
         Given an export with conversations about different frameworks,
@@ -188,9 +184,7 @@ class TestExcludeAcceptance:
         assert "conv-python-flask" not in result_ids
         assert len(results) == 1
 
-    def test_us3_as3_exclude_all_results(
-        self, exclude_export_file: Path
-    ) -> None:
+    def test_us3_as3_exclude_all_results(self, exclude_export_file: Path) -> None:
         """AS3: Excluding all matching results returns empty.
 
         Given all matching conversations contain excluded terms,
@@ -208,9 +202,7 @@ class TestExcludeAcceptance:
         # All Python conversations excluded
         assert len(results) == 0
 
-    def test_us3_as4_exclude_no_effect_on_non_matching(
-        self, exclude_export_file: Path
-    ) -> None:
+    def test_us3_as4_exclude_no_effect_on_non_matching(self, exclude_export_file: Path) -> None:
         """AS4: Exclude has no effect when term not present.
 
         Given conversations that don't contain the excluded term,
@@ -280,9 +272,7 @@ class TestExcludeEdgeCases:
         # Flask and FastAPI mention "web framework"
         assert len(results) >= 1
 
-    def test_empty_exclude_returns_all_matches(
-        self, exclude_export_file: Path
-    ) -> None:
+    def test_empty_exclude_returns_all_matches(self, exclude_export_file: Path) -> None:
         """Empty exclude_keywords returns all matching results."""
         adapter = OpenAIAdapter()
         query = SearchQuery(keywords=["python"], exclude_keywords=[])

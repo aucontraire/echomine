@@ -93,9 +93,7 @@ class TestOnSkipCallback:
 
         # Act: Stream with on_skip callback
         adapter = OpenAIAdapter()
-        conversations = list(
-            adapter.stream_conversations(file, on_skip=on_skip_handler)
-        )
+        conversations = list(adapter.stream_conversations(file, on_skip=on_skip_handler))
 
         # Assert: Callback was invoked for malformed conversation
         assert len(skip_calls) == 1
@@ -180,29 +178,31 @@ class TestSearchProgressCallback:
         # Arrange: Create export with 250 conversations (triggers callback 2x)
         data = []
         for i in range(250):
-            data.append({
-                "id": f"conv-{i:03d}",
-                "title": f"Conversation {i}",
-                "create_time": 1700000000.0 + i,
-                "update_time": 1700001000.0 + i,
-                "mapping": {
-                    f"msg-{i:03d}": {
-                        "id": f"msg-{i:03d}",
-                        "message": {
+            data.append(
+                {
+                    "id": f"conv-{i:03d}",
+                    "title": f"Conversation {i}",
+                    "create_time": 1700000000.0 + i,
+                    "update_time": 1700001000.0 + i,
+                    "mapping": {
+                        f"msg-{i:03d}": {
                             "id": f"msg-{i:03d}",
-                            "author": {"role": "user"},
-                            "content": {"content_type": "text", "parts": [f"Message {i}"]},
-                            "create_time": 1700000000.0 + i,
-                            "update_time": None,
-                            "metadata": {},
-                        },
-                        "parent": None,
-                        "children": [],
-                    }
-                },
-                "moderation_results": [],
-                "current_node": f"msg-{i:03d}",
-            })
+                            "message": {
+                                "id": f"msg-{i:03d}",
+                                "author": {"role": "user"},
+                                "content": {"content_type": "text", "parts": [f"Message {i}"]},
+                                "create_time": 1700000000.0 + i,
+                                "update_time": None,
+                                "metadata": {},
+                            },
+                            "parent": None,
+                            "children": [],
+                        }
+                    },
+                    "moderation_results": [],
+                    "current_node": f"msg-{i:03d}",
+                }
+            )
 
         file = tmp_path / "test_search_progress.json"
         file.write_text(json.dumps(data), encoding="utf-8")

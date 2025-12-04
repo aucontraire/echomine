@@ -46,9 +46,7 @@ class TestCombinedSearchFeatures:
         for result in results:
             assert result.snippet is not None
 
-    def test_keywords_with_exclude_and_role(
-        self, sample_export_path: Path
-    ) -> None:
+    def test_keywords_with_exclude_and_role(self, sample_export_path: Path) -> None:
         """Keywords + exclude + role filter combined."""
         adapter = OpenAIAdapter()
         query = SearchQuery(
@@ -105,9 +103,7 @@ class TestCombinedSearchFeatures:
 class TestFeatureInteractionEdgeCases:
     """Test edge cases in feature interactions."""
 
-    def test_empty_results_with_strict_filters(
-        self, sample_export_path: Path
-    ) -> None:
+    def test_empty_results_with_strict_filters(self, sample_export_path: Path) -> None:
         """Very restrictive filters may return empty results."""
         adapter = OpenAIAdapter()
         query = SearchQuery(
@@ -139,9 +135,7 @@ class TestFeatureInteractionEdgeCases:
         for result in results:
             assert result.snippet is not None
 
-    def test_snippet_respects_role_filter(
-        self, sample_export_path: Path
-    ) -> None:
+    def test_snippet_respects_role_filter(self, sample_export_path: Path) -> None:
         """Snippet content should come from role-filtered messages."""
         adapter = OpenAIAdapter()
         query = SearchQuery(
@@ -160,9 +154,7 @@ class TestFeatureInteractionEdgeCases:
 class TestCombinedAcceptanceCriteria:
     """Acceptance criteria for combined features."""
 
-    def test_combined_search_returns_valid_structure(
-        self, sample_export_path: Path
-    ) -> None:
+    def test_combined_search_returns_valid_structure(self, sample_export_path: Path) -> None:
         """Combined search returns properly structured results."""
         adapter = OpenAIAdapter()
         query = SearchQuery(
@@ -203,9 +195,7 @@ class TestCombinedAcceptanceCriteria:
             for i in range(len(results) - 1):
                 assert results[i].score >= results[i + 1].score
 
-    def test_limit_respected_with_all_features(
-        self, sample_export_path: Path
-    ) -> None:
+    def test_limit_respected_with_all_features(self, sample_export_path: Path) -> None:
         """Limit is respected even with all features active."""
         limit = 3
         adapter = OpenAIAdapter()

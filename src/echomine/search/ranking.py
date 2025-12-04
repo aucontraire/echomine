@@ -233,9 +233,7 @@ class BM25Scorer:
             # Guard against division by zero when avg_doc_length is 0
             # This can happen with sparse corpora (e.g., role_filter=system with few system messages)
             # When avg_doc_length is 0, skip length normalization (use ratio of 1.0)
-            length_ratio = (
-                doc_length / self.avg_doc_length if self.avg_doc_length > 0 else 1.0
-            )
+            length_ratio = doc_length / self.avg_doc_length if self.avg_doc_length > 0 else 1.0
 
             denominator = tf + self.K1 * (1.0 - self.B + self.B * length_ratio)
 

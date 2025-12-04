@@ -174,9 +174,7 @@ class TestPhraseSearchAcceptance:
         assert "conv-exact-phrase" in result_ids  # Has "algo-insights"
         assert "conv-multiple-phrases" in result_ids  # Has both
 
-    def test_us1_as4_phrase_combined_with_keywords(
-        self, phrase_export_file: Path
-    ) -> None:
+    def test_us1_as4_phrase_combined_with_keywords(self, phrase_export_file: Path) -> None:
         """AS4: Phrases can be combined with keywords (OR logic by default).
 
         Given user runs search with both keywords and phrases,

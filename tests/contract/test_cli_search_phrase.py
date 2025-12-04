@@ -113,13 +113,12 @@ def phrase_export(tmp_path: Path) -> Path:
 class TestPhraseFlagAccepted:
     """Contract tests for --phrase flag acceptance (FR-001)."""
 
-    def test_phrase_flag_accepted(
-        self, cli_command: list[str], phrase_export: Path
-    ) -> None:
+    def test_phrase_flag_accepted(self, cli_command: list[str], phrase_export: Path) -> None:
         """--phrase flag is accepted by search command."""
         result = subprocess.run(
             [*cli_command, "search", str(phrase_export), "--phrase", "algo-insights"],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -129,13 +128,12 @@ class TestPhraseFlagAccepted:
         # Once implemented, this will return results
         assert result.returncode in (0, 1)  # 0 success, 1 for not-yet-implemented
 
-    def test_phrase_flag_as_only_filter(
-        self, cli_command: list[str], phrase_export: Path
-    ) -> None:
+    def test_phrase_flag_as_only_filter(self, cli_command: list[str], phrase_export: Path) -> None:
         """--phrase alone (without -k) should be a valid filter."""
         result = subprocess.run(
             [*cli_command, "search", str(phrase_export), "--phrase", "algo-insights"],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -162,7 +160,8 @@ class TestMultiplePhrasesFlags:
                 "--phrase",
                 "data pipeline",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -174,9 +173,7 @@ class TestMultiplePhrasesFlags:
 class TestPhraseCombinedWithKeywords:
     """Contract tests for combining --phrase with -k (FR-004)."""
 
-    def test_phrase_and_keyword_combined(
-        self, cli_command: list[str], phrase_export: Path
-    ) -> None:
+    def test_phrase_and_keyword_combined(self, cli_command: list[str], phrase_export: Path) -> None:
         """--phrase can be combined with -k keywords."""
         result = subprocess.run(
             [
@@ -188,7 +185,8 @@ class TestPhraseCombinedWithKeywords:
                 "--phrase",
                 "algo-insights",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -199,9 +197,7 @@ class TestPhraseCombinedWithKeywords:
 class TestPhraseJsonOutput:
     """Contract tests for phrase in JSON output."""
 
-    def test_phrase_in_json_query(
-        self, cli_command: list[str], phrase_export: Path
-    ) -> None:
+    def test_phrase_in_json_query(self, cli_command: list[str], phrase_export: Path) -> None:
         """JSON output includes phrases in query section."""
         result = subprocess.run(
             [
@@ -212,7 +208,8 @@ class TestPhraseJsonOutput:
                 "algo-insights",
                 "--json",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 

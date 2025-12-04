@@ -51,20 +51,13 @@ class TestSnippetIntegration:
         # At least one result should have snippet with keyword (or be fallback)
         if results:
             snippets_with_keyword = [
-                r
-                for r in results
-                if r.snippet and "python" in r.snippet.lower()
+                r for r in results if r.snippet and "python" in r.snippet.lower()
             ]
             fallback_snippets = [
-                r
-                for r in results
-                if r.snippet in ["[Content unavailable]", "[No content matched]"]
+                r for r in results if r.snippet in ["[Content unavailable]", "[No content matched]"]
             ]
             # Either has keyword in snippet or uses fallback
-            assert (
-                len(snippets_with_keyword) > 0
-                or len(fallback_snippets) == len(results)
-            )
+            assert len(snippets_with_keyword) > 0 or len(fallback_snippets) == len(results)
 
     def test_snippet_length_limit(self, sample_export_path: Path) -> None:
         """Snippet respects length limit (~100 chars + indicator)."""
@@ -76,9 +69,7 @@ class TestSnippetIntegration:
         for result in results:
             if result.snippet:
                 # Allow up to 150 chars (100 + "..." + " (+N more matches)")
-                assert len(result.snippet) <= 150, (
-                    f"Snippet too long: {len(result.snippet)} chars"
-                )
+                assert len(result.snippet) <= 150, f"Snippet too long: {len(result.snippet)} chars"
 
 
 class TestSnippetWithPhrases:
@@ -126,9 +117,7 @@ class TestSnippetEdgeCases:
         for result in results:
             assert result.snippet is not None
 
-    def test_snippet_multiple_matches_indicator(
-        self, sample_export_path: Path
-    ) -> None:
+    def test_snippet_multiple_matches_indicator(self, sample_export_path: Path) -> None:
         """Multiple keyword matches show indicator."""
         adapter = OpenAIAdapter()
         # Use common word to get multiple matches
@@ -147,9 +136,7 @@ class TestSnippetEdgeCases:
 class TestSnippetAcceptanceCriteria:
     """Acceptance criteria tests for US5."""
 
-    def test_us5_as1_snippet_in_search_results(
-        self, sample_export_path: Path
-    ) -> None:
+    def test_us5_as1_snippet_in_search_results(self, sample_export_path: Path) -> None:
         """US5-AS1: Search results include matched text snippet."""
         adapter = OpenAIAdapter()
         query = SearchQuery(keywords=["python"], limit=5)
@@ -162,9 +149,7 @@ class TestSnippetAcceptanceCriteria:
                 f"Missing snippet for conversation: {result.conversation.title}"
             )
 
-    def test_us5_as2_snippet_truncated_to_100_chars(
-        self, sample_export_path: Path
-    ) -> None:
+    def test_us5_as2_snippet_truncated_to_100_chars(self, sample_export_path: Path) -> None:
         """US5-AS2: Snippets are truncated to ~100 characters."""
         adapter = OpenAIAdapter()
         query = SearchQuery(keywords=["python"], limit=10)
@@ -175,9 +160,7 @@ class TestSnippetAcceptanceCriteria:
             if result.snippet and "..." in result.snippet:
                 # Truncated snippets should be around 100 chars
                 base_snippet = result.snippet.split("...")[0] + "..."
-                assert len(base_snippet) <= 110, (
-                    f"Base snippet too long: {len(base_snippet)} chars"
-                )
+                assert len(base_snippet) <= 110, f"Base snippet too long: {len(base_snippet)} chars"
 
     def test_us5_as3_fallback_for_empty_content(self) -> None:
         """US5-AS3: Empty content returns fallback text (FR-025)."""

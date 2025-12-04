@@ -235,9 +235,7 @@ class TestSnippetFromMessages:
         keywords = ["python"]
         matched_message_ids = ["msg-2", "msg-3"]
 
-        snippet, count = extract_snippet_from_messages(
-            messages, keywords, matched_message_ids
-        )
+        snippet, count = extract_snippet_from_messages(messages, keywords, matched_message_ids)
 
         assert "Python" in snippet
         assert count == 2  # Two messages matched
@@ -260,9 +258,7 @@ class TestSnippetFromMessages:
         keywords = ["python"]
         matched_message_ids: list[str] = []
 
-        snippet, count = extract_snippet_from_messages(
-            messages, keywords, matched_message_ids
-        )
+        snippet, count = extract_snippet_from_messages(messages, keywords, matched_message_ids)
 
         assert snippet == "[No content matched]"
         assert count == 0
@@ -276,9 +272,7 @@ class TestSnippetFromMessages:
         keywords = ["python"]
         matched_message_ids: list[str] = []
 
-        snippet, count = extract_snippet_from_messages(
-            messages, keywords, matched_message_ids
-        )
+        snippet, count = extract_snippet_from_messages(messages, keywords, matched_message_ids)
 
         assert snippet == "[Content unavailable]"
         assert count == 0

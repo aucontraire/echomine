@@ -260,9 +260,7 @@ class TestCombinedFeaturesPerformance:
         result = benchmark(search_combined)
         assert result >= 0
 
-    def test_combined_features_memory_overhead(
-        self, large_export_advanced: Path
-    ) -> None:
+    def test_combined_features_memory_overhead(self, large_export_advanced: Path) -> None:
         """Validate memory usage with all features active.
 
         Combined features should not cause excessive memory growth.
