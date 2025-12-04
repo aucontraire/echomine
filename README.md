@@ -30,7 +30,7 @@ Echomine is a Python library and CLI tool for parsing, searching, and exporting 
 4. **Test-Driven Development**: All features test-first validated
 5. **YAGNI**: Simple solutions, no speculative features
 
-See [Constitution](specs/001-ai-chat-parser/constitution.md) for complete design principles.
+See [Constitution](.specify/memory/constitution.md) for complete design principles.
 
 ## Installation
 
@@ -153,7 +153,7 @@ echomine --version
 
 **Search Filter Logic:** Content matching (phrases OR keywords) happens first, then post-filtering (--exclude, --role, --title, dates) is applied. See [CLI Usage](https://aucontraire.github.io/echomine/cli-usage/#how-search-filters-combine) for details.
 
-See [Quickstart Guide](specs/001-ai-chat-parser/quickstart.md) for detailed examples.
+See [Quickstart Guide](docs/quickstart.md) for detailed examples.
 
 ## Development
 
