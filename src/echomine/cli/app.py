@@ -113,9 +113,9 @@ def _configure_encoding() -> None:
     import io
 
     # Only reconfigure if not already UTF-8 (common on Windows)
-    if sys.stdout.encoding.lower() != "utf-8":
+    if sys.stdout.encoding.lower() != "utf-8":  # pragma: no cover
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-    if sys.stderr.encoding.lower() != "utf-8":
+    if sys.stderr.encoding.lower() != "utf-8":  # pragma: no cover
         sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 
