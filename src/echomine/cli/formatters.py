@@ -166,6 +166,7 @@ def format_search_results(results: list[SearchResult[Conversation]]) -> str:
     - Score (0.00-1.00, higher = more relevant)
     - ID (conversation UUID, truncated to 36 chars)
     - Title (truncated to 30 chars)
+    - Snippet (matched text, truncated to 40 chars) [FR-021]
     - Created date
     - Message count
 
@@ -176,14 +177,15 @@ def format_search_results(results: list[SearchResult[Conversation]]) -> str:
         Formatted text table
 
     Example Output:
-        Score  ID                                    Title                          Created              Messages
-        ─────────────────────────────────────────────────────────────────────────────────────────────────────────
-        1.00   a1b2c3d4-e5f6-7890-abcd-ef1234567890  Python async best practices    2024-03-15 14:23:11        47
-        0.85   b2c3d4e5-f6a7-8901-bcde-f12345678901  Intro to Python for beginners  2024-03-14 09:15:42        12
+        Score  ID                                    Title                          Snippet                                   Created              Messages
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        1.00   a1b2c3d4-e5f6-7890-abcd-ef1234567890  Python async best practices    Python is great for...                    2024-03-15 14:23:11        47
+        0.85   b2c3d4e5-f6a7-8901-bcde-f12345678901  Intro to Python for beginners  Learn Python basics...                    2024-03-14 09:15:42        12
 
     Requirements:
         - FR-018: Human-readable format
         - FR-019: Pipeline-friendly output
+        - FR-021: Snippet column in output
         - CHK031: Output to stdout (caller responsibility)
     """
     if not results:
@@ -193,11 +195,12 @@ def format_search_results(results: list[SearchResult[Conversation]]) -> str:
     score_width = 6
     id_width = 36
     title_width = 30
+    snippet_width = 40  # FR-021: Snippet column
     created_width = 20
     messages_width = 8
 
     # Header
-    header = f"{'Score':<{score_width}} {'ID':<{id_width}}  {'Title':<{title_width}}  {'Created':<{created_width}}  {'Messages':>{messages_width}}"
+    header = f"{'Score':<{score_width}} {'ID':<{id_width}}  {'Title':<{title_width}}  {'Snippet':<{snippet_width}}  {'Created':<{created_width}}  {'Messages':>{messages_width}}"
 
     # Separator
     separator = "─" * len(header)
@@ -216,13 +219,18 @@ def format_search_results(results: list[SearchResult[Conversation]]) -> str:
         if len(title) > title_width:
             title = title[: title_width - 3] + "..."
 
+        # Format snippet (FR-021)
+        snippet = result.snippet or ""
+        if len(snippet) > snippet_width:
+            snippet = snippet[: snippet_width - 3] + "..."
+
         # Format created date
         created = conv.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
         # Message count
         msg_count = conv.message_count
 
-        row = f"{score_str:<{score_width}} {conv_id:<{id_width}}  {title:<{title_width}}  {created:<{created_width}}  {msg_count:>{messages_width}}"
+        row = f"{score_str:<{score_width}} {conv_id:<{id_width}}  {title:<{title_width}}  {snippet:<{snippet_width}}  {created:<{created_width}}  {msg_count:>{messages_width}}"
         rows.append(row)
 
     # Combine all parts
@@ -235,6 +243,10 @@ def format_search_results(results: list[SearchResult[Conversation]]) -> str:
 def format_search_results_json(
     results: list[SearchResult[Conversation]],
     query_keywords: list[str] | None = None,
+    query_phrases: list[str] | None = None,
+    query_match_mode: str = "any",
+    query_exclude_keywords: list[str] | None = None,
+    query_role_filter: str | None = None,
     query_title_filter: str | None = None,
     query_from_date: str | None = None,
     query_to_date: str | None = None,
@@ -318,6 +330,7 @@ def format_search_results_json(
                 "score": result.score,
                 "matched_message_ids": result.matched_message_ids,
                 "message_count": conv.message_count,
+                "snippet": result.snippet,  # FR-024: Snippet in JSON output
             }
         )
 
@@ -325,6 +338,10 @@ def format_search_results_json(
     metadata = {
         "query": {
             "keywords": query_keywords,
+            "phrases": query_phrases,  # v1.1.0: Phrase search (FR-001)
+            "match_mode": query_match_mode,  # v1.1.0: Boolean match mode (FR-007)
+            "exclude_keywords": query_exclude_keywords,  # v1.1.0: Exclude keywords (FR-012)
+            "role_filter": query_role_filter,  # v1.1.0: Role filter (FR-017)
             "title_filter": query_title_filter,
             "date_from": query_from_date,
             "date_to": query_to_date,

@@ -85,6 +85,56 @@ query = SearchQuery(
 
 for result in adapter.search(export_file, query):
     print(f"[{result.score:.2f}] {result.conversation.title}")
+    print(f"  Preview: {result.snippet}")  # v1.1.0: automatic snippets
+    print(f"  Matches: {len(result.matched_message_ids)} messages")
+```
+
+#### Understanding Filter Combinations
+
+Search filters use a two-stage process:
+
+**Stage 1: Content Matching (OR relationship)**
+- Phrases: ANY phrase matches (exact, case-insensitive)
+- Keywords: Match according to `match_mode`
+  - `match_mode="any"` (default): ANY keyword matches
+  - `match_mode="all"`: ALL keywords must be present
+
+If you specify both phrases and keywords, a conversation matches if EITHER a phrase matches OR keywords match (they are alternatives, not cumulative).
+
+**Stage 2: Post-Match Filters (AND relationship)**
+- `exclude_keywords`: Removes results containing ANY excluded term
+- `role_filter`: Only searches messages from specified role
+- `title_filter`: Only includes conversations with matching title
+- `from_date` / `to_date`: Only includes conversations in date range
+
+**Examples:**
+
+```python
+# Phrase OR keyword (matches conversations with "api" phrase OR "python" keyword)
+query = SearchQuery(phrases=["api"], keywords=["python"])
+
+# Multiple keywords with ALL mode (requires both "python" AND "async")
+query = SearchQuery(keywords=["python", "async"], match_mode="all")
+
+# Content matching + exclusion (phrase OR keyword, then exclude "java")
+query = SearchQuery(
+    phrases=["api"],
+    keywords=["python"],
+    exclude_keywords=["java"]
+)
+
+# Role-specific search (only search user messages)
+query = SearchQuery(keywords=["python"], role_filter="user")
+
+# Complex combination
+query = SearchQuery(
+    phrases=["algo-insights"],
+    keywords=["refactor"],
+    exclude_keywords=["test", "documentation"],
+    role_filter="user",
+    title_filter="Project",
+    match_mode="any"  # Only affects keywords when multiple specified
+)
 ```
 
 ### Filter by Title
@@ -169,6 +219,300 @@ if result:
 
 - Without `conversation_id`: O(N*M) - searches all conversations and their messages
 - With `conversation_id`: O(N) - searches only until the specified conversation is found
+
+## Advanced Search Features (v1.1.0+)
+
+Version 1.1.0 introduces five powerful search enhancements for the library API:
+
+### 1. Exact Phrase Matching
+
+Search for exact multi-word phrases while preserving special characters:
+
+```python
+from echomine.models import SearchQuery
+
+# Single phrase
+query = SearchQuery(phrases=["algo-insights"])
+for result in adapter.search(export_file, query):
+    print(f"{result.conversation.title}: {result.snippet}")
+
+# Multiple phrases (OR logic - matches any)
+query = SearchQuery(phrases=["algo-insights", "data pipeline", "api design"])
+for result in adapter.search(export_file, query):
+    print(f"[{result.score:.2f}] {result.conversation.title}")
+
+# Combine phrases and keywords
+query = SearchQuery(
+    phrases=["algo-insights"],
+    keywords=["optimization", "performance"]
+)
+results = list(adapter.search(export_file, query))
+```
+
+**Use Cases:**
+- Project-specific terminology with special characters
+- Code patterns like "async/await", "error-handling"
+- Multi-word concepts that must appear together
+
+### 2. Boolean Match Mode
+
+Control keyword matching logic with AND or OR:
+
+```python
+# Require ALL keywords (AND logic)
+query = SearchQuery(
+    keywords=["python", "async", "testing"],
+    match_mode="all"  # All three keywords must be present
+)
+for result in adapter.search(export_file, query):
+    print(f"Contains ALL keywords: {result.conversation.title}")
+
+# Default: ANY keyword matches (OR logic)
+query = SearchQuery(
+    keywords=["python", "javascript", "rust"],
+    match_mode="any"  # At least one keyword present (default)
+)
+for result in adapter.search(export_file, query):
+    print(f"Contains ANY keyword: {result.conversation.title}")
+
+# Compare results
+query_all = SearchQuery(keywords=["python", "async"], match_mode="all")
+query_any = SearchQuery(keywords=["python", "async"], match_mode="any")
+
+results_all = list(adapter.search(export_file, query_all))
+results_any = list(adapter.search(export_file, query_any))
+
+print(f"AND mode: {len(results_all)} results")
+print(f"OR mode: {len(results_any)} results")
+```
+
+**Use Cases:**
+- Narrow results: Find conversations covering multiple topics
+- Broad discovery: Cast wide net across related keywords
+- Topic intersection: Require specific keyword combinations
+
+**Note:** `match_mode` only affects keywords. Phrases always use OR logic.
+
+### 3. Exclude Keywords
+
+Filter out unwanted results containing specific terms:
+
+```python
+# Exclude single term
+query = SearchQuery(
+    keywords=["python"],
+    exclude_keywords=["django"]
+)
+for result in adapter.search(export_file, query):
+    print(result.conversation.title)
+    # Guaranteed: no results contain "django"
+
+# Exclude multiple terms (OR logic - excludes if ANY present)
+query = SearchQuery(
+    keywords=["python"],
+    exclude_keywords=["django", "flask", "pyramid"]
+)
+for result in adapter.search(export_file, query):
+    print(result.conversation.title)
+    # None of these contain django, flask, or pyramid
+
+# Combine with other filters
+query = SearchQuery(
+    keywords=["refactor", "optimization"],
+    exclude_keywords=["test", "example", "tutorial"],
+    match_mode="all"
+)
+results = list(adapter.search(export_file, query))
+```
+
+**Use Cases:**
+- Remove noise: Exclude "test", "example", "deprecated"
+- Filter frameworks: Search Python without specific frameworks
+- Avoid unrelated topics: Exclude terms that pollute results
+
+**Note:** Excluded terms use OR logic - a result is removed if it contains ANY excluded term.
+
+### 4. Role Filtering
+
+Search only messages from specific author roles:
+
+```python
+# Search only YOUR questions
+query = SearchQuery(
+    keywords=["how do I", "refactor", "optimize"],
+    role_filter="user"
+)
+for result in adapter.search(export_file, query):
+    print(f"You asked: {result.snippet}")
+
+# Search only AI responses
+query = SearchQuery(
+    keywords=["recommend", "suggest", "best practice"],
+    role_filter="assistant"
+)
+for result in adapter.search(export_file, query):
+    print(f"AI suggested: {result.snippet}")
+
+# Search system messages
+query = SearchQuery(
+    keywords=["context", "instructions"],
+    role_filter="system"
+)
+for result in adapter.search(export_file, query):
+    print(f"System: {result.snippet}")
+
+# Compare user vs assistant content
+user_query = SearchQuery(keywords=["algorithm"], role_filter="user")
+assistant_query = SearchQuery(keywords=["algorithm"], role_filter="assistant")
+
+user_results = list(adapter.search(export_file, user_query))
+assistant_results = list(adapter.search(export_file, assistant_query))
+
+print(f"You mentioned 'algorithm' in {len(user_results)} conversations")
+print(f"AI mentioned 'algorithm' in {len(assistant_results)} conversations")
+```
+
+**Use Cases:**
+- Find your questions: `role_filter="user"`
+- Find AI recommendations: `role_filter="assistant"`
+- Analyze system prompts: `role_filter="system"`
+- Compare user vs AI language patterns
+
+**Valid Roles:** `"user"`, `"assistant"`, `"system"` (case-insensitive)
+
+### 5. Message Snippets (Automatic)
+
+All search results automatically include message previews:
+
+```python
+query = SearchQuery(keywords=["algorithm"])
+
+for result in adapter.search(export_file, query):
+    # v1.1.0: snippet field always present
+    print(f"Title: {result.conversation.title}")
+    print(f"Score: {result.score:.2f}")
+    print(f"Preview: {result.snippet}")
+    print(f"Matched messages: {len(result.matched_message_ids)}")
+    print(f"Message IDs: {result.matched_message_ids[:3]}")  # First 3
+    print("---")
+```
+
+**Snippet Features:**
+- ~100 character preview from first matching message
+- Truncated with "..." for long content
+- Multiple matches indicated in `matched_message_ids`
+- Fallback text for empty/malformed content
+- Always present (never None)
+
+**Working with Matched Messages:**
+
+```python
+from echomine import OpenAIAdapter, SearchQuery
+
+adapter = OpenAIAdapter()
+query = SearchQuery(keywords=["refactor"])
+
+for result in adapter.search(export_file, query):
+    conversation = result.conversation
+    matched_ids = result.matched_message_ids
+
+    # Find the actual matched messages
+    matched_messages = [
+        msg for msg in conversation.messages
+        if msg.id in matched_ids
+    ]
+
+    print(f"Conversation: {conversation.title}")
+    print(f"Matched {len(matched_messages)} messages:")
+    for msg in matched_messages:
+        print(f"  [{msg.role}] {msg.content[:80]}...")
+```
+
+### Combining Advanced Features
+
+All features work together for powerful precision searches:
+
+```python
+from datetime import date
+
+# Complex query combining all v1.1.0 features
+query = SearchQuery(
+    # Content matching (Stage 1: OR relationship)
+    keywords=["python", "optimization"],
+    phrases=["algo-insights"],
+    match_mode="all",  # Only affects keywords
+
+    # Post-match filters (Stage 2: AND relationship)
+    exclude_keywords=["test", "documentation"],
+    role_filter="user",
+    title_filter="Project",
+    from_date=date(2024, 1, 1),
+    to_date=date(2024, 12, 31),
+
+    # Output control
+    limit=10
+)
+
+for result in adapter.search(export_file, query):
+    print(f"[{result.score:.2f}] {result.conversation.title}")
+    print(f"  Created: {result.conversation.created_at.date()}")
+    print(f"  Snippet: {result.snippet}")
+    print(f"  Matches: {len(result.matched_message_ids)} messages")
+```
+
+### Filter Combination Logic
+
+Understanding how filters interact is crucial:
+
+**Stage 1: Content Matching (OR relationship)**
+- **Phrases**: Match if ANY phrase is found (exact, case-insensitive)
+- **Keywords**: Match according to `match_mode`
+  - `match_mode="any"` (default): Match if ANY keyword present
+  - `match_mode="all"`: Match if ALL keywords present
+- **Key insight**: Phrases OR keywords (not both required)
+
+**Stage 2: Post-Match Filters (AND relationship)**
+- `exclude_keywords`: Remove if ANY excluded term found
+- `role_filter`: Only messages from specified role
+- `title_filter`: Only conversations with matching title
+- `from_date` / `to_date`: Only in date range
+- **All must be satisfied**
+
+**Examples:**
+
+```python
+# Phrase OR keyword (matches either)
+query = SearchQuery(phrases=["api"], keywords=["python"])
+# Matches: conversations with "api" phrase OR "python" keyword
+
+# Multiple keywords with ALL mode
+query = SearchQuery(keywords=["python", "async"], match_mode="all")
+# Matches: conversations with BOTH "python" AND "async"
+
+# Content + exclusion
+query = SearchQuery(
+    phrases=["api"],
+    keywords=["python"],
+    exclude_keywords=["java"]
+)
+# Matches: ("api" phrase OR "python" keyword) AND NOT "java"
+
+# Role-specific search
+query = SearchQuery(keywords=["python"], role_filter="user")
+# Matches: "python" in user messages only
+
+# Complex combination
+query = SearchQuery(
+    phrases=["algo-insights"],
+    keywords=["refactor"],
+    exclude_keywords=["test", "docs"],
+    role_filter="user",
+    title_filter="Project",
+    match_mode="any"
+)
+# Matches: ("algo-insights" phrase OR "refactor" keyword) in user messages
+#          in conversations titled "Project" WITHOUT "test" or "docs"
+```
 
 ## Advanced Usage
 

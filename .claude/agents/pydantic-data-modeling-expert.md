@@ -64,13 +64,13 @@ from typing import Optional, Literal
 
 class ExampleModel(BaseModel):
     """Brief description of the model's purpose.
-    
+
     Example:
         >>> model = ExampleModel(field="value", timestamp=datetime.now(timezone.utc))
         >>> model.field
         'value'
     """
-    
+
     field: str = Field(
         ...,
         min_length=1,
@@ -81,7 +81,7 @@ class ExampleModel(BaseModel):
         ...,
         description="UTC-normalized timestamp"
     )
-    
+
     @field_validator('field')
     @classmethod
     def validate_field(cls, v: str) -> str:
@@ -89,14 +89,14 @@ class ExampleModel(BaseModel):
         if not v.strip():
             raise ValueError("Field cannot be empty or whitespace")
         return v.strip()
-    
+
     @field_validator('timestamp', mode='before')
     @classmethod
     def normalize_timestamp(cls, v: datetime) -> datetime:
         if v.tzinfo is None:
             raise ValueError("Timestamp must be timezone-aware")
         return v.astimezone(timezone.utc)
-    
+
     model_config = {
         "frozen": True,
         "extra": "forbid",

@@ -61,7 +61,13 @@ from echomine.models.image import ImageRef
 from echomine.models.message import Message
 from echomine.models.protocols import OnSkipCallback, ProgressCallback
 from echomine.models.search import SearchQuery, SearchResult
-from echomine.search.ranking import BM25Scorer
+from echomine.search.ranking import (
+    BM25Scorer,
+    all_terms_present,
+    exclude_filter,
+    phrase_matches,
+)
+from echomine.search.snippet import extract_snippet_from_messages
 
 
 # Module logger for operational visibility
@@ -272,7 +278,8 @@ class OpenAIAdapter:
             ```
         """
         # Stream conversations and apply filters
-        conversations: list[Conversation] = []
+        # Type: (conversation, filtered_messages) for snippet extraction
+        conversations: list[tuple[Conversation, list[Message]]] = []
         corpus_texts: list[str] = []
 
         count = 0
@@ -301,10 +308,25 @@ class OpenAIAdapter:
                 if query.to_date is not None and conv_date > query.to_date:
                     continue
 
-            # Build corpus text (title + all message content)
-            conv_text = f"{conv.title} " + " ".join(m.content for m in conv.messages)
+            # FR-018: Filter messages by role before text aggregation
+            if query.role_filter is not None:
+                filtered_messages = [m for m in conv.messages if m.role == query.role_filter]
+            else:
+                filtered_messages = list(conv.messages)
 
-            conversations.append(conv)
+            # Skip conversations with no messages matching the role filter
+            if query.role_filter is not None and not filtered_messages:
+                continue
+
+            # Build corpus text
+            # When role_filter is set, only search in filtered message content (not title)
+            # When role_filter is None, include title for metadata-based matching
+            if query.role_filter is not None:
+                conv_text = " ".join(m.content for m in filtered_messages)
+            else:
+                conv_text = f"{conv.title} " + " ".join(m.content for m in filtered_messages)
+
+            conversations.append((conv, filtered_messages))
             corpus_texts.append(conv_text)
 
         # Final progress callback
@@ -332,26 +354,67 @@ class OpenAIAdapter:
         scorer = BM25Scorer(corpus=corpus_texts, avg_doc_length=avg_doc_length)
 
         # Score all conversations
-        scored_conversations: list[tuple[Conversation, float, list[str]]] = []
+        # Type: (conversation, score, matched_message_ids, filtered_messages)
+        scored_conversations: list[tuple[Conversation, float, list[str], list[Message]]] = []
 
-        for conv, conv_text in zip(conversations, corpus_texts):
+        for (conv, filtered_msgs), conv_text in zip(conversations, corpus_texts):
+            score = 0.0
+            matched_message_ids: list[str] = []
+            has_keyword_match = False
+            has_phrase_match = False
+
+            # Check keyword matches (BM25 scoring)
             if query.has_keyword_search():
                 assert query.keywords is not None  # Type narrowing
-                # Calculate BM25 score for keywords
-                score = scorer.score(conv_text, query.keywords)
 
-                # Track which messages contain keyword matches
-                matched_message_ids = self._find_matched_messages(conv, query.keywords)
+                # FR-009: match_mode='all' requires ALL keywords present
+                if query.match_mode == "all":
+                    if all_terms_present(conv_text, query.keywords, scorer):
+                        # All keywords present - calculate score
+                        score = scorer.score(conv_text, query.keywords)
+                        matched_message_ids = self._find_matched_messages(
+                            filtered_msgs, query.keywords
+                        )
+                        has_keyword_match = True
+                    # else: keywords don't all match, but may still match phrases (checked below)
+                else:
+                    # Default 'any' mode: regular BM25 scoring
+                    score = scorer.score(conv_text, query.keywords)
+                    matched_message_ids = self._find_matched_messages(filtered_msgs, query.keywords)
+                    if score > 0.0:
+                        has_keyword_match = True
 
-                # Skip conversations with no matches (score = 0)
-                if score == 0.0:
+            # Check phrase matches (exact substring matching)
+            # FR-002: Multiple phrases use OR logic
+            # FR-004: Phrases can be combined with keywords (OR logic)
+            if query.has_phrase_search():
+                assert query.phrases is not None  # Type narrowing
+                if phrase_matches(conv_text, query.phrases):
+                    has_phrase_match = True
+                    # If phrase matches but no keyword score, use 1.0
+                    if score == 0.0:
+                        score = 1.0
+                    # Find messages that match the phrases (from filtered messages only)
+                    for message in filtered_msgs:
+                        if phrase_matches(message.content, query.phrases):
+                            if message.id not in matched_message_ids:
+                                matched_message_ids.append(message.id)
+
+            # Skip conversations with no matches (neither keyword nor phrase)
+            if not has_keyword_match and not has_phrase_match:
+                # If no keywords or phrases specified, include all (title/date filter only)
+                if not query.has_keyword_search() and not query.has_phrase_search():
+                    score = 1.0
+                else:
                     continue
-            else:
-                # No keywords - all have score 1.0 (title/date filter only)
-                score = 1.0
-                matched_message_ids = []
 
-            scored_conversations.append((conv, score, matched_message_ids))
+            # FR-014: Apply exclude filter after matching, before ranking
+            if query.has_exclude_keywords():
+                assert query.exclude_keywords is not None  # Type narrowing
+                if exclude_filter(conv_text, query.exclude_keywords, scorer):
+                    continue  # Skip conversations containing excluded terms
+
+            scored_conversations.append((conv, score, matched_message_ids, filtered_msgs))
 
         # Handle no results after filtering
         if not scored_conversations:
@@ -364,20 +427,34 @@ class OpenAIAdapter:
         # Formula: score_normalized = score_raw / (score_raw + 1)
         # This ensures consistent score interpretation across queries
         scored_conversations = [
-            (conv, score / (score + 1.0) if score > 0 else 0.0, msg_ids)
-            for conv, score, msg_ids in scored_conversations
+            (conv, score / (score + 1.0) if score > 0 else 0.0, msg_ids, msgs)
+            for conv, score, msg_ids, msgs in scored_conversations
         ]
 
-        # Apply limit if specified
-        if query.limit:
-            scored_conversations = scored_conversations[: query.limit]
+        # Apply limit (always positive integer per SearchQuery validation)
+        scored_conversations = scored_conversations[: query.limit]
 
-        # Yield SearchResult objects
-        for conv, score, matched_message_ids in scored_conversations:
+        # Yield SearchResult objects with snippet extraction (FR-021-025)
+        for conv, score, matched_message_ids, filtered_msgs in scored_conversations:
+            # Build keywords list for snippet extraction
+            snippet_keywords: list[str] = []
+            if query.keywords:
+                snippet_keywords.extend(query.keywords)
+            if query.phrases:
+                snippet_keywords.extend(query.phrases)
+
+            # Extract snippet from matched messages
+            snippet, _ = extract_snippet_from_messages(
+                filtered_msgs,
+                snippet_keywords,
+                matched_message_ids,
+            )
+
             yield SearchResult[Conversation](
                 conversation=conv,
                 score=score,
                 matched_message_ids=matched_message_ids,
+                snippet=snippet,
             )
 
     def get_conversation_by_id(
@@ -512,7 +589,7 @@ class OpenAIAdapter:
         # Not found in any conversation
         return None
 
-    def _find_matched_messages(self, conversation: Conversation, keywords: list[str]) -> list[str]:
+    def _find_matched_messages(self, messages: list[Message], keywords: list[str]) -> list[str]:
         """Find message IDs containing any of the keywords.
 
         Uses word-boundary matching to find keywords as complete tokens,
@@ -522,7 +599,7 @@ class OpenAIAdapter:
         keywords (e.g., Chinese "编程" -> ["编", "程"]).
 
         Args:
-            conversation: Conversation to search
+            messages: List of messages to search (pre-filtered by role if applicable)
             keywords: List of keywords to match (will be tokenized)
 
         Returns:
@@ -530,8 +607,8 @@ class OpenAIAdapter:
 
         Example:
             ```python
-            conv = Conversation(...)
-            matched_ids = self._find_matched_messages(conv, ["python", "java"])
+            messages = [msg1, msg2, msg3]
+            matched_ids = self._find_matched_messages(messages, ["python", "java"])
             # Returns IDs of messages containing "python" OR "java"
             ```
         """
@@ -548,7 +625,7 @@ class OpenAIAdapter:
             # Non-Latin tokens (CJK characters)
             keyword_tokens.extend(re.findall(r"[^\W\d_a-z]", kw_lower))
 
-        for message in conversation.messages:
+        for message in messages:
             # Tokenize message content using same method as BM25Scorer
             content_lower = message.content.lower()
             message_tokens: list[str] = []

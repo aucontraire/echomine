@@ -50,16 +50,18 @@ Complete Protocol Method Signatures (per FR-215, FR-216, FR-217, FR-218, FR-220,
    Determinism: Same file + ID -> same conversation (or None if not found)
 """
 
-from typing import Protocol, Iterator, Optional, Callable, TypeVar, Generic
-from pathlib import Path
+from collections.abc import Callable, Iterator
 from datetime import datetime
+from pathlib import Path
+from typing import Generic, Protocol, TypeVar
+
 
 # Forward references to models defined in data-model.md
 # Actual implementation will import from src/echomine/models/
 
 
 # Generic Type Variable (per FR-151, FR-152, FR-154)
-ConversationT = TypeVar('ConversationT', bound='BaseConversation')
+ConversationT = TypeVar("ConversationT", bound="BaseConversation")
 
 
 class BaseConversation(Protocol):
@@ -68,6 +70,7 @@ class BaseConversation(Protocol):
     All provider-specific conversation types must implement these attributes.
     This enables type-safe multi-provider support via TypeVar bound constraint.
     """
+
     id: str
     title: str
     created_at: datetime
@@ -78,6 +81,7 @@ class Conversation:
 
     Implements BaseConversation protocol.
     """
+
     id: str
     title: str
     created_at: datetime
@@ -90,14 +94,16 @@ class SearchResult(Generic[ConversationT]):
     Type parameter allows adapters to return provider-specific conversation types
     while maintaining type safety. Example: SearchResult[Conversation] for OpenAI.
     """
+
     conversation: ConversationT  # Generic conversation type
     relevance_score: float
 
 
 class SearchQuery:
     """Placeholder for SearchQuery model (see data-model.md)."""
-    keywords: Optional[list[str]]
-    title_filter: Optional[str]
+
+    keywords: list[str] | None
+    title_filter: str | None
 
 
 # Callback Type Aliases (per FR-076, FR-106, FR-219)
@@ -158,8 +164,8 @@ class ConversationProvider(Protocol[ConversationT]):
         self,
         file_path: Path,
         *,
-        progress_callback: Optional[ProgressCallback] = None,
-        on_skip: Optional[OnSkipCallback] = None
+        progress_callback: ProgressCallback | None = None,
+        on_skip: OnSkipCallback | None = None,
     ) -> Iterator[ConversationT]:
         """
         Stream conversations one at a time from export file (per FR-151, FR-153).
@@ -222,8 +228,8 @@ class ConversationProvider(Protocol[ConversationT]):
         file_path: Path,
         query: SearchQuery,
         *,
-        progress_callback: Optional[ProgressCallback] = None,
-        on_skip: Optional[OnSkipCallback] = None
+        progress_callback: ProgressCallback | None = None,
+        on_skip: OnSkipCallback | None = None,
     ) -> Iterator[SearchResult[ConversationT]]:
         """
         Search conversations matching query criteria with relevance ranking (per FR-152, FR-153).
@@ -258,11 +264,7 @@ class ConversationProvider(Protocol[ConversationT]):
         """
         ...
 
-    def get_conversation_by_id(
-        self,
-        file_path: Path,
-        conversation_id: str
-    ) -> Optional[ConversationT]:
+    def get_conversation_by_id(self, file_path: Path, conversation_id: str) -> ConversationT | None:
         """
         Retrieve specific conversation by UUID (per FR-151, FR-153, FR-155).
 

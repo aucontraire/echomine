@@ -42,7 +42,7 @@ import sys
 import time
 from datetime import date, datetime
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal, cast
 
 import typer
 from pydantic import ValidationError as PydanticValidationError
@@ -129,6 +129,36 @@ def search_conversations(
             help="Keywords to search for (can specify multiple)",
         ),
     ] = None,
+    phrase: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--phrase",
+            help="Exact phrase to match (case-insensitive, can specify multiple)",
+        ),
+    ] = None,
+    match_mode: Annotated[
+        str,
+        typer.Option(
+            "--match-mode",
+            help="Keyword matching mode: 'any' (OR, default) or 'all' (AND)",
+            case_sensitive=False,
+        ),
+    ] = "any",
+    exclude: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--exclude",
+            help="Keywords to exclude from results (can specify multiple)",
+        ),
+    ] = None,
+    role: Annotated[
+        str | None,
+        typer.Option(
+            "--role",
+            help="Filter to messages from specific role (user, assistant, system)",
+            case_sensitive=False,
+        ),
+    ] = None,
     title: Annotated[
         str | None,
         typer.Option(
@@ -186,28 +216,48 @@ def search_conversations(
 ) -> None:
     """Search conversations by keywords with BM25 relevance ranking.
 
+    Filter Logic:
+        Stage 1 (Content Matching - OR): Phrases OR Keywords
+          - --phrase: Match ANY phrase (exact, case-insensitive)
+          - --keywords: Match according to --match-mode
+            * --match-mode any (default): Match ANY keyword
+            * --match-mode all: Match ALL keywords
+
+        Stage 2 (Post-Filtering - AND): All must match
+          - --exclude: Remove if ANY excluded term found
+          - --role: Only search specified role's messages
+          - --title: Only include matching titles
+          - --from-date/--to-date: Date range filter
+
     Examples:
-        # Search for Python-related conversations
-        echomine search export.json --keywords python
+        # Phrase OR keyword
+        echomine search export.json --phrase "api" -k python
 
-        # Multiple keywords (OR logic)
-        echomine search export.json -k python -k async -k tutorial
+        # Multiple keywords (ALL required)
+        echomine search export.json -k python -k async --match-mode all
 
-        # Title filter
-        echomine search export.json -k python --title "best practices"
+        # Content matching + exclusion
+        echomine search export.json --phrase "api" -k python --exclude java
+
+        # Role-specific search
+        echomine search export.json -k python --role user
+
+        # Complex combination
+        echomine search export.json --phrase "tutorial" -k python --title "Guide" --exclude test
 
         # Date range
         echomine search export.json -k python --from-date 2024-01-01 --to-date 2024-12-31
-
-        # Limit results
-        echomine search export.json -k python --limit 10
 
         # JSON output
         echomine search export.json -k python --format json
 
     Args:
         file_path: Path to OpenAI export JSON file
-        keywords: Keywords for full-text search (OR logic)
+        keywords: Keywords for full-text search
+        phrase: Exact phrases to match
+        match_mode: Keyword matching mode ('any' or 'all')
+        exclude: Keywords to exclude
+        role: Filter by message role
         title: Partial title match filter
         from_date: Start date filter (inclusive)
         to_date: End date filter (inclusive)
@@ -245,11 +295,32 @@ def search_conversations(
             )
             raise typer.Exit(code=1)
 
-        # Validate: at least one filter must be provided (FR-298, FR-009)
-        # Accept keywords, title, or date filters (from_date/to_date)
-        if not keywords and not title and not from_date and not to_date:
+        # Validate match_mode option (FR-007)
+        match_mode_lower = match_mode.lower()
+        if match_mode_lower not in ("any", "all"):
             typer.echo(
-                "Error: At least one filter must be specified (--keywords, --title, --from-date, or --to-date)",
+                f"Error: Invalid --match-mode '{match_mode}'. Must be 'any' or 'all'.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+
+        # Validate role option (FR-017)
+        role_filter_value: Literal["user", "assistant", "system"] | None = None
+        if role is not None:
+            role_lower = role.lower()
+            if role_lower not in ("user", "assistant", "system"):
+                typer.echo(
+                    f"Error: Invalid --role '{role}'. Must be 'user', 'assistant', or 'system'.",
+                    err=True,
+                )
+                raise typer.Exit(code=2)
+            role_filter_value = cast(Literal["user", "assistant", "system"], role_lower)
+
+        # Validate: at least one filter must be provided (FR-298, FR-009)
+        # Accept keywords, phrase, title, or date filters (from_date/to_date)
+        if not keywords and not phrase and not title and not from_date and not to_date:
+            typer.echo(
+                "Error: At least one filter must be specified (--keywords, --phrase, --title, --from-date, or --to-date)",
                 err=True,
             )
             raise typer.Exit(code=2)
@@ -319,6 +390,10 @@ def search_conversations(
         try:
             query = SearchQuery(
                 keywords=processed_keywords,
+                phrases=phrase,  # Pass phrases to SearchQuery (FR-001)
+                match_mode=cast(Literal["all", "any"], match_mode_lower),  # FR-007
+                exclude_keywords=exclude,  # FR-012: Pass exclude keywords
+                role_filter=role_filter_value,  # FR-017: Pass role filter
                 title_filter=title,
                 from_date=parsed_from_date,
                 to_date=parsed_to_date,
@@ -392,6 +467,10 @@ def search_conversations(
             output = format_search_results_json(
                 results,
                 query_keywords=processed_keywords,
+                query_phrases=phrase,  # v1.1.0: Pass phrases to JSON output (T019)
+                query_match_mode=match_mode_lower,  # v1.1.0: Pass match mode (T028)
+                query_exclude_keywords=exclude,  # v1.1.0: Pass exclude keywords (T037)
+                query_role_filter=role_filter_value,  # v1.1.0: Pass role filter (T045)
                 query_title_filter=title,
                 query_from_date=query_from_date_str,
                 query_to_date=query_to_date_str,

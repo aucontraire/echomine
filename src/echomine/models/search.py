@@ -7,12 +7,19 @@ Constitution Compliance:
 - Principle VI: Strict typing with mypy --strict compliance
 - Principle I: Library-first (importable, reusable models)
 - FR-224, FR-227: Immutability via frozen=True
+
+Advanced Search Features (v1.1.0):
+- FR-001-006: Exact phrase matching (phrases field)
+- FR-007-011: Boolean match mode (match_mode field)
+- FR-012-016: Exclude keywords (exclude_keywords field)
+- FR-017-020: Role filtering (role_filter field)
+- FR-021-025: Message snippets (snippet field in SearchResult)
 """
 
 from __future__ import annotations
 
 from datetime import date
-from typing import Generic, TypeVar
+from typing import Generic, Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -99,6 +106,30 @@ class SearchQuery(BaseModel):
         description="Maximum results to return (1-1000, default: 10)",
     )
 
+    # NEW v1.1.0: Exact phrase matching (FR-001-006)
+    phrases: list[str] | None = Field(
+        default=None,
+        description="Exact phrases to match (no tokenization, case-insensitive)",
+    )
+
+    # NEW v1.1.0: Boolean match mode (FR-007-011)
+    match_mode: Literal["all", "any"] = Field(
+        default="any",
+        description="'all' requires ALL keywords/phrases; 'any' matches ANY (default)",
+    )
+
+    # NEW v1.1.0: Exclude keywords (FR-012-016)
+    exclude_keywords: list[str] | None = Field(
+        default=None,
+        description="Keywords to exclude from results (uses same tokenization as keywords)",
+    )
+
+    # NEW v1.1.0: Role filter (FR-017-020)
+    role_filter: Literal["user", "assistant", "system"] | None = Field(
+        default=None,
+        description="Filter to messages from specific role only",
+    )
+
     def has_keyword_search(self) -> bool:
         """Check if keyword search is requested.
 
@@ -142,6 +173,34 @@ class SearchQuery(BaseModel):
             ```
         """
         return self.from_date is not None or self.to_date is not None
+
+    def has_phrase_search(self) -> bool:
+        """Check if phrase search is requested.
+
+        Returns:
+            True if phrases provided and non-empty, False otherwise
+
+        Example:
+            ```python
+            query = SearchQuery(phrases=["algo-insights"])
+            assert query.has_phrase_search() is True
+            ```
+        """
+        return self.phrases is not None and len(self.phrases) > 0
+
+    def has_exclude_keywords(self) -> bool:
+        """Check if exclude keywords filtering is requested.
+
+        Returns:
+            True if exclude_keywords provided and non-empty, False otherwise
+
+        Example:
+            ```python
+            query = SearchQuery(keywords=["python"], exclude_keywords=["django"])
+            assert query.has_exclude_keywords() is True
+            ```
+        """
+        return self.exclude_keywords is not None and len(self.exclude_keywords) > 0
 
 
 class SearchResult(BaseModel, Generic[ConversationT]):
@@ -203,6 +262,12 @@ class SearchResult(BaseModel, Generic[ConversationT]):
     matched_message_ids: list[str] = Field(
         default_factory=list,
         description="Message IDs containing keyword matches",
+    )
+
+    # NEW v1.1.0: Message snippet (FR-021-025)
+    snippet: str | None = Field(
+        default=None,
+        description="First ~100 chars of first matched message",
     )
 
     def __lt__(self, other: SearchResult[ConversationT]) -> bool:

@@ -52,7 +52,7 @@ from __future__ import annotations
 import json
 from collections import Counter
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated
 
 import typer
 from pydantic import ValidationError as PydanticValidationError
@@ -112,23 +112,18 @@ def _format_conversation_table(conversation: Conversation, verbose: bool = False
     lines.append("Message Summary:")
     lines.append("─" * 47)
 
-    # Count messages by role
-    role_counts = Counter(msg.role for msg in conversation.messages)
+    # Count messages by role (use Counter[str] for simpler type handling)
+    role_counts: Counter[str] = Counter(msg.role for msg in conversation.messages)
 
     # Simple text table
     lines.append(f"{'Role':<15} {'Count':>10}")
     lines.append("─" * 47)
 
-    # Type the role list explicitly for mypy --strict
-    roles: tuple[Literal["user"], Literal["assistant"], Literal["system"]] = (
-        "user",
-        "assistant",
-        "system",
-    )
-    for role_literal in roles:
-        count = role_counts.get(role_literal, 0)
+    # Display counts for each role
+    for role_name in ("user", "assistant", "system"):
+        count = role_counts[role_name]  # Counter returns 0 for missing keys
         if count > 0:
-            lines.append(f"{role_literal:<15} {count:>10}")
+            lines.append(f"{role_name:<15} {count:>10}")
 
     # Verbose mode: show message details
     if verbose:

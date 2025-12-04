@@ -13,7 +13,8 @@ Echomine is a Python library and CLI tool for parsing, searching, and exporting 
 ## Key Features
 
 - **Memory Efficient**: Stream-based parsing handles 1GB+ files with constant memory usage
-- **Full-Text Search**: BM25 relevance ranking for keyword searches across conversations
+- **Advanced Search**: BM25 relevance ranking with exact phrase matching, boolean logic, role filtering, and keyword exclusion (v1.1.0+)
+- **Message Snippets**: Automatic preview generation for search results with match context (v1.1.0+)
 - **Type Safe**: Strict typing with Pydantic v2 and mypy --strict compliance
 - **Library First**: All CLI capabilities available as importable Python library
 - **Multi-Provider Ready**: Adapter pattern supports multiple AI export formats
@@ -43,10 +44,18 @@ for conversation in adapter.stream_conversations(export_file):
     print(f"[{conversation.created_at.date()}] {conversation.title}")
     print(f"  Messages: {len(conversation.messages)}")
 
-# 2. Search with keywords (BM25 ranking)
-query = SearchQuery(keywords=["algorithm", "design"], limit=10)
+# 2. Advanced search with v1.1.0 features
+query = SearchQuery(
+    keywords=["algorithm", "design"],
+    phrases=["algo-insights"],  # Exact phrase matching
+    match_mode="all",  # Require ALL keywords (AND logic)
+    exclude_keywords=["test"],  # Filter out unwanted results
+    role_filter="user",  # Search only user messages
+    limit=10
+)
 for result in adapter.search(export_file, query):
     print(f"{result.conversation.title} (score: {result.score:.2f})")
+    print(f"  Preview: {result.snippet}")  # v1.1.0: automatic snippets
 
 # 3. Filter by date range
 from datetime import date
@@ -72,6 +81,18 @@ echomine list export.json
 
 # Search by keywords
 echomine search export.json --keywords "algorithm,design" --limit 10
+
+# v1.1.0: Exact phrase matching
+echomine search export.json --phrase "algo-insights"
+
+# v1.1.0: Boolean match mode (require ALL keywords)
+echomine search export.json -k "python" -k "async" --match-mode all
+
+# v1.1.0: Exclude unwanted results
+echomine search export.json -k "python" --exclude "django" --exclude "flask"
+
+# v1.1.0: Role filtering
+echomine search export.json -k "refactor" --role user
 
 # Search by title (fast, metadata-only)
 echomine search export.json --title "Project"

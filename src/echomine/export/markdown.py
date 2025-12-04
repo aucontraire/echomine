@@ -236,8 +236,10 @@ class MarkdownExporter:
                 lines.append(f"![Image]({image})")
                 lines.append("")
 
-            # Render content
-            lines.append(msg["content"].strip())
+            # Render content, stripping trailing whitespace from each line
+            content_lines = msg["content"].strip().split("\n")
+            content = "\n".join(line.rstrip() for line in content_lines)
+            lines.append(content)
 
             # Add separator between messages (but not after last)
             if i < len(messages) - 1:
@@ -245,7 +247,8 @@ class MarkdownExporter:
                 lines.append("---")
                 lines.append("")
 
-        return "\n".join(lines)
+        # Add trailing newline for POSIX text file compliance
+        return "\n".join(lines) + "\n"
 
     def _render_metadata_header(
         self,

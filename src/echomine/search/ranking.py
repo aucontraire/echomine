@@ -22,6 +22,10 @@ Constitution Compliance:
     - Principle VI: Strict typing with mypy --strict
     - FR-317-326: BM25 algorithm with standard parameters
     - FR-319: Case-insensitive keyword matching
+
+Advanced Search Features (v1.1.0):
+    - FR-001-006: phrase_matches() for exact phrase matching
+    - FR-012-016: exclude_filter() for exclusion filtering
 """
 
 from __future__ import annotations
@@ -225,10 +229,147 @@ class BM25Scorer:
 
             # BM25 formula
             numerator = tf * (self.K1 + 1.0)
-            denominator = tf + self.K1 * (
-                1.0 - self.B + self.B * (doc_length / self.avg_doc_length)
-            )
+
+            # Guard against division by zero when avg_doc_length is 0
+            # This can happen with sparse corpora (e.g., role_filter=system with few system messages)
+            # When avg_doc_length is 0, skip length normalization (use ratio of 1.0)
+            length_ratio = doc_length / self.avg_doc_length if self.avg_doc_length > 0 else 1.0
+
+            denominator = tf + self.K1 * (1.0 - self.B + self.B * length_ratio)
 
             score += idf * (numerator / denominator)
 
         return score
+
+
+def phrase_matches(text: str, phrases: list[str]) -> bool:
+    """Check if any phrase matches in the text (case-insensitive substring).
+
+    This function implements exact phrase matching without tokenization.
+    Phrases are matched as-is, preserving hyphens, underscores, and spaces.
+
+    Args:
+        text: Text to search in (e.g., conversation content)
+        phrases: List of phrases to match
+
+    Returns:
+        True if any phrase is found in text, False otherwise
+
+    Example:
+        ```python
+        text = "We use algo-insights for data analysis"
+        assert phrase_matches(text, ["algo-insights"]) is True
+        assert phrase_matches(text, ["algorithm"]) is False
+        ```
+
+    Requirements:
+        - FR-001: Exact phrase matching (no tokenization)
+        - FR-003: Case-insensitive matching
+        - FR-006: Special characters matched literally
+    """
+    # Empty phrases list means no matches possible
+    if not phrases:
+        return False
+
+    # Empty text means no matches possible
+    if not text:
+        return False
+
+    # Case-insensitive substring matching (OR logic for multiple phrases)
+    text_lower = text.lower()
+    return any(phrase.lower() in text_lower for phrase in phrases)
+
+
+def all_terms_present(text: str, keywords: list[str], scorer: BM25Scorer) -> bool:
+    """Check if ALL keyword tokens are present in the text.
+
+    Uses the same tokenization as BM25Scorer to ensure consistent matching
+    behavior. All keyword tokens must be present in the text tokens for
+    match_mode='all' to succeed.
+
+    Args:
+        text: Text to check
+        keywords: Keywords to find (will be tokenized)
+        scorer: BM25Scorer instance for tokenization
+
+    Returns:
+        True if ALL keyword tokens are present in text,
+        False otherwise
+
+    Example:
+        ```python
+        scorer = BM25Scorer(corpus=["test"], avg_doc_length=1.0)
+        text = "Python and Java programming"
+        assert all_terms_present(text, ["python", "java"], scorer) is True
+        assert all_terms_present(text, ["python", "rust"], scorer) is False
+        ```
+
+    Requirements:
+        - FR-009: All keywords must be present (AND logic)
+        - FR-010: Uses same tokenization as BM25
+    """
+    # Empty keywords list is vacuously true (all of nothing is present)
+    if not keywords:
+        return True
+
+    # Tokenize the text using BM25Scorer's tokenization
+    text_tokens = set(scorer._tokenize(text))  # noqa: SLF001
+
+    # Tokenize all keywords and check if each token is present
+    for keyword in keywords:
+        keyword_tokens = scorer._tokenize(keyword)  # noqa: SLF001
+        # All tokens from this keyword must be present
+        for token in keyword_tokens:
+            if token not in text_tokens:
+                return False
+
+    return True
+
+
+def exclude_filter(text: str, exclude_keywords: list[str], scorer: BM25Scorer) -> bool:
+    """Check if text contains any excluded keywords.
+
+    Uses the same tokenization as BM25Scorer to ensure consistent matching
+    behavior between inclusion and exclusion.
+
+    Args:
+        text: Text to check for excluded terms
+        exclude_keywords: Keywords to exclude (will be tokenized)
+        scorer: BM25Scorer instance for tokenization
+
+    Returns:
+        True if text should be EXCLUDED (contains any excluded term),
+        False if text should be KEPT (no excluded terms found)
+
+    Example:
+        ```python
+        scorer = BM25Scorer(corpus=["test"], avg_doc_length=1.0)
+        text = "Python with Django framework"
+        assert exclude_filter(text, ["django"], scorer) is True  # Exclude
+        assert exclude_filter(text, ["flask"], scorer) is False  # Keep
+        ```
+
+    Requirements:
+        - FR-014: Applied after matching, before ranking
+        - FR-015: Uses same tokenization as keywords
+    """
+    # Empty exclusions means keep all
+    if not exclude_keywords:
+        return False
+
+    # Empty text has no tokens to match exclusions
+    if not text:
+        return False
+
+    # Tokenize the text using BM25Scorer's tokenization
+    text_tokens = set(scorer._tokenize(text))  # noqa: SLF001
+
+    # Check if ANY excluded token is present (OR logic for exclusion)
+    for keyword in exclude_keywords:
+        keyword_tokens = scorer._tokenize(keyword)  # noqa: SLF001
+        # If any token from this keyword is present, exclude
+        for token in keyword_tokens:
+            if token in text_tokens:
+                return True
+
+    return False

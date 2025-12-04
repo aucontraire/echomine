@@ -60,9 +60,7 @@ class CognivaultClient:
         self.workspace_id = workspace_id
         self.inserted_count = 0
 
-    def bulk_insert_conversations(
-        self, conversations: list[dict[str, Any]]
-    ) -> None:
+    def bulk_insert_conversations(self, conversations: list[dict[str, Any]]) -> None:
         """Bulk insert conversations into cognivault (mock).
 
         In production, this would call cognivault's batch API.
@@ -192,8 +190,7 @@ class CognivaultIngestionPipeline:
             file=sys.stderr,
         )
         print(
-            f"[CONFIG] Batch size: {self.batch_size}, "
-            f"Workspace: {self.client.workspace_id}",
+            f"[CONFIG] Batch size: {self.batch_size}, Workspace: {self.client.workspace_id}",
             file=sys.stderr,
         )
 
