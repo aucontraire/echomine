@@ -235,3 +235,114 @@ class TestPhraseSearchEdgeCases:
         # May return all or none based on design decision
         # For now, just verify no error
         assert isinstance(results, list)
+
+    def test_phrase_with_keywords_both_zero_score(self, tmp_path: Path) -> None:
+        """Phrase match with zero keyword score uses phrase score 1.0."""
+        conversations = [
+            {
+                "id": "conv-phrase-only",
+                "title": "Random Title",
+                "create_time": 1700000000.0,
+                "update_time": 1700001000.0,
+                "mapping": {
+                    "msg-1": {
+                        "id": "msg-1",
+                        "message": {
+                            "id": "msg-1",
+                            "author": {"role": "user"},
+                            "content": {
+                                "content_type": "text",
+                                "parts": ["This has algo-insights but not the keywords"],
+                            },
+                            "create_time": 1700000000.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": [],
+                    },
+                },
+                "moderation_results": [],
+                "current_node": "msg-1",
+            },
+        ]
+
+        export_file = tmp_path / "phrase_keyword_test.json"
+        with export_file.open("w") as f:
+            json.dump(conversations, f)
+
+        adapter = OpenAIAdapter()
+        # Keywords that don't match, but phrase does
+        query = SearchQuery(keywords=["python"], phrases=["algo-insights"])
+
+        results = list(adapter.search(export_file, query))
+
+        # Should find conversation because phrase matches (score=0.0 branch)
+        assert len(results) == 1
+        assert results[0].conversation.id == "conv-phrase-only"
+        assert results[0].score > 0.0
+
+    def test_phrase_match_duplicate_message_ids(self, tmp_path: Path) -> None:
+        """Phrase matching doesn't add duplicate message IDs."""
+        conversations = [
+            {
+                "id": "conv-multi-msg",
+                "title": "Testing",
+                "create_time": 1700000000.0,
+                "update_time": 1700001000.0,
+                "mapping": {
+                    "msg-1": {
+                        "id": "msg-1",
+                        "message": {
+                            "id": "msg-1",
+                            "author": {"role": "user"},
+                            "content": {
+                                "content_type": "text",
+                                "parts": ["First algo-insights mention"],
+                            },
+                            "create_time": 1700000000.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": ["msg-2"],
+                    },
+                    "msg-2": {
+                        "id": "msg-2",
+                        "message": {
+                            "id": "msg-2",
+                            "author": {"role": "assistant"},
+                            "content": {
+                                "content_type": "text",
+                                "parts": ["Response with algo-insights again"],
+                            },
+                            "create_time": 1700000100.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": "msg-1",
+                        "children": [],
+                    },
+                },
+                "moderation_results": [],
+                "current_node": "msg-2",
+            },
+        ]
+
+        export_file = tmp_path / "duplicate_test.json"
+        with export_file.open("w") as f:
+            json.dump(conversations, f)
+
+        adapter = OpenAIAdapter()
+        # Use both keywords and phrases to trigger both matching paths
+        query = SearchQuery(keywords=["algo"], phrases=["algo-insights"])
+
+        results = list(adapter.search(export_file, query))
+
+        # Should find 2 unique message IDs, no duplicates
+        assert len(results) == 1
+        result = results[0]
+        # Both messages should match
+        assert len(result.matched_message_ids) == 2
+        # No duplicates
+        assert len(result.matched_message_ids) == len(set(result.matched_message_ids))

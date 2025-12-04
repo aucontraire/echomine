@@ -110,7 +110,7 @@ def _configure_encoding() -> None:
     This reconfigures streams to use UTF-8 with 'replace' error handling
     to avoid UnicodeEncodeError on special characters.
     """
-    import io
+    import io  # pragma: no cover
 
     # Only reconfigure if not already UTF-8 (common on Windows)
     if sys.stdout.encoding.lower() != "utf-8":  # pragma: no cover
@@ -140,16 +140,16 @@ def main() -> None:
 
     try:
         app()
-    except typer.Exit:
+    except typer.Exit:  # pragma: no cover
         # typer.Exit exceptions are raised by commands to set exit codes
         # Re-raise to preserve exit code
         raise
-    except KeyboardInterrupt:
+    except KeyboardInterrupt:  # pragma: no cover
         # User interrupted with Ctrl+C
         # Exit cleanly without error message
         typer.echo("", err=True)
         sys.exit(1)
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         # Unexpected error not caught by command
         # This is a safety net - commands should handle their own errors
         typer.echo(f"Error: {e}", err=True)

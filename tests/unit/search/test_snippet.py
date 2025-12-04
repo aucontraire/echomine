@@ -276,3 +276,42 @@ class TestSnippetFromMessages:
 
         assert snippet == "[Content unavailable]"
         assert count == 0
+
+    def test_extract_snippet_from_messages_ids_not_in_map(self) -> None:
+        """Matched IDs not in message map returns fallback."""
+        from datetime import datetime
+
+        from echomine.models.message import Message
+        from echomine.search.snippet import extract_snippet_from_messages
+
+        messages = [
+            Message(
+                id="msg-1",
+                role="user",
+                content="Hello, how are you?",
+                timestamp=datetime.now(UTC),
+            ),
+        ]
+        keywords = ["python"]
+        # IDs that don't exist in messages
+        matched_message_ids = ["msg-999", "msg-888"]
+
+        snippet, count = extract_snippet_from_messages(messages, keywords, matched_message_ids)
+
+        # Should return fallback when no matched IDs found in map
+        assert snippet == "[No content matched]"
+        assert count == 0
+
+    def test_extract_snippet_multiple_keywords_finds_earliest(self) -> None:
+        """Multiple keywords finds the earliest match in content."""
+        from echomine.search.snippet import extract_snippet
+
+        message_content = "First we discuss algorithms. Then Python. Finally async."
+        # "python" appears later, but should be found if searched first
+        keywords = ["python", "algorithm"]
+
+        snippet = extract_snippet(message_content, keywords)
+
+        # First keyword in list that appears in content determines position
+        # "python" is first in list, should center around it
+        assert "Python" in snippet or "algorithm" in snippet

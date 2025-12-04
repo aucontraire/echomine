@@ -431,9 +431,8 @@ class OpenAIAdapter:
             for conv, score, msg_ids, msgs in scored_conversations
         ]
 
-        # Apply limit if specified
-        if query.limit:
-            scored_conversations = scored_conversations[: query.limit]
+        # Apply limit (always positive integer per SearchQuery validation)
+        scored_conversations = scored_conversations[: query.limit]
 
         # Yield SearchResult objects with snippet extraction (FR-021-025)
         for conv, score, matched_message_ids, filtered_msgs in scored_conversations:
