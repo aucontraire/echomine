@@ -245,7 +245,8 @@ class MarkdownExporter:
                 lines.append("---")
                 lines.append("")
 
-        return "\n".join(lines)
+        # Add trailing newline for POSIX text file compliance
+        return "\n".join(lines) + "\n"
 
     def _render_metadata_header(
         self,
