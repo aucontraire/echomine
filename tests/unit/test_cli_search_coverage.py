@@ -19,10 +19,8 @@ Constitution Compliance:
 
 from __future__ import annotations
 
-import sys
 from datetime import date
 from pathlib import Path
-from typing import Iterator
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -31,7 +29,6 @@ from pydantic import ValidationError as PydanticValidationError
 from echomine.adapters.openai import OpenAIAdapter
 from echomine.cli.commands.search import _build_search_suggestions, search_conversations
 from echomine.exceptions import ValidationError
-from echomine.models.conversation import Conversation
 from echomine.models.search import SearchResult
 
 
@@ -204,7 +201,10 @@ class TestSearchQueryValidationError:
 
             # Assert: Error message on stderr
             captured = capsys.readouterr()
-            assert "invalid search parameters" in captured.err.lower() or "validation" in captured.err.lower()
+            assert (
+                "invalid search parameters" in captured.err.lower()
+                or "validation" in captured.err.lower()
+            )
 
 
 @pytest.mark.unit
@@ -516,7 +516,9 @@ class TestSearchEdgeCases:
     Additional coverage for tricky branches.
     """
 
-    def test_search_with_limit_applies_correctly(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    def test_search_with_limit_applies_correctly(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
         """Test that limit is applied correctly to results.
 
         Validates:
@@ -549,7 +551,10 @@ class TestSearchEdgeCases:
         # Mock the formatter to avoid issues
         with (
             patch("echomine.cli.commands.search.OpenAIAdapter", return_value=mock_adapter),
-            patch("echomine.cli.commands.search.format_search_results", return_value="formatted output\n"),
+            patch(
+                "echomine.cli.commands.search.format_search_results",
+                return_value="formatted output\n",
+            ),
         ):
             # Act: Search with limit=5
             search_conversations(

@@ -10,8 +10,6 @@ Bug Reference:
 
 from __future__ import annotations
 
-import pytest
-
 from echomine.search.ranking import BM25Scorer
 
 
@@ -39,6 +37,7 @@ class TestBM25ZeroAvgDocLength:
         # Score should be a valid number (not NaN or Inf)
         assert score >= 0.0
         import math
+
         assert not math.isnan(score)
         assert not math.isinf(score)
 
