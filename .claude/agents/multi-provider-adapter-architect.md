@@ -34,7 +34,7 @@ You **MUST** be involved in:
 - Example pattern:
   ```python
   from typing import Protocol, runtime_checkable
-  
+
   @runtime_checkable
   class ConversationProvider(Protocol[ConversationT]):
       def parse(self, data: dict) -> ConversationT: ...

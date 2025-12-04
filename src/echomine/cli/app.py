@@ -103,6 +103,22 @@ app.command(name="search", help="Search conversations by keywords")(search_conve
 app.command(name="export", help="Export conversation to markdown format")(export_conversation)
 
 
+def _configure_encoding() -> None:
+    """Configure stdout/stderr for UTF-8 on Windows.
+
+    Windows uses cp1252 (charmap) by default which can't handle Unicode.
+    This reconfigures streams to use UTF-8 with 'replace' error handling
+    to avoid UnicodeEncodeError on special characters.
+    """
+    import io
+
+    # Only reconfigure if not already UTF-8 (common on Windows)
+    if sys.stdout.encoding.lower() != "utf-8":
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    if sys.stderr.encoding.lower() != "utf-8":
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+
+
 def main() -> None:
     """Entry point for CLI application.
 
@@ -119,6 +135,9 @@ def main() -> None:
         - CHK032: Consistent exit codes
         - Entry point for installed script
     """
+    # Configure UTF-8 encoding for Windows compatibility
+    _configure_encoding()
+
     try:
         app()
     except typer.Exit:

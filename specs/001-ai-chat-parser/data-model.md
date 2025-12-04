@@ -862,24 +862,24 @@ Stateless adapter design for thread safety (per FR-113, FR-114, FR-115, FR-120).
 ```python
 class OpenAIAdapter:
     """Stateless adapter for OpenAI ChatGPT export format.
-    
+
     Thread Safety:
     - Instance can be shared across threads (per FR-098)
     - No mutable state, no configuration
     - Each method call creates independent iterator
-    
+
     Lifecycle:
     - Instantiation is lightweight (no I/O)
     - No context manager needed (stateless)
     - Reusable across different export files
     """
-    
+
     def __init__(self) -> None:
         """Initialize adapter with no configuration.
-        
+
         Per FR-113: No configuration parameters (stateless design).
         Per FR-115: Lightweight - no I/O, validation, or setup.
-        
+
         Example:
             >>> adapter = OpenAIAdapter()  # Instant, no side effects
             >>> # Reuse across files
@@ -941,7 +941,7 @@ def stream_conversations(
             for idx, conv_data in enumerate(ijson.items(f, 'item')):
                 if progress_callback and idx % 100 == 0:
                     progress_callback(idx + 1)
-                
+
                 try:
                     yield parse_conversation(conv_data)
                 except ValidationError as e:
@@ -2073,4 +2073,3 @@ ADAPTERS = [
 ```
 
 ---
-

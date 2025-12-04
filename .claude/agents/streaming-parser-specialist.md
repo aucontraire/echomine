@@ -86,7 +86,7 @@ For OpenAI exports, prefer `ijson.items(file, 'item')` to stream top-level array
 
 ```python
 # Streaming with progress
-def stream_items(file_path: Path, 
+def stream_items(file_path: Path,
                  progress_callback: Optional[Callable[[int], None]] = None
                 ) -> Generator[Item, None, None]:
     with open(file_path, 'rb') as f:

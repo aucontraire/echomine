@@ -186,6 +186,11 @@ ignore = [
 "src/echomine/cli/**/*.py" = [
     "T201",    # Print statements - CLI output to stdout is intentional
 ]
+"examples/**/*.py" = [
+    "T201",    # Print statements - expected in example scripts
+    "S101",    # Assert - acceptable in examples
+    "DTZ001",  # datetime without tz - examples may demonstrate edge cases
+]
 "src/echomine/export/**/*.py" = [
     "B007",    # Unused loop variable - sometimes needed for dict.items() pattern
 ]

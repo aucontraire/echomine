@@ -160,7 +160,7 @@ def example_json_serialization() -> None:
     }
 
     print(f"JSON output: {json_output}")
-    print(f"✓ Both timestamps present in JSON (created_at == updated_at)")
+    print("✓ Both timestamps present in JSON (created_at == updated_at)")
     assert json_output["created_at"] == json_output["updated_at"]
 
 

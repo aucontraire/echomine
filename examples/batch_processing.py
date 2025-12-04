@@ -65,7 +65,7 @@ from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from rich.console import Console
 from rich.live import Live
@@ -79,7 +79,7 @@ from rich.progress import (
 )
 from rich.table import Table
 
-from echomine import Conversation, OpenAIAdapter
+from echomine import OpenAIAdapter
 
 
 # =============================================================================
@@ -109,7 +109,7 @@ class FileStats:
     messages_processed: int = 0
     conversations_skipped: int = 0
     success: bool = False
-    error_message: Optional[str] = None
+    error_message: str | None = None
     elapsed_seconds: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
@@ -254,8 +254,7 @@ def process_single_file(
     # Thread-safe logging (stderr is thread-safe in Python)
     if verbose:
         print(
-            f"[Worker {threading.current_thread().name}] "
-            f"Started processing {file_path.name}",
+            f"[Worker {threading.current_thread().name}] Started processing {file_path.name}",
             file=sys.stderr,
         )
 
@@ -392,9 +391,7 @@ class BatchProcessor:
         self.verbose = verbose
         self.console = Console(stderr=True)  # Progress to stderr
 
-    def process_files(
-        self, file_paths: list[Path]
-    ) -> tuple[BatchStats, list[FileStats]]:
+    def process_files(self, file_paths: list[Path]) -> tuple[BatchStats, list[FileStats]]:
         """Process multiple export files concurrently.
 
         Creates thread pool, dispatches workers, tracks progress, and
@@ -490,9 +487,7 @@ class BatchProcessor:
 # =============================================================================
 
 
-def print_summary_table(
-    batch_stats: BatchStats, file_stats: list[FileStats]
-) -> None:
+def print_summary_table(batch_stats: BatchStats, file_stats: list[FileStats]) -> None:
     """Print formatted summary table to stderr.
 
     Args:
@@ -509,19 +504,11 @@ def print_summary_table(
     summary_table.add_row("Files Total", str(batch_stats.files_total))
     summary_table.add_row("Files Successful", str(batch_stats.files_successful))
     summary_table.add_row("Files Failed", str(batch_stats.files_failed))
-    summary_table.add_row(
-        "Conversations Processed", str(batch_stats.conversations_total)
-    )
+    summary_table.add_row("Conversations Processed", str(batch_stats.conversations_total))
     summary_table.add_row("Messages Processed", str(batch_stats.messages_total))
-    summary_table.add_row(
-        "Conversations Skipped", str(batch_stats.conversations_skipped_total)
-    )
-    summary_table.add_row(
-        "Elapsed Time", f"{batch_stats.elapsed_seconds:.2f}s"
-    )
-    summary_table.add_row(
-        "Throughput", f"{batch_stats.throughput_conv_per_sec:.1f} conv/sec"
-    )
+    summary_table.add_row("Conversations Skipped", str(batch_stats.conversations_skipped_total))
+    summary_table.add_row("Elapsed Time", f"{batch_stats.elapsed_seconds:.2f}s")
+    summary_table.add_row("Throughput", f"{batch_stats.throughput_conv_per_sec:.1f} conv/sec")
 
     console.print()
     console.print(summary_table)
@@ -551,9 +538,7 @@ def print_summary_table(
     console.print()
 
 
-def print_json_output(
-    batch_stats: BatchStats, file_stats: list[FileStats]
-) -> None:
+def print_json_output(batch_stats: BatchStats, file_stats: list[FileStats]) -> None:
     """Print JSON output to stdout.
 
     Args:

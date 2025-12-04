@@ -100,7 +100,7 @@ Yes — it’s quite plausible that the painting carries **erotic or sensual und
   - **Sensuality in composition** (curves, tension, layered bodies)
   - **Mythic erotic symbols** (mermaid, horn)
   - **Emotion in posture and gaze**
-  
+
 This is a classic surrealist technique — to invoke desire, power, and taboo through dreamlike allegory rather than explicit form. Think *Leonora Carrington* or *Remedios Varo*, who both used animal-human hybrids and fantastical scenes to convey hidden emotional or erotic energy.
 
 ---

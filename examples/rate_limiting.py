@@ -277,7 +277,7 @@ class RateLimitedAPIClient:
         self.request_count = 0
         self.start_time = time.monotonic()
 
-    def ingest_conversation(self, conversation: Conversation) -> None:  # noqa: ARG002
+    def ingest_conversation(self, conversation: Conversation) -> None:
         """Simulate API call to ingest conversation.
 
         In production, this would be:
