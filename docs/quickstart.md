@@ -55,24 +55,32 @@ query = SearchQuery(
 # Execute search (returns ranked results)
 for result in adapter.search(export_file, query):
     print(f"[{result.score:.2f}] {result.conversation.title}")
+    print(f"  Preview: {result.snippet}")  # v1.1.0: automatic snippets
 ```
 
-### 3. Filter by Date Range
+### 3. Advanced Search (v1.1.0+)
 
-Narrow down conversations by creation date:
+Use powerful new search features:
 
 ```python
 from datetime import date
 
+# Exact phrase matching + boolean logic + exclusions + role filtering
 query = SearchQuery(
-    keywords=["refactor"],
+    keywords=["refactor", "optimization"],
+    phrases=["algo-insights"],  # Exact phrase (preserves hyphens)
+    match_mode="all",  # Require ALL keywords (AND logic)
+    exclude_keywords=["test"],  # Filter out unwanted results
+    role_filter="user",  # Search only your messages
     from_date=date(2024, 1, 1),
     to_date=date(2024, 3, 31),
     limit=5
 )
 
 for result in adapter.search(export_file, query):
-    print(f"{result.conversation.title} - {result.conversation.created_at}")
+    print(f"[{result.score:.2f}] {result.conversation.title}")
+    print(f"  Snippet: {result.snippet}")
+    print(f"  Matched: {len(result.matched_message_ids)} messages")
 ```
 
 ### 4. Get Specific Conversation
@@ -108,19 +116,41 @@ echomine list conversations.json --limit 10
 # Search by keywords
 echomine search export.json --keywords "algorithm,design" --limit 10
 
+# v1.1.0: Exact phrase matching
+echomine search export.json --phrase "algo-insights"
+
+# v1.1.0: Boolean match mode (require ALL keywords)
+echomine search export.json -k "python" -k "async" --match-mode all
+
+# v1.1.0: Exclude unwanted results
+echomine search export.json -k "python" --exclude "django" --exclude "flask"
+
+# v1.1.0: Role filtering (search only user/assistant messages)
+echomine search export.json -k "refactor" --role user
+
 # Search by title (fast, metadata-only)
 echomine search export.json --title "Project"
 
 # Filter by date range
 echomine search export.json --from-date "2024-01-01" --to-date "2024-03-31"
 
-# Combine filters
+# v1.1.0: Combine all advanced features
 echomine search export.json \
+  --phrase "api design" \
   --keywords "python" \
+  --exclude "test" \
+  --role user \
+  --match-mode all \
   --title "Tutorial" \
   --from-date "2024-01-01" \
   --limit 5
 ```
+
+**How filters combine:**
+- **Content matching** (Stage 1): Phrases OR Keywords (use --match-mode for keyword logic)
+- **Post-filtering** (Stage 2): --exclude, --role, --title, date range (all must match)
+
+See [CLI Usage](cli-usage.md#how-search-filters-combine) for detailed filter logic.
 
 ### Export to Markdown or JSON
 

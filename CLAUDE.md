@@ -7,6 +7,8 @@
 ---
 
 ## Active Technologies
+- Python 3.12+ (existing stack, mypy --strict compliant) (002-advanced-search)
+- File system only (JSON exports, no database) (002-advanced-search)
 
 ### Core Stack
 - **Python 3.12+**: Required for modern type hints (PEP 695, improved generics)
@@ -613,6 +615,7 @@ logger.error(
 ---
 
 ## Recent Changes
+- 002-advanced-search: Added Python 3.12+ (existing stack, mypy --strict compliant)
 
 - 2025-11-22: Added comprehensive development guidelines, agent coordination, constitution principles
 - 2025-11-21: Initial project setup from Specify template (001-ai-chat-parser)

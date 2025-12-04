@@ -116,22 +116,100 @@ echomine search [OPTIONS] FILE_PATH
 
 **Options:**
 
-- `--keywords TEXT`: Comma-separated keywords to search for
-- `--title TEXT`: Filter by conversation title (partial match, case-insensitive)
+Content Matching (v1.1.0+):
+- `--keywords, -k TEXT`: Keywords to search for (can specify multiple, OR logic by default)
+- `--phrase TEXT`: Exact phrase to match (can specify multiple, preserves hyphens/special chars)
+- `--match-mode TEXT`: Keyword matching mode: 'any' (OR, default) or 'all' (AND)
+- `--exclude TEXT`: Keywords to exclude from results (can specify multiple, OR logic)
+- `--role TEXT`: Filter to messages from specific role: 'user', 'assistant', or 'system'
+
+Legacy Filters:
+- `--title, -t TEXT`: Filter by conversation title (partial match, case-insensitive)
 - `--from-date DATE`: Filter conversations created on or after date (YYYY-MM-DD)
 - `--to-date DATE`: Filter conversations created on or before date (YYYY-MM-DD)
-- `--limit INTEGER`: Maximum number of results to return (default: 10)
-- `--json`: Output as JSON
+
+Output Control:
+- `--limit, -n INTEGER`: Maximum number of results to return (default: 10)
+- `--format, -f TEXT`: Output format ('text' or 'json')
+- `--quiet, -q`: Suppress progress indicators
+- `--json`: Output as JSON (alias for --format json)
 - `--help`: Show help message
+
+#### How Search Filters Combine
+
+Search filters follow a two-stage matching process:
+
+**Stage 1: Content Matching (OR relationship)**
+
+Conversations are included if ANY of these match:
+- **Phrases**: ANY phrase is found (exact match, case-insensitive)
+- **Keywords**: Keywords match according to `--match-mode`
+  - `--match-mode any` (default): ANY keyword matches
+  - `--match-mode all`: ALL keywords must be present
+
+Phrases and keywords are alternatives: `--phrase "api" -k "python"` matches conversations containing EITHER "api" phrase OR "python" keyword.
+
+**Stage 2: Post-Match Filters (AND relationship)**
+
+After content matching, results are filtered by ALL of these conditions:
+- `--exclude`: Removes results containing ANY excluded term
+- `--role`: Only includes messages from the specified role
+- `--title`: Only includes conversations with matching title
+- `--from-date` / `--to-date`: Only includes conversations in date range
+
+**Example Scenarios:**
+
+```bash
+# Matches if "api" phrase found OR "python" keyword found
+echomine search export.json --phrase "api" -k "python"
+
+# Matches if "python" AND "async" keywords both present
+echomine search export.json -k "python" -k "async" --match-mode all
+
+# Matches if ("api" phrase OR "python" keyword) AND NOT contains "java"
+echomine search export.json --phrase "api" -k "python" --exclude "java"
+
+# Matches if "python" keyword found in user messages only
+echomine search export.json -k "python" --role user
+
+# Matches if ("tutorial" phrase OR "python" keyword) AND title contains "Guide"
+echomine search export.json --phrase "tutorial" -k "python" --title "Guide"
+```
 
 **Examples:**
 
 ```bash
-# Search by keywords
+# Basic keyword search
 echomine search export.json --keywords "algorithm,design"
 
 # Search with limit
 echomine search export.json --keywords "python" --limit 5
+
+# NEW v1.1.0: Exact phrase matching
+echomine search export.json --phrase "algo-insights"
+echomine search export.json --phrase "data pipeline" --phrase "api design"  # Multiple phrases (OR)
+
+# NEW v1.1.0: Boolean match mode (require ALL keywords)
+echomine search export.json -k "python" -k "async" --match-mode all
+echomine search export.json -k "python" -k "async" --match-mode any  # Default: OR logic
+
+# NEW v1.1.0: Exclude keywords
+echomine search export.json -k "python" --exclude "django"
+echomine search export.json -k "python" --exclude "django" --exclude "flask"  # Multiple exclusions
+
+# NEW v1.1.0: Role filtering
+echomine search export.json -k "refactor" --role user       # Your questions
+echomine search export.json -k "recommend" --role assistant # AI responses
+echomine search export.json -k "system" --role system       # System messages
+
+# NEW v1.1.0: Combined advanced search
+echomine search export.json \
+  --phrase "algo-insights" \
+  -k "python" \
+  --exclude "test" \
+  --role user \
+  --match-mode all \
+  --limit 5
 
 # Search by title (fast, metadata-only)
 echomine search export.json --title "Project"
@@ -139,16 +217,20 @@ echomine search export.json --title "Project"
 # Filter by date range
 echomine search export.json --from-date "2024-01-01" --to-date "2024-03-31"
 
-# Combine filters
+# Combine all filters
 echomine search export.json \
+  --phrase "api design" \
   --keywords "python,async" \
+  --exclude "test" \
+  --role user \
   --title "Tutorial" \
   --from-date "2024-01-01" \
+  --match-mode all \
   --limit 10
 
-# JSON output for processing
+# JSON output for processing (includes snippets in v1.1.0+)
 echomine search export.json --keywords "machine learning" --json | \
-  jq '.results[] | select(.score > 0.8)'
+  jq '.results[] | select(.score > 0.8) | {title: .conversation.title, snippet: .snippet}'
 ```
 
 **Output (Human-Readable):**
@@ -156,20 +238,15 @@ echomine search export.json --keywords "machine learning" --json | \
 ```
 Search Results
 
-[0.92] Python Async Best Practices
-  Created: 2024-01-15
-  Messages: 42
-  ID: conv-abc123
+Score  ID         Title                         Created     Snippet                                          Messages
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+0.92   abc-123    Python Async Best Practices   2024-01-15  How do I use async/await with Python...          42
+0.85   xyz-789    Algorithm Design Patterns     2024-01-14  I need to refactor my algorithm using... (+2)    28
 
-[0.85] Algorithm Design Patterns
-  Created: 2024-01-14
-  Messages: 28
-  ID: conv-xyz789
-
-...
-
-Found 5 conversations (showing top 5)
+Showing 2 of 5 results
 ```
+
+Note: v1.1.0+ automatically includes message snippets (~100 characters) with match preview. The "(+N)" indicator shows when multiple messages matched.
 
 **Output (JSON):**
 
@@ -183,16 +260,177 @@ Found 5 conversations (showing top 5)
         "created_at": "2024-01-15T10:30:00Z",
         "message_count": 42
       },
-      "score": 0.92
+      "score": 0.92,
+      "matched_message_ids": ["msg-001", "msg-015"],
+      "snippet": "How do I use async/await with Python..."
     }
   ],
   "total": 5,
   "query": {
     "keywords": ["algorithm", "design"],
+    "phrases": null,
+    "match_mode": "any",
+    "exclude_keywords": null,
+    "role_filter": null,
     "limit": 10
   }
 }
 ```
+
+Note: v1.1.0+ adds `matched_message_ids` (list of matching message IDs) and `snippet` (preview text) to each result.
+
+---
+
+### Advanced Search Features (v1.1.0+)
+
+Version 1.1.0 introduces five powerful search enhancements:
+
+#### 1. Exact Phrase Matching
+
+Search for exact multi-word phrases while preserving special characters like hyphens and underscores.
+
+**Use Cases:**
+- Find project-specific terminology: `"algo-insights"`, `"data-pipeline"`
+- Match code patterns: `"async/await"`, `"error-handling"`
+- Locate specific concepts: `"machine learning"`, `"database migration"`
+
+**Examples:**
+```bash
+# Find exact phrase (hyphen preserved)
+echomine search export.json --phrase "algo-insights"
+
+# Multiple phrases (OR logic - matches any)
+echomine search export.json --phrase "api design" --phrase "system architecture"
+
+# Combine with keywords
+echomine search export.json --phrase "algo-insights" -k "optimization"
+```
+
+#### 2. Boolean Match Mode
+
+Control whether keywords use AND logic (all required) or OR logic (any match).
+
+**Use Cases:**
+- Narrow results: Require ALL keywords present (`--match-mode all`)
+- Broad discovery: Match ANY keyword (`--match-mode any`, default)
+- Topic intersection: Find conversations covering multiple topics
+
+**Examples:**
+```bash
+# Require ALL keywords (AND logic)
+echomine search export.json -k "python" -k "async" -k "testing" --match-mode all
+
+# Default: ANY keyword matches (OR logic)
+echomine search export.json -k "python" -k "javascript" --match-mode any
+```
+
+**Important:** `--match-mode` only affects keywords. Phrases always use OR logic.
+
+#### 3. Exclude Keywords
+
+Filter out unwanted results containing specific terms.
+
+**Use Cases:**
+- Remove noise: Exclude "test", "example", "tutorial"
+- Filter frameworks: Exclude "django" when searching Python
+- Avoid topics: Exclude "deprecated", "legacy"
+
+**Examples:**
+```bash
+# Exclude single term
+echomine search export.json -k "python" --exclude "django"
+
+# Exclude multiple terms (OR logic - excludes if ANY present)
+echomine search export.json -k "python" --exclude "django" --exclude "flask" --exclude "pyramid"
+
+# Combine with other filters
+echomine search export.json -k "refactor" --exclude "test" --role user
+```
+
+**Important:** Excluded terms use OR logic - a result is removed if it contains ANY excluded term.
+
+#### 4. Role Filtering
+
+Search only messages from a specific author role.
+
+**Use Cases:**
+- Find your questions: `--role user`
+- Find AI recommendations: `--role assistant`
+- Find system prompts: `--role system`
+
+**Examples:**
+```bash
+# Search only your messages
+echomine search export.json -k "how do I" --role user
+
+# Search only AI responses
+echomine search export.json -k "recommend" --role assistant
+
+# Search system messages
+echomine search export.json -k "context" --role system
+```
+
+**Note:** Role filtering is case-insensitive (`user`, `User`, `USER` all work).
+
+#### 5. Message Snippets (Automatic)
+
+All search results automatically include ~100 character previews of matched content.
+
+**Features:**
+- Shows first matching message content
+- Truncated with "..." for long messages
+- Multiple matches indicated with "+N more"
+- Fallback text for empty/malformed content
+
+**Example Output:**
+```
+Score  Title                    Snippet
+0.92   Python Async Tutorial    How do I use async/await with Python...
+0.85   Refactoring Guide        I need to refactor my algorithm... (+2 more)
+```
+
+**JSON Output:**
+```json
+{
+  "snippet": "How do I use async/await with Python...",
+  "matched_message_ids": ["msg-001", "msg-015", "msg-023"]
+}
+```
+
+#### Combining Advanced Features
+
+All features work together for powerful precision searches:
+
+```bash
+# Find conversations where:
+# - You asked about refactoring (role=user)
+# - Mentioning "algo-insights" exactly (phrase)
+# - Discussing Python (keyword)
+# - NOT about testing (exclude)
+# - All conditions must match (match-mode=all)
+echomine search export.json \
+  --phrase "algo-insights" \
+  -k "python" \
+  --exclude "test" \
+  --role user \
+  --match-mode all \
+  --limit 10
+```
+
+#### Filter Combination Logic
+
+**Stage 1: Content Matching (OR relationship)**
+- Phrases: Match if ANY phrase is found (exact, case-insensitive)
+- Keywords: Match according to `--match-mode` (any OR all)
+- Phrase OR keyword match (not both required)
+
+**Stage 2: Post-Match Filters (AND relationship)**
+- `--exclude`: Remove if ANY excluded term found
+- `--role`: Only messages from specified role
+- `--title`: Only conversations with matching title
+- `--from-date` / `--to-date`: Only in date range
+
+All post-match filters must be satisfied.
 
 ---
 

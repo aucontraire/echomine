@@ -25,6 +25,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A
 
+## [1.1.0] - 2025-12-04
+
+### Added
+
+#### Advanced Search Features (5 User Stories)
+
+- **Exact Phrase Matching (US1, FR-001-006)**: Search for exact phrases like "algo-insights"
+  - CLI: `--phrase "algo-insights"`
+  - Library: `SearchQuery(phrases=["algo-insights"])`
+  - Preserves hyphens, underscores, and special characters
+  - Multiple phrases use OR logic
+
+- **Boolean Match Mode (US2, FR-007-011)**: Control keyword matching logic
+  - CLI: `--match-mode all` or `--match-mode any`
+  - Library: `SearchQuery(keywords=["python", "async"], match_mode="all")`
+  - "all" = AND logic (all keywords must be present)
+  - "any" = OR logic (default, at least one keyword)
+
+- **Exclude Keywords (US3, FR-012-016)**: Filter out unwanted results
+  - CLI: `--exclude "django" --exclude "flask"`
+  - Library: `SearchQuery(keywords=["python"], exclude_keywords=["django"])`
+  - Excluded terms use OR logic (any excluded term removes result)
+
+- **Role Filtering (US4, FR-017-020)**: Search by message author role
+  - CLI: `--role user` or `--role assistant`
+  - Library: `SearchQuery(keywords=["refactor"], role_filter="user")`
+  - Supports: "user", "assistant", "system"
+  - Case-insensitive role matching
+
+- **Message Snippets (US5, FR-021-025)**: Preview matched content
+  - Automatically included in all search results
+  - `SearchResult.snippet` field shows ~100 character preview
+  - Truncated with "..." suffix for long content
+  - Multiple matches show "+N more" indicator
+  - Fallback text for empty/malformed content
+
+#### New Tests
+- Combined feature integration tests (10 tests)
+- Advanced search performance benchmarks (7 tests)
+- Snippet extraction unit tests (18 tests)
+- Role filtering contract tests (6 tests)
+
+### Changed
+- SearchQuery model extended with new optional fields
+- SearchResult model includes snippet field
+- CLI search output includes Snippet column
+- JSON output includes snippet field in results
+
+### Documentation
+- Quickstart guide for advanced search features
+- Library API examples for all new features
+- CLI usage examples with all new flags
+
 ## [1.0.2] - 2025-12-03
 
 ### Added
@@ -110,7 +163,8 @@ Each release includes:
 
 ---
 
-[Unreleased]: https://github.com/aucontraire/echomine/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/aucontraire/echomine/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/aucontraire/echomine/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/aucontraire/echomine/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/aucontraire/echomine/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/aucontraire/echomine/releases/tag/v1.0.0

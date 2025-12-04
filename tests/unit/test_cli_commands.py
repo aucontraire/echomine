@@ -636,6 +636,7 @@ class TestSearchCommand:
 
         Validates:
         - search.py lines 363-381: zero results handling with suggestions
+        - search.py lines 91-96: _build_search_suggestions with keywords
         - Exit code 0 (zero results is not an error)
         """
         # Act
@@ -643,6 +644,131 @@ class TestSearchCommand:
 
         # Assert: Success (zero results is not an error)
         assert result.exit_code == 0
+
+    def test_search_zero_results_with_title_filter(self, sample_export: Path) -> None:
+        """Test search with title filter returning no results.
+
+        Validates:
+        - search.py lines 98-101: _build_search_suggestions with title filter
+        - Exit code 0 (zero results is not an error)
+        """
+        # Act
+        result = runner.invoke(
+            app, ["search", str(sample_export), "--title", "NonexistentTitle XYZ"]
+        )
+
+        # Assert: Success (zero results is not an error)
+        assert result.exit_code == 0
+
+    def test_search_zero_results_with_date_filter(self, sample_export: Path) -> None:
+        """Test search with date filter returning no results.
+
+        Validates:
+        - search.py lines 103-104: _build_search_suggestions with date filter
+        - Exit code 0 (zero results is not an error)
+        """
+        # Act - search for dates way in the future
+        result = runner.invoke(
+            app,
+            ["search", str(sample_export), "-k", "anything", "--from-date", "2099-01-01"],
+        )
+
+        # Assert: Success (zero results is not an error)
+        assert result.exit_code == 0
+
+    def test_search_invalid_format_option(self, sample_export: Path) -> None:
+        """Test search with invalid format option.
+
+        Validates:
+        - search.py lines 271-276: format validation
+        - Exit code 1 (invalid format)
+        """
+        # Act
+        result = runner.invoke(
+            app, ["search", str(sample_export), "-k", "python", "--format", "xml"]
+        )
+
+        # Assert: Exit code 1
+        assert result.exit_code == 1
+        assert "invalid format" in result.output.lower()
+
+    def test_search_invalid_match_mode_option(self, sample_export: Path) -> None:
+        """Test search with invalid match_mode option.
+
+        Validates:
+        - search.py lines 280-285: match_mode validation
+        - Exit code 2 (invalid argument)
+        """
+        # Act
+        result = runner.invoke(
+            app, ["search", str(sample_export), "-k", "python", "--match-mode", "invalid"]
+        )
+
+        # Assert: Exit code 2
+        assert result.exit_code == 2
+        assert "invalid --match-mode" in result.output.lower()
+
+    def test_search_invalid_role_option(self, sample_export: Path) -> None:
+        """Test search with invalid role option.
+
+        Validates:
+        - search.py lines 290-296: role validation
+        - Exit code 2 (invalid argument)
+        """
+        # Act
+        result = runner.invoke(
+            app, ["search", str(sample_export), "-k", "python", "--role", "invalid-role"]
+        )
+
+        # Assert: Exit code 2
+        assert result.exit_code == 2
+        assert "invalid --role" in result.output.lower()
+
+    def test_search_with_valid_role_user(self, sample_export: Path) -> None:
+        """Test search with valid role=user option.
+
+        Validates:
+        - search.py line 297: role_filter_value cast
+        - Exit code 0
+        """
+        # Act
+        result = runner.invoke(
+            app, ["search", str(sample_export), "-k", "python", "--role", "user"]
+        )
+
+        # Assert: Success
+        assert result.exit_code == 0
+
+    def test_search_with_valid_role_assistant(self, sample_export: Path) -> None:
+        """Test search with valid role=assistant option.
+
+        Validates:
+        - search.py line 297: role_filter_value cast
+        - Exit code 0
+        """
+        # Act
+        result = runner.invoke(
+            app, ["search", str(sample_export), "-k", "python", "--role", "assistant"]
+        )
+
+        # Assert: Success
+        assert result.exit_code == 0
+
+    def test_search_invalid_to_date_format(self, sample_export: Path) -> None:
+        """Test search with invalid to_date format.
+
+        Validates:
+        - search.py lines 330-338: to_date parsing and validation
+        - Exit code 2 (invalid argument)
+        """
+        # Act
+        result = runner.invoke(
+            app, ["search", str(sample_export), "-k", "python", "--to-date", "not-a-date"]
+        )
+
+        # Assert: Exit code 2
+        assert result.exit_code == 2
+        assert "invalid" in result.output.lower()
 
     def test_search_with_quiet_flag(self, sample_export: Path) -> None:
         """Test search with --quiet flag suppresses progress.
@@ -800,6 +926,147 @@ class TestExportCommand:
 
         # Assert: Exit code 1
         assert result.exit_code == 1
+
+    def test_export_by_id_json_format(self, sample_export: Path) -> None:
+        """Test export conversation in JSON format instead of markdown.
+
+        Validates:
+        - export.py line 268: JSON format export using model_dump_json
+        - Exit code 0
+        - Valid JSON output with conversation data
+        """
+        # Act
+        result = runner.invoke(app, ["export", str(sample_export), "conv-001", "--format", "json"])
+
+        # Assert: Success
+        assert result.exit_code == 0
+
+        # Assert: Valid JSON with conversation fields
+        data = json.loads(result.stdout)
+        assert data["id"] == "conv-001"
+        assert data["title"] == "Python AsyncIO Tutorial"
+        assert "messages" in data
+        assert isinstance(data["messages"], list)
+        assert len(data["messages"]) == 2
+
+    def test_export_title_multiple_matches_error(self, tmp_path: Path) -> None:
+        """Test export with ambiguous title matching multiple conversations.
+
+        Validates:
+        - export.py lines 225-226: Multiple matches error handling
+        - Exit code 1 (ambiguous title is an operational error)
+        """
+        # Arrange: Create export with multiple conversations with similar titles
+        data = [
+            {
+                "id": "conv-001",
+                "title": "Python Tutorial - Part 1",
+                "create_time": 1700000000.0,
+                "update_time": 1700001000.0,
+                "mapping": {
+                    "msg-001": {
+                        "id": "msg-001",
+                        "message": {
+                            "id": "msg-001",
+                            "author": {"role": "user"},
+                            "content": {"content_type": "text", "parts": ["Test"]},
+                            "create_time": 1700000000.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": [],
+                    }
+                },
+                "moderation_results": [],
+                "current_node": "msg-001",
+            },
+            {
+                "id": "conv-002",
+                "title": "Python Tutorial - Part 2",
+                "create_time": 1700100000.0,
+                "update_time": 1700101000.0,
+                "mapping": {
+                    "msg-002": {
+                        "id": "msg-002",
+                        "message": {
+                            "id": "msg-002",
+                            "author": {"role": "user"},
+                            "content": {"content_type": "text", "parts": ["Test"]},
+                            "create_time": 1700100000.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": [],
+                    }
+                },
+                "moderation_results": [],
+                "current_node": "msg-002",
+            },
+        ]
+
+        file = tmp_path / "ambiguous.json"
+        file.write_text(json.dumps(data), encoding="utf-8")
+
+        # Act: Search with ambiguous title "Python Tutorial"
+        result = runner.invoke(app, ["export", str(file), "--title", "Python Tutorial"])
+
+        # Assert: Exit code 1 (ambiguous match is an error)
+        assert result.exit_code == 1
+        assert "multiple" in result.output.lower() or "ambiguous" in result.output.lower()
+
+    def test_export_title_lookup_skips_non_dict_entries(self, tmp_path: Path) -> None:
+        """Test _find_conversation_by_title skips non-dict entries gracefully.
+
+        Validates:
+        - export.py line 81: isinstance(conv, dict) check to skip malformed entries
+        - Title lookup continues when encountering non-dict entries
+
+        Note: This tests the title lookup logic specifically. The actual conversation
+        loading via adapter.stream_conversations() may still fail on malformed entries,
+        which is expected behavior (fail-fast on streaming, graceful on lookup).
+        """
+        # Arrange: Create export with mix of valid and malformed entries
+        # Place valid conversation FIRST to avoid adapter streaming errors
+        data = [
+            {
+                "id": "conv-001",
+                "title": "Valid Conversation",
+                "create_time": 1700000000.0,
+                "update_time": 1700001000.0,
+                "mapping": {
+                    "msg-001": {
+                        "id": "msg-001",
+                        "message": {
+                            "id": "msg-001",
+                            "author": {"role": "user"},
+                            "content": {"content_type": "text", "parts": ["Test content"]},
+                            "create_time": 1700000000.0,
+                            "update_time": None,
+                            "metadata": {},
+                        },
+                        "parent": None,
+                        "children": [],
+                    }
+                },
+                "moderation_results": [],
+                "current_node": "msg-001",
+            },
+            "this is not a dict",  # Malformed entry (skipped by line 81)
+            123,  # Another malformed entry (skipped by line 81)
+        ]
+
+        file = tmp_path / "malformed_entries.json"
+        file.write_text(json.dumps(data), encoding="utf-8")
+
+        # Act: Try to export by title from file with malformed entries
+        # Title lookup should skip non-dict entries and find valid conversation
+        result = runner.invoke(app, ["export", str(file), "--title", "Valid"])
+
+        # Assert: Success - title lookup skipped non-dict entries
+        assert result.exit_code == 0
+        assert "Valid Conversation" in result.stdout
 
 
 # ============================================================================

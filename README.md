@@ -16,7 +16,8 @@ Echomine is a Python library and CLI tool for parsing, searching, and exporting 
 ### Key Features
 
 - **Memory Efficient**: Stream-based parsing handles 1GB+ files with constant memory usage
-- **Full-Text Search**: BM25 relevance ranking for keyword searches across conversations
+- **Advanced Search**: BM25 relevance ranking with exact phrase matching, boolean logic, role filtering, and keyword exclusion
+- **Message Snippets**: Automatic preview generation for search results with match context
 - **Type Safe**: Strict typing with Pydantic v2 and mypy --strict compliance
 - **Library First**: All CLI capabilities available as importable Python library
 - **Multi-Provider Ready**: Adapter pattern supports multiple AI export formats
@@ -74,16 +75,23 @@ for conversation in adapter.stream_conversations(export_file):
 query = SearchQuery(keywords=["algorithm", "design"], limit=10)
 for result in adapter.search(export_file, query):
     print(f"{result.conversation.title} (score: {result.score:.2f})")
+    print(f"  Preview: {result.snippet}")  # v1.1.0: automatic snippets
 
-# 3. Filter by date range
+# 3. Advanced search with filters (v1.1.0+)
 from datetime import date
 query = SearchQuery(
     keywords=["refactor"],
+    phrases=["algo-insights"],  # Exact phrase matching
+    match_mode="all",  # Require ALL keywords (AND logic)
+    exclude_keywords=["test"],  # Filter out unwanted results
+    role_filter="user",  # Search only user messages
     from_date=date(2024, 1, 1),
     to_date=date(2024, 3, 31),
     limit=5
 )
-results = list(adapter.search(export_file, query))
+for result in adapter.search(export_file, query):
+    print(f"[{result.score:.2f}] {result.conversation.title}")
+    print(f"  Snippet: {result.snippet}")
 
 # 4. Get specific conversation by ID
 conversation = adapter.get_conversation_by_id(export_file, "conv-abc123")
@@ -99,6 +107,21 @@ echomine list export.json
 
 # Search by keywords
 echomine search export.json --keywords "algorithm,design" --limit 10
+
+# Search by exact phrase (v1.1.0+)
+echomine search export.json --phrase "algo-insights"
+
+# Boolean match mode: require ALL keywords (v1.1.0+)
+echomine search export.json -k "python" -k "async" --match-mode all
+
+# Exclude unwanted results (v1.1.0+)
+echomine search export.json -k "python" --exclude "django" --exclude "flask"
+
+# Role filtering: search only user/assistant messages (v1.1.0+)
+echomine search export.json -k "refactor" --role user
+
+# Combine all filters (v1.1.0+)
+echomine search export.json --phrase "api" -k "python" --exclude "test" --role user --match-mode all
 
 # Search by title (fast, metadata-only)
 echomine search export.json --title "Project"
@@ -127,6 +150,8 @@ echomine search export.json --keywords "python" --json | jq '.results[].title'
 # Version info
 echomine --version
 ```
+
+**Search Filter Logic:** Content matching (phrases OR keywords) happens first, then post-filtering (--exclude, --role, --title, dates) is applied. See [CLI Usage](https://aucontraire.github.io/echomine/cli-usage/#how-search-filters-combine) for details.
 
 See [Quickstart Guide](specs/001-ai-chat-parser/quickstart.md) for detailed examples.
 
