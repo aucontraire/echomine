@@ -1830,3 +1830,204 @@ class TestCLIDateFilteringContract:
         stderr = result.stderr
         assert len(stderr) > 0, "Error message should be on stderr"
         assert "date" in stderr.lower(), f"Error should mention date. Got: {stderr}"
+
+
+# =============================================================================
+# T029-T032: CLI Contract Tests - Message Count Filtering (RED Phase)
+# =============================================================================
+
+
+@pytest.mark.contract
+class TestCLIMessageCountFilteringContract:
+    """Contract tests for message count filtering flags in search command.
+
+    Tasks: T029-T032 - Message count filtering CLI contract validation
+    Phase: RED (tests designed to FAIL initially)
+
+    These tests validate the --min-messages and --max-messages CLI flags work correctly
+    and provide proper error handling for invalid bounds.
+
+    Contract Requirements Validated:
+    - FR-001: --min-messages flag filters conversations >= min_messages
+    - FR-002: --max-messages flag filters conversations <= max_messages
+    - FR-008: Invalid bounds (min > max) returns exit code 2
+    - CHK032: Exit codes (0=success, 2=invalid arguments)
+    """
+
+    def test_min_messages_flag_accepted(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test --min-messages flag is accepted by search command (T029).
+
+        Validates:
+        - FR-001: --min-messages flag accepted
+        - Exit code 0 on success
+        - Filtering logic works correctly
+
+        Expected to FAIL: --min-messages flag not implemented yet.
+        """
+        # Act: Run search with --min-messages
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(sample_cli_export),
+                "--keywords",
+                "Test",
+                "--min-messages",
+                "2",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
+        )
+
+        # Assert: Exit code 0 for success
+        assert result.returncode == 0, (
+            f"Search with --min-messages should succeed. "
+            f"Got exit code {result.returncode}. stderr: {result.stderr}"
+        )
+
+        # Assert: stdout contains results (conversations with >= 2 messages)
+        stdout = result.stdout
+        assert len(stdout) > 0, "stdout should contain search results"
+
+    def test_max_messages_flag_accepted(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test --max-messages flag is accepted by search command (T030).
+
+        Validates:
+        - FR-002: --max-messages flag accepted
+        - Exit code 0 on success
+        - Filtering logic works correctly
+
+        Expected to FAIL: --max-messages flag not implemented yet.
+        """
+        # Act: Run search with --max-messages
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(sample_cli_export),
+                "--keywords",
+                "Test",
+                "--max-messages",
+                "10",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
+        )
+
+        # Assert: Exit code 0 for success
+        assert result.returncode == 0, (
+            f"Search with --max-messages should succeed. "
+            f"Got exit code {result.returncode}. stderr: {result.stderr}"
+        )
+
+        # Assert: stdout contains results (conversations with <= 10 messages)
+        stdout = result.stdout
+        assert len(stdout) > 0, "stdout should contain search results"
+
+    def test_invalid_bounds_min_greater_than_max_exits_with_code_2(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test min_messages > max_messages returns exit code 2 (T031).
+
+        Validates:
+        - FR-008: Invalid bounds validation (min > max)
+        - Exit code 2 for usage error
+        - Clear error message on stderr
+
+        Expected to FAIL: Bounds validation not implemented yet.
+        """
+        # Act: Search with invalid bounds (min=20, max=5)
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(sample_cli_export),
+                "--keywords",
+                "Test",
+                "--min-messages",
+                "20",
+                "--max-messages",
+                "5",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
+        )
+
+        # Assert: Exit code 2 (usage error)
+        assert result.returncode == 2, (
+            f"Invalid bounds should exit with code 2. Got {result.returncode}"
+        )
+
+        # Assert: Error message on stderr
+        stderr = result.stderr
+        assert len(stderr) > 0, "Error message should be on stderr"
+        assert "min_messages" in stderr and "max_messages" in stderr, (
+            f"Error should mention min_messages and max_messages. Got: {stderr}"
+        )
+        # Verify error message format from cli_spec.md
+        assert "20" in stderr and "5" in stderr, (
+            f"Error should include actual values. Got: {stderr}"
+        )
+
+    def test_json_output_includes_message_count(
+        self, cli_command: list[str], sample_cli_export: Path
+    ) -> None:
+        """Test JSON output includes message_count field for each result (T032).
+
+        Validates:
+        - FR-049: JSON output schema includes message_count
+        - Contract: message_count field present in each result
+
+        Expected to PASS: message_count already in JSON output from v1.1.0.
+        """
+        # Act: Search with JSON output
+        result = subprocess.run(
+            [
+                *cli_command,
+                "search",
+                str(sample_cli_export),
+                "--keywords",
+                "Test",
+                "--json",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
+        )
+
+        # Assert: Success
+        assert result.returncode == 0, f"JSON output failed: {result.stderr}"
+
+        # Assert: Valid JSON
+        stdout = result.stdout
+        try:
+            data = json.loads(stdout)
+        except json.JSONDecodeError as e:
+            pytest.fail(f"Output is not valid JSON: {e}\n{stdout}")
+
+        # Assert: Results array exists
+        assert "results" in data, "JSON should have 'results' field"
+        assert isinstance(data["results"], list), "results should be array"
+
+        # Assert: Each result has message_count field
+        if len(data["results"]) > 0:
+            for result_item in data["results"]:
+                assert "message_count" in result_item, "Each result must have message_count field"
+                assert isinstance(result_item["message_count"], int), (
+                    "message_count must be integer"
+                )

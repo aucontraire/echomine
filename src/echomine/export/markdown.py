@@ -52,12 +52,17 @@ class MarkdownExporter:
         self,
         export_file: Path,
         conversation_id: str,
+        *,
+        include_metadata: bool = True,
+        include_message_ids: bool = True,
     ) -> str:
         """Export a single conversation to markdown format.
 
         Args:
             export_file: Path to OpenAI export JSON file
             conversation_id: ID of conversation to export
+            include_metadata: Include YAML frontmatter (default: True) (FR-030, FR-035)
+            include_message_ids: Include message IDs in headers (default: True) (FR-035)
 
         Returns:
             Markdown string formatted for VS Code preview
@@ -70,9 +75,15 @@ class MarkdownExporter:
         Example:
             ```python
             exporter = MarkdownExporter()
+
+            # With metadata and IDs (default)
+            md = exporter.export_conversation(Path("export.json"), "abc-123")
+
+            # Without metadata
             md = exporter.export_conversation(
                 Path("export.json"),
-                "abc-123"
+                "abc-123",
+                include_metadata=False
             )
             ```
         """
@@ -89,7 +100,12 @@ class MarkdownExporter:
         messages = self._extract_messages(conversation_data)
 
         # Convert to markdown with conversation metadata
-        return self._render_markdown(messages, conversation_data)
+        return self._render_markdown(
+            messages,
+            conversation_data,
+            include_metadata=include_metadata,
+            include_message_ids=include_message_ids,
+        )
 
     def _find_conversation(self, data: Any, conversation_id: str) -> dict[str, Any] | None:
         """Find conversation by ID in OpenAI export data.
@@ -145,9 +161,12 @@ class MarkdownExporter:
             # Extract content and images
             content, images = self._extract_content_and_images(msg_data)
 
+            # Get message ID from source, or None if missing (will be generated later)
+            message_id = msg_data.get("id")
+
             messages.append(
                 {
-                    "id": msg_data["id"],
+                    "id": message_id,
                     "role": role,
                     "timestamp": msg_data.get("create_time"),
                     "content": content,
@@ -157,6 +176,13 @@ class MarkdownExporter:
 
         # Sort by timestamp
         messages.sort(key=lambda m: m["timestamp"] if m["timestamp"] else 0)
+
+        # Generate deterministic IDs for messages without source IDs (FR-032a, FR-032b)
+        conversation_id = conversation_data.get("id", "unknown")
+        for i, msg in enumerate(messages, start=1):
+            if msg["id"] is None:
+                # Format: msg-{conversation_id}-{zero_padded_index}
+                msg["id"] = f"msg-{conversation_id}-{i:03d}"
 
         return messages
 
@@ -204,31 +230,68 @@ class MarkdownExporter:
         self,
         messages: list[dict[str, Any]],
         conversation_data: dict[str, Any],
+        *,
+        include_metadata: bool = True,
+        include_message_ids: bool = True,
     ) -> str:
-        """Render messages as markdown string with conversation metadata header.
+        """Render messages as markdown string with optional YAML frontmatter.
 
         Args:
             messages: List of message dicts
             conversation_data: Conversation metadata from OpenAI export
+            include_metadata: Include YAML frontmatter (FR-030)
+            include_message_ids: Include message IDs in headers (FR-032)
 
         Returns:
-            Formatted markdown string with metadata header followed by messages
+            Formatted markdown string with optional frontmatter and messages
         """
         lines = []
 
-        # Render conversation metadata header (FR-014)
-        metadata_header = self._render_metadata_header(conversation_data, len(messages))
-        lines.append(metadata_header)
+        # Render YAML frontmatter if enabled (FR-030, FR-031)
+        if include_metadata:
+            frontmatter = self._render_yaml_frontmatter(conversation_data, len(messages))
+            lines.append(frontmatter)
+            lines.append("")
+
+        # Always render title heading
+        title = conversation_data.get("title", "Untitled Conversation")
+        lines.append(f"# {title}")
         lines.append("")
 
+        # Render inline metadata fields only when frontmatter disabled (backward compatibility)
+        if not include_metadata:
+            # Add Created/Updated/Messages fields after title
+            create_time = conversation_data.get("create_time")
+            created_str = self._format_timestamp(create_time)
+            lines.append(f"Created: {created_str}")
+
+            update_time = conversation_data.get("update_time")
+            if update_time is not None:
+                updated_str = self._format_timestamp(update_time)
+                lines.append(f"Updated: {updated_str}")
+
+            message_str = "message" if len(messages) == 1 else "messages"
+            lines.append(f"Messages: {len(messages)} {message_str}")
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+
         for i, msg in enumerate(messages):
-            # Render header with emoji and timestamp
+            # Render header with optional message ID and timestamp
             role = msg["role"]
-            emoji = "👤" if role == "user" else "🤖"
             role_name = "User" if role == "user" else "Assistant"
             timestamp = self._format_timestamp(msg["timestamp"])
 
-            lines.append(f"## {emoji} {role_name} · {timestamp}")
+            # Build header with optional message ID (FR-032)
+            # New format (no emojis): ## User (`msg-id`) - timestamp
+            if include_message_ids:
+                message_id = msg["id"]
+                lines.append(f"## {role_name} (`{message_id}`) - {timestamp}")
+            else:
+                # Backward compatibility: keep emojis when IDs disabled
+                emoji = "👤" if role == "user" else "🤖"
+                lines.append(f"## {emoji} {role_name} · {timestamp}")
+
             lines.append("")
 
             # Render images before content
@@ -249,6 +312,77 @@ class MarkdownExporter:
 
         # Add trailing newline for POSIX text file compliance
         return "\n".join(lines) + "\n"
+
+    def _render_yaml_frontmatter(
+        self,
+        conversation_data: dict[str, Any],
+        message_count: int,
+    ) -> str:
+        """Render YAML frontmatter for Jekyll/Hugo compatibility.
+
+        Generates YAML frontmatter with conversation metadata per FR-031.
+
+        Args:
+            conversation_data: OpenAI conversation object with metadata
+            message_count: Number of messages in conversation
+
+        Returns:
+            YAML frontmatter block enclosed in --- delimiters
+
+        Format (FR-031):
+            ---
+            id: conversation-id
+            title: Conversation Title
+            created_at: 2024-01-15T10:30:00Z
+            updated_at: 2024-01-15T14:30:00Z
+            message_count: 42
+            export_date: 2025-12-05T15:30:00Z
+            exported_by: echomine
+            ---
+        """
+        lines = []
+
+        # Opening delimiter
+        lines.append("---")
+
+        # id field (FR-031)
+        conv_id = conversation_data.get("id", "unknown")
+        lines.append(f"id: {conv_id}")
+
+        # title field (FR-031)
+        title = conversation_data.get("title", "Untitled Conversation")
+        lines.append(f"title: {title}")
+
+        # created_at field (FR-031, FR-031b)
+        create_time = conversation_data.get("create_time")
+        created_str = self._format_timestamp_iso8601_z(create_time)
+        lines.append(f"created_at: {created_str}")
+
+        # updated_at field (FR-031, FR-031b)
+        # Can be None if conversation never updated
+        update_time = conversation_data.get("update_time")
+        if update_time is not None:
+            updated_str = self._format_timestamp_iso8601_z(update_time)
+            lines.append(f"updated_at: {updated_str}")
+        else:
+            # Omit field if never updated (cleaner than "updated_at: null")
+            pass
+
+        # message_count field (FR-031)
+        lines.append(f"message_count: {message_count}")
+
+        # export_date field (FR-031, FR-031b) - current time
+        export_date = datetime.now(UTC)
+        export_date_str = export_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+        lines.append(f"export_date: {export_date_str}")
+
+        # exported_by field (FR-031)
+        lines.append("exported_by: echomine")
+
+        # Closing delimiter
+        lines.append("---")
+
+        return "\n".join(lines)
 
     def _render_metadata_header(
         self,
@@ -309,3 +443,24 @@ class MarkdownExporter:
 
         dt = datetime.fromtimestamp(timestamp, tz=UTC)
         return dt.strftime("%Y-%m-%dT%H:%M:%S+00:00")
+
+    def _format_timestamp_iso8601_z(self, timestamp: float | None) -> str:
+        """Format Unix timestamp to ISO 8601 format with Z suffix.
+
+        This format is required for YAML frontmatter per FR-031b.
+
+        Args:
+            timestamp: Unix timestamp (seconds since epoch)
+
+        Returns:
+            ISO 8601 formatted string with Z suffix (YYYY-MM-DDTHH:MM:SSZ)
+
+        Example:
+            >>> exporter._format_timestamp_iso8601_z(1705320600.0)
+            '2024-01-15T10:30:00Z'
+        """
+        if timestamp is None:
+            return "N/A"
+
+        dt = datetime.fromtimestamp(timestamp, tz=UTC)
+        return dt.strftime("%Y-%m-%dT%H:%M:%SZ")

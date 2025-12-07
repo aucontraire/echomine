@@ -308,6 +308,18 @@ class OpenAIAdapter:
                 if query.to_date is not None and conv_date > query.to_date:
                     continue
 
+            # FR-006: Message count filter (streaming approach for O(1) memory)
+            if query.has_message_count_filter():
+                msg_count = conv.message_count
+
+                # Check min_messages (inclusive)
+                if query.min_messages is not None and msg_count < query.min_messages:
+                    continue
+
+                # Check max_messages (inclusive)
+                if query.max_messages is not None and msg_count > query.max_messages:
+                    continue
+
             # FR-018: Filter messages by role before text aggregation
             if query.role_filter is not None:
                 filtered_messages = [m for m in conv.messages if m.role == query.role_filter]
@@ -420,8 +432,45 @@ class OpenAIAdapter:
         if not scored_conversations:
             return  # Empty iterator
 
-        # Sort by relevance (descending)
-        scored_conversations.sort(key=lambda x: x[1], reverse=True)
+        # Sort conversations based on query parameters (FR-043-048)
+        # FR-043a: Tie-breaking by conversation_id (ascending, lexicographic)
+        # FR-043b: Stable sort (Python's sort() is stable by default)
+        def get_sort_key(
+            item: tuple[Conversation, float, list[str], list[Message]],
+        ) -> tuple[float | str | int, str]:
+            """Get sort key based on query sort_by parameter.
+
+            Returns tuple for multi-level sorting:
+            - Primary: sort_by field value
+            - Secondary: conversation_id (tie-breaker, FR-043a)
+
+            FR-046a: For date sort, use updated_at or fall back to created_at if None
+            FR-047: Title sort is case-insensitive
+            """
+            conv, score, _, _ = item
+
+            primary_key: float | str | int
+            if query.sort_by == "score":
+                # Sort by BM25 relevance score
+                primary_key = score
+            elif query.sort_by == "date":
+                # FR-046a: Use updated_at if present, otherwise created_at
+                sort_date = conv.updated_at if conv.updated_at is not None else conv.created_at
+                # Convert datetime to timestamp for numeric sorting
+                primary_key = sort_date.timestamp()
+            elif query.sort_by == "title":
+                # FR-047: Case-insensitive title sort
+                primary_key = conv.title.lower()
+            else:  # query.sort_by == "messages"
+                # Sort by message count
+                primary_key = conv.message_count
+
+            # FR-043a: Tie-breaking by conversation_id (ascending)
+            return (primary_key, conv.id)
+
+        # Apply sorting with reverse based on sort_order (FR-044)
+        reverse_sort = query.sort_order == "desc"
+        scored_conversations.sort(key=get_sort_key, reverse=reverse_sort)
 
         # Normalize scores to [0.0, 1.0] range using BM25 normalization formula (FR-319)
         # Formula: score_normalized = score_raw / (score_raw + 1)

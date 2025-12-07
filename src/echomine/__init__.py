@@ -65,11 +65,23 @@ from echomine.exceptions import (
     SchemaVersionError,
     ValidationError,
 )
+from echomine.export.csv import CSVExporter
 from echomine.export.markdown import MarkdownExporter
 from echomine.models.conversation import Conversation
 from echomine.models.message import Message
 from echomine.models.protocols import ConversationProvider
 from echomine.models.search import SearchQuery, SearchResult
+from echomine.models.statistics import (
+    ConversationStatistics,
+    ConversationSummary,
+    ExportMetadata,
+    ExportStatistics,
+    RoleCount,
+)
+from echomine.statistics import (
+    calculate_conversation_statistics,
+    calculate_statistics,
+)
 
 
 # T063: __all__ defines public API surface for library consumers
@@ -81,12 +93,22 @@ __all__: list[str] = [
     "Message",
     "SearchQuery",
     "SearchResult",
+    # Statistics models (v1.2.0)
+    "ExportStatistics",
+    "ConversationStatistics",
+    "ConversationSummary",
+    "RoleCount",
+    "ExportMetadata",
     # Adapters
     "OpenAIAdapter",
     # Exporters
+    "CSVExporter",
     "MarkdownExporter",
     # Protocols
     "ConversationProvider",
+    # Statistics functions (v1.2.0)
+    "calculate_statistics",
+    "calculate_conversation_statistics",
     # Exceptions
     "EchomineError",
     "ParseError",

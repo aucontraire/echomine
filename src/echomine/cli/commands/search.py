@@ -46,10 +46,17 @@ from typing import Annotated, Literal, cast
 
 import typer
 from pydantic import ValidationError as PydanticValidationError
+from rich.console import Console
 
 from echomine.adapters.openai import OpenAIAdapter
-from echomine.cli.formatters import format_search_results, format_search_results_json
+from echomine.cli.formatters import (
+    create_rich_search_table,
+    format_search_results,
+    format_search_results_json,
+    is_rich_enabled,
+)
 from echomine.exceptions import ParseError, ValidationError
+from echomine.export.csv import CSVExporter
 from echomine.models.search import SearchQuery
 
 
@@ -181,6 +188,20 @@ def search_conversations(
             help="Filter to date (YYYY-MM-DD)",
         ),
     ] = None,
+    min_messages: Annotated[
+        int | None,
+        typer.Option(
+            "--min-messages",
+            help="Minimum message count (inclusive, must be >= 1)",
+        ),
+    ] = None,
+    max_messages: Annotated[
+        int | None,
+        typer.Option(
+            "--max-messages",
+            help="Maximum message count (inclusive, must be >= 1)",
+        ),
+    ] = None,
     limit: Annotated[
         int | None,
         typer.Option(
@@ -189,6 +210,22 @@ def search_conversations(
             help="Limit number of results",
         ),
     ] = None,
+    sort: Annotated[
+        str,
+        typer.Option(
+            "--sort",
+            help="Sort by: score (default), date, title, or messages",
+            case_sensitive=False,
+        ),
+    ] = "score",
+    order: Annotated[
+        str,
+        typer.Option(
+            "--order",
+            help="Sort order: asc or desc (default: desc)",
+            case_sensitive=False,
+        ),
+    ] = "desc",
     format: Annotated[
         str,
         typer.Option(
@@ -213,72 +250,56 @@ def search_conversations(
             help="Output in JSON format (alias for --format json)",
         ),
     ] = False,
+    csv_messages: Annotated[
+        bool,
+        typer.Option(
+            "--csv-messages",
+            help="Output message-level CSV (mutually exclusive with --format csv)",
+        ),
+    ] = False,
 ) -> None:
-    """Search conversations by keywords with BM25 relevance ranking.
+    """[bold]Search conversations[/bold] by keywords with BM25 relevance ranking.
 
-    Filter Logic:
+    [bold]Filter Logic:[/bold]
         Stage 1 (Content Matching - OR): Phrases OR Keywords
-          - --phrase: Match ANY phrase (exact, case-insensitive)
-          - --keywords: Match according to --match-mode
-            * --match-mode any (default): Match ANY keyword
-            * --match-mode all: Match ALL keywords
+          - [cyan]--phrase[/cyan]: Match ANY phrase (exact, case-insensitive)
+          - [cyan]--keywords[/cyan]: Match according to [cyan]--match-mode[/cyan]
+            * [cyan]--match-mode any[/cyan] (default): Match ANY keyword
+            * [cyan]--match-mode all[/cyan]: Match ALL keywords
 
         Stage 2 (Post-Filtering - AND): All must match
-          - --exclude: Remove if ANY excluded term found
-          - --role: Only search specified role's messages
-          - --title: Only include matching titles
-          - --from-date/--to-date: Date range filter
+          - [cyan]--exclude[/cyan]: Remove if ANY excluded term found
+          - [cyan]--role[/cyan]: Only search specified role's messages
+          - [cyan]--title[/cyan]: Only include matching titles
+          - [cyan]--from-date[/cyan]/[cyan]--to-date[/cyan]: Date range filter
 
-    Examples:
-        # Phrase OR keyword
-        echomine search export.json --phrase "api" -k python
+    [bold]Examples:[/bold]
+        [dim]# Phrase OR keyword[/dim]
+        $ [green]echomine search[/green] export.json [cyan]--phrase[/cyan] "api" [cyan]-k[/cyan] python
 
-        # Multiple keywords (ALL required)
-        echomine search export.json -k python -k async --match-mode all
+        [dim]# Multiple keywords (ALL required)[/dim]
+        $ [green]echomine search[/green] export.json [cyan]-k[/cyan] python [cyan]-k[/cyan] async [cyan]--match-mode[/cyan] all
 
-        # Content matching + exclusion
-        echomine search export.json --phrase "api" -k python --exclude java
+        [dim]# Content matching + exclusion[/dim]
+        $ [green]echomine search[/green] export.json [cyan]--phrase[/cyan] "api" [cyan]-k[/cyan] python [cyan]--exclude[/cyan] java
 
-        # Role-specific search
-        echomine search export.json -k python --role user
+        [dim]# Role-specific search[/dim]
+        $ [green]echomine search[/green] export.json [cyan]-k[/cyan] python [cyan]--role[/cyan] user
 
-        # Complex combination
-        echomine search export.json --phrase "tutorial" -k python --title "Guide" --exclude test
+        [dim]# Complex combination[/dim]
+        $ [green]echomine search[/green] export.json [cyan]--phrase[/cyan] "tutorial" [cyan]-k[/cyan] python [cyan]-t[/cyan] "Guide" [cyan]--exclude[/cyan] test
 
-        # Date range
-        echomine search export.json -k python --from-date 2024-01-01 --to-date 2024-12-31
+        [dim]# Date range[/dim]
+        $ [green]echomine search[/green] export.json [cyan]-k[/cyan] python [cyan]--from-date[/cyan] 2024-01-01 [cyan]--to-date[/cyan] 2024-12-31
 
-        # JSON output
-        echomine search export.json -k python --format json
+        [dim]# JSON output[/dim]
+        $ [green]echomine search[/green] export.json [cyan]-k[/cyan] python [cyan]--format[/cyan] json
 
-    Args:
-        file_path: Path to OpenAI export JSON file
-        keywords: Keywords for full-text search
-        phrase: Exact phrases to match
-        match_mode: Keyword matching mode ('any' or 'all')
-        exclude: Keywords to exclude
-        role: Filter by message role
-        title: Partial title match filter
-        from_date: Start date filter (inclusive)
-        to_date: End date filter (inclusive)
-        limit: Maximum results to return
-        format: Output format ('text' or 'json')
-        quiet: Suppress progress indicators
-        json: Output in JSON format (alias for --format json)
-
-    Exit Codes:
-        0: Success (including zero results)
-        1: File not found, permission denied, parse error
-        2: Invalid arguments
+    [bold]Exit Codes:[/bold]
+        [green]0[/green]: Success (including zero results)
+        [red]1[/red]: File not found, permission denied, parse error
+        [yellow]2[/yellow]: Invalid arguments
         130: User interrupt (Ctrl+C)
-
-    Requirements:
-        - FR-291-292: stdout for results, stderr for progress/errors
-        - FR-296-299: Exit codes 0/1/2/130
-        - FR-301-306: JSON output schema
-        - FR-310: --quiet flag suppresses progress
-        - CHK031: stdout/stderr separation
-        - CHK032: Proper exit codes
     """
     try:
         # Validate format option
@@ -288,9 +309,18 @@ def search_conversations(
         if json:
             format_lower = "json"
 
-        if format_lower not in ("text", "json"):
+        # Validate mutual exclusion of --format csv and --csv-messages (FR-051a)
+        if format_lower == "csv" and csv_messages:
             typer.echo(
-                f"Error: Invalid format '{format}'. Must be 'text' or 'json'.",
+                "Error: --format csv and --csv-messages are mutually exclusive. "
+                "Use --format csv for conversation-level or --csv-messages for message-level export.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+
+        if format_lower not in ("text", "json", "csv"):
+            typer.echo(
+                f"Error: Invalid format '{format}'. Must be 'text', 'json', or 'csv'.",
                 err=True,
             )
             raise typer.Exit(code=1)
@@ -329,6 +359,24 @@ def search_conversations(
         if limit is not None and limit <= 0:
             typer.echo(
                 f"Error: --limit must be positive, got {limit}",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+
+        # Validate sort option (FR-043)
+        sort_lower = sort.lower()
+        if sort_lower not in ("score", "date", "title", "messages"):
+            typer.echo(
+                f"Error: Invalid --sort '{sort}'. Must be 'score', 'date', 'title', or 'messages'.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+
+        # Validate order option (FR-044)
+        order_lower = order.lower()
+        if order_lower not in ("asc", "desc"):
+            typer.echo(
+                f"Error: Invalid --order '{order}'. Must be 'asc' or 'desc'.",
                 err=True,
             )
             raise typer.Exit(code=2)
@@ -397,9 +445,30 @@ def search_conversations(
                 title_filter=title,
                 from_date=parsed_from_date,
                 to_date=parsed_to_date,
+                min_messages=min_messages,  # v1.2.0: Message count filtering (T033)
+                max_messages=max_messages,  # v1.2.0: Message count filtering (T034)
                 limit=query_limit,
+                sort_by=cast(Literal["score", "date", "title", "messages"], sort_lower),  # FR-043
+                sort_order=cast(Literal["asc", "desc"], order_lower),  # FR-044
             )
         except PydanticValidationError as e:
+            # T035: Handle invalid bounds (min > max) with proper error message
+            # Extract validation error message for user-friendly output
+            error_msg = str(e)
+            # Check if it's the min/max validation error
+            if "min_messages" in error_msg and "max_messages" in error_msg:
+                # Extract the specific validation error message
+                # Pydantic v2 error format includes the message in errors
+                if hasattr(e, "errors"):
+                    errors = e.errors()
+                    for error in errors:
+                        if error.get("type") == "value_error":
+                            typer.echo(
+                                f"Error: {error['msg']}",
+                                err=True,
+                            )
+                            raise typer.Exit(code=2)
+            # Fallback for other validation errors
             typer.echo(
                 f"Error: Invalid search parameters: {e}",
                 err=True,
@@ -456,7 +525,17 @@ def search_conversations(
             typer.echo("", err=True)  # Blank line for readability
 
         # Format output based on requested format
-        if format_lower == "json":
+        if csv_messages:
+            # Message-level CSV output (FR-051, FR-052)
+            exporter = CSVExporter()
+            output = exporter.export_messages_from_results(results)
+            typer.echo(output, nl=False)
+        elif format_lower == "csv":
+            # Conversation-level CSV output with scores (FR-049, FR-050)
+            exporter = CSVExporter()
+            output = exporter.export_search_results(results)
+            typer.echo(output, nl=False)
+        elif format_lower == "json":
             # FR-301-306: Pass metadata to JSON formatter
             # Convert dates to ISO 8601 format for metadata
             query_from_date_str = (
@@ -479,12 +558,21 @@ def search_conversations(
                 skipped_conversations=0,  # TODO: Track skipped conversations in adapter
                 elapsed_seconds=elapsed_seconds,
             )
+            # Write JSON output to stdout (CHK031)
+            typer.echo(output, nl=False)
         else:
-            output = format_search_results(results)
+            # Check if Rich formatting should be used (FR-036, FR-040, FR-041)
+            use_rich = is_rich_enabled(json_flag=False)
 
-        # Write output to stdout (CHK031)
-        # Use nl=False to avoid extra newline (formatters include trailing newline)
-        typer.echo(output, nl=False)
+            if use_rich:
+                # Rich table output with colored scores (FR-036, FR-037)
+                table = create_rich_search_table(results)
+                console = Console()
+                console.print(table)
+            else:
+                # Plain text table output (default for pipes/redirects)
+                output = format_search_results(results)
+                typer.echo(output, nl=False)
 
         # Return normally for success (exit code 0)
         return
@@ -498,9 +586,9 @@ def search_conversations(
         raise typer.Exit(code=1)
 
     except PermissionError:
-        # Permission denied when trying to read file
+        # Permission denied when trying to read file (FR-061)
         typer.echo(
-            f"Error: Permission denied: {file_path}",
+            f"Error: Permission denied: {file_path}. Check file read permissions.",
             err=True,
         )
         raise typer.Exit(code=1)

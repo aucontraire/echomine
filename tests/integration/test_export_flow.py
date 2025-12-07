@@ -239,14 +239,16 @@ class TestExportIntegrationFlow:
 
         content = output_file.read_text(encoding="utf-8")
         assert len(content) > 0, "Output file should not be empty"
-        assert "Python Async Programming" in content, (
-            "Title SHOULD be in metadata header (FR-014 requirement)"
+        assert "title: Python Async Programming" in content, (
+            "Title should be in YAML frontmatter (FR-030 YAML format)"
         )
-        assert "Created:" in content, "Should include created timestamp in metadata"
-        assert "Messages:" in content, "Should include message count in metadata"
+        assert "created_at:" in content, "Should include created_at in YAML frontmatter"
+        assert "message_count:" in content, "Should include message_count in YAML frontmatter"
         assert "async/await" in content, "Should contain conversation content"
         assert "##" in content, "Should have markdown headers"
-        assert "👤" in content or "🤖" in content, "Should have emoji headers"
+        assert "## User" in content or "## Assistant" in content, (
+            "Should have User/Assistant role headers"
+        )
 
     def test_export_conversation_by_title_to_file(
         self, integration_export_file: Path, tmp_path: Path

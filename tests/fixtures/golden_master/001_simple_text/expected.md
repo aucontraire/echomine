@@ -1,12 +1,16 @@
-# Indigenous DNA in Mexico
-
-Created: 2025-10-15T04:37:47+00:00
-Updated: 2025-10-15T04:38:09+00:00
-Messages: 3 messages
-
+---
+id: 68ef24dd-7008-832c-bd68-1bb462dd87bc
+title: Indigenous DNA in Mexico
+created_at: 2025-10-15T04:37:47Z
+updated_at: 2025-10-15T04:38:09Z
+message_count: 3
+export_date: 2025-12-07T13:41:19Z
+exported_by: echomine
 ---
 
-## 👤 User · 2025-10-15T04:37:46+00:00
+# Indigenous DNA in Mexico
+
+## User (`be564d31-08a7-4666-b311-ecd021124464`) - 2025-10-15T04:37:46+00:00
 
 ME:
 
@@ -137,13 +141,13 @@ Would you like any sources or quotes from her on this point, or a comparison to 
 
 ---
 
-## 🤖 Assistant · 2025-10-15T04:37:47+00:00
+## Assistant (`62d4637b-cff3-4a2a-a56a-a206f9f88726`) - 2025-10-15T04:37:47+00:00
 
 
 
 ---
 
-## 🤖 Assistant · 2025-10-15T04:37:47+00:00
+## Assistant (`f7df9d33-b98c-47ca-964a-2b1bdb9808f3`) - 2025-10-15T04:37:47+00:00
 
 Absolutely — I can provide both **primary quotes from Roxanne Dunbar-Ortiz** and a **comparison to U.S. immigration politics today** that highlights how anti-Indigenous ideology manifests in anti-Mexican racism.
 

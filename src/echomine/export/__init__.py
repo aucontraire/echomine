@@ -10,7 +10,8 @@ Constitution Compliance:
 
 from __future__ import annotations
 
+from echomine.export.csv import CSVExporter
 from echomine.export.markdown import MarkdownExporter
 
 
-__all__ = ["MarkdownExporter"]
+__all__ = ["CSVExporter", "MarkdownExporter"]

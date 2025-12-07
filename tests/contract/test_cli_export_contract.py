@@ -658,11 +658,10 @@ class TestCLIExportCommandContract:
         # Read markdown content
         markdown = output_file.read_text(encoding="utf-8")
 
-        # Assert: Headers with emoji (## 👤 User · [timestamp])
+        # Assert: Headers with role names (## User (`msg-id`) - [timestamp])
         assert "##" in markdown, "Should have markdown headers"
-        assert "👤" in markdown or "🤖" in markdown, "Should have emoji in headers"
-        assert "User" in markdown, "Should have 'User' role in headers"
-        assert "Assistant" in markdown, "Should have 'Assistant' role in headers"
+        assert "## User" in markdown, "Should have 'User' role in headers"
+        assert "## Assistant" in markdown, "Should have 'Assistant' role in headers"
 
         # Assert: ISO 8601 timestamps
         assert "T" in markdown, "Should have ISO 8601 timestamps (contains 'T')"
@@ -728,10 +727,10 @@ class TestCLIExportCommandContract:
         # Split markdown into lines for analysis
         lines = markdown.split("\n")
 
-        # Find first message header (messages start with ## 👤 User or ## 🤖 Assistant)
+        # Find first message header (messages start with ## User or ## Assistant)
         first_message_line_idx = None
         for i, line in enumerate(lines):
-            if ("👤" in line or "🤖" in line) and line.startswith("##"):
+            if line.startswith("## User") or line.startswith("## Assistant"):
                 first_message_line_idx = i
                 break
 
@@ -741,65 +740,56 @@ class TestCLIExportCommandContract:
         metadata_section = "\n".join(lines[:first_message_line_idx])
 
         # =====================================================================
-        # FR-014 REQUIREMENT 1: Title in Metadata
+        # FR-014 REQUIREMENT 1: Title in YAML Frontmatter
         # =====================================================================
 
         expected_title = "Python AsyncIO Tutorial"
 
-        assert expected_title in metadata_section, (
+        assert f"title: {expected_title}" in metadata_section, (
             f"FR-014 VIOLATION: Conversation title '{expected_title}' MUST appear "
-            f"in metadata header BEFORE messages. "
-            f"Title not found in metadata section:\n{metadata_section[:300]}\n\n"
+            f"in YAML frontmatter BEFORE messages. "
+            f"Title not found in YAML frontmatter:\n{metadata_section[:300]}\n\n"
             f"This is US3-AS3 acceptance scenario requirement."
         )
 
         # =====================================================================
-        # FR-014 REQUIREMENT 2: Created Date in Metadata
+        # FR-014 REQUIREMENT 2: Created Date in YAML Frontmatter
         # =====================================================================
 
-        # Look for date markers (ISO 8601 format or "Created:" label)
-        has_created_date = any(
-            date_marker in metadata_section
-            for date_marker in ["2024-", "Created:", "Created At:", "Date:"]
-        )
+        # Look for created_at field in YAML (ISO 8601 format)
+        has_created_date = "created_at:" in metadata_section and "2024-" in metadata_section
 
         assert has_created_date, (
-            f"FR-014 VIOLATION: Created date MUST appear in metadata header. "
-            f"Date markers not found in metadata section:\n{metadata_section[:300]}\n\n"
+            f"FR-014 VIOLATION: Created date MUST appear in YAML frontmatter as 'created_at:'. "
+            f"Date field not found in YAML frontmatter:\n{metadata_section[:300]}\n\n"
             f"This is US3-AS3 acceptance scenario requirement."
         )
 
         # =====================================================================
-        # FR-014 REQUIREMENT 3: Message Count in Metadata
+        # FR-014 REQUIREMENT 3: Message Count in YAML Frontmatter
         # =====================================================================
 
-        # The fixture has 2 messages, look for message count indicator
-        has_message_count = any(
-            count_marker in metadata_section
-            for count_marker in ["2 message", "Messages:", "Message Count:", "Count:"]
-        )
+        # The fixture has 2 messages, look for message_count in YAML
+        has_message_count = "message_count: 2" in metadata_section
 
         assert has_message_count, (
-            f"FR-014 VIOLATION: Message count MUST appear in metadata header. "
-            f"Count indicators not found in metadata section:\n{metadata_section[:300]}\n\n"
+            f"FR-014 VIOLATION: Message count MUST appear in YAML frontmatter as 'message_count: 2'. "
+            f"Count field not found in YAML frontmatter:\n{metadata_section[:300]}\n\n"
             f"This is US3-AS3 acceptance scenario requirement."
         )
 
         # =====================================================================
-        # ADDITIONAL VALIDATION: Metadata Uses Proper Markdown Structure
+        # ADDITIONAL VALIDATION: YAML Frontmatter Structure
         # =====================================================================
 
-        # Metadata should start with a heading or have clear structure
-        assert len(metadata_section.strip()) > 0, "Metadata section should not be empty"
-
-        # Metadata should be visually distinct (heading or labeled fields)
-        has_markdown_structure = (
-            metadata_section.startswith("#") or ":" in metadata_section or "-" in metadata_section
+        # Metadata should start with YAML frontmatter delimiter
+        assert metadata_section.startswith("---"), (
+            "Metadata should start with YAML frontmatter (---)"
         )
 
-        assert has_markdown_structure, (
-            f"Metadata should use proper markdown structure (headings, lists, or labels). "
-            f"Got:\n{metadata_section[:200]}"
+        # YAML frontmatter should have closing delimiter
+        assert metadata_section.count("---") >= 2, (
+            "YAML frontmatter should have opening and closing --- delimiters"
         )
 
     def test_export_command_preserves_message_order(
@@ -879,15 +869,16 @@ class TestCLIExportCommandContract:
         assert "2024-03" in markdown, "Should contain timestamp with year-month"
         assert "T" in markdown, "Should use ISO 8601 format (contains 'T' separator)"
 
-    def test_export_command_includes_emoji_headers(
+    def test_export_command_includes_message_ids_in_headers(
         self, cli_command: list[str], export_sample_file: Path, tmp_path: Path
     ) -> None:
-        """Test that role headers include emoji.
+        """Test that role headers include message IDs in backticks.
 
         Validates:
-        - User format preference: 👤 for user, 🤖 for assistant
+        - Default format includes message IDs: ## User (`msg-id`) - timestamp
+        - Both User and Assistant headers have this format
 
-        Expected to FAIL: Emoji formatting not implemented.
+        Expected to PASS: Message IDs are included by default in Phase 9.
         """
         output_file = tmp_path / "output.md"
 
@@ -911,11 +902,9 @@ class TestCLIExportCommandContract:
 
         markdown = output_file.read_text(encoding="utf-8")
 
-        # Assert: User emoji
-        assert "👤" in markdown, "Should include 👤 emoji for user messages"
-
-        # Assert: Assistant emoji
-        assert "🤖" in markdown, "Should include 🤖 emoji for assistant messages"
+        # Assert: Message headers include IDs in backticks
+        assert "## User (`" in markdown, "Should include User message ID in backticks"
+        assert "## Assistant (`" in markdown, "Should include Assistant message ID in backticks"
 
     # =========================================================================
     # Edge Cases
