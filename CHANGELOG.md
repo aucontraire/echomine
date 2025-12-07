@@ -25,6 +25,105 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A
 
+## [1.2.0] - 2025-12-07
+
+### Added
+
+#### New Commands
+
+- **Stats Command**: Generate comprehensive conversation statistics
+  - CLI: `echomine stats export.json`
+  - Library: `calculate_statistics(file_path)`
+  - Displays total conversations, messages, date ranges, word counts, and author analysis
+  - Rich terminal output with formatted tables and statistics panels
+  - JSON output support via `--json` flag
+
+- **Get Command**: Retrieve and display individual conversations by ID
+  - CLI: `echomine get export.json <conversation-id>`
+  - Library: Already available via `OpenAIAdapter.stream_conversations()`
+  - Rich terminal output with syntax highlighting
+  - Multiple output formats: full, summary, messages-only via `--display` flag
+  - JSON output support via `--json` flag
+
+#### Export Enhancements
+
+- **CSV Export**: Export conversations to CSV format
+  - CLI: `echomine export export.json --format csv --output output.csv`
+  - Library: `CSVExporter().export_conversation()`
+  - Customizable field selection via `--fields` flag
+  - Supports all conversation and message fields
+  - Configurable delimiter and quoting options
+
+- **YAML Frontmatter**: Markdown exports now include YAML frontmatter
+  - Automatically includes: title, created date, updated date, message count, participants
+  - Configurable metadata fields
+  - Compatible with static site generators and markdown processors
+
+#### Rich CLI Formatting
+
+- **Color-Coded Output**: All commands use Rich library for enhanced terminal display
+  - Syntax highlighting for code blocks and conversation content
+  - Color-coded message roles (user, assistant, system)
+  - Formatted tables with automatic column sizing
+  - Progress bars for long-running operations
+
+- **Enhanced List Output**: Improved conversation list display
+  - Sortable columns: created, updated, messages, title
+  - Compact and expanded view modes
+  - Better date formatting and message count display
+
+- **Enhanced Search Output**: Improved search results display
+  - Highlighted matching snippets
+  - Relevance score visualization
+  - Sortable results with multiple criteria
+
+#### New Data Models
+
+- **Statistics Models**: New Pydantic models for statistics data
+  - `ExportStatistics`: Overall export statistics
+  - `ConversationStatistics`: Per-conversation statistics
+  - `ConversationSummary`: Summary information
+  - `RoleCount`: Message count by author role
+  - `ExportMetadata`: Export file metadata
+
+#### Library API Enhancements
+
+- **Statistics Functions**: New public API for statistics calculation
+  - `calculate_statistics()`: Calculate export-level statistics
+  - `calculate_conversation_statistics()`: Calculate per-conversation statistics
+  - Streaming-based with O(1) memory usage
+  - Full type safety with Pydantic models
+
+### Changed
+
+- CLI exception handling now uses Rich error formatting for better readability
+- Golden master tests updated with YAML frontmatter in expected outputs
+- Export date formatting normalized across all output formats
+- List command default output now uses Rich tables instead of plain text
+
+### Fixed
+
+- Fixed 4 golden master tests by adding date normalization helper
+- Fixed failing CLI exception test to accept Rich error formatting
+- Fixed ruff linting issues (unused imports, else-if patterns)
+- Fixed edge cases in validation error handling paths
+
+### Documentation
+
+- Complete specification: `specs/003-baseline-enhancements/spec.md`
+- Implementation plan: `specs/003-baseline-enhancements/plan.md`
+- Task breakdown: `specs/003-baseline-enhancements/tasks.md`
+- Library API contracts: `specs/003-baseline-enhancements/contracts/library_api.md`
+- CLI contracts: `specs/003-baseline-enhancements/contracts/cli_spec.md`
+- Quickstart guide: `specs/003-baseline-enhancements/quickstart.md`
+
+### Quality Metrics
+
+- Test coverage: 91.72% (1136 passed, 7 skipped, 0 failed)
+- mypy --strict: 0 errors
+- ruff check: All passed
+- Added 40+ new tests for Rich formatting and validation error paths
+
 ## [1.1.0] - 2025-12-04
 
 ### Added
@@ -163,7 +262,8 @@ Each release includes:
 
 ---
 
-[Unreleased]: https://github.com/aucontraire/echomine/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/aucontraire/echomine/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/aucontraire/echomine/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/aucontraire/echomine/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/aucontraire/echomine/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/aucontraire/echomine/compare/v1.0.0...v1.0.1

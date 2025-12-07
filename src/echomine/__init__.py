@@ -54,7 +54,7 @@ License:
     AGPL-3.0 License - See LICENSE file for details
 """
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __author__ = "Echomine Contributors"
 
 # Public API imports (T061-T062)
