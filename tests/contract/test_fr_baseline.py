@@ -1011,7 +1011,8 @@ class TestFR043SearchSortOptions:
         runner = CliRunner()
 
         # Check help text includes --sort flag
-        result = runner.invoke(app, ["search", "--help"])
+        # Use wide terminal (COLUMNS=200) to prevent Rich truncation in CI
+        result = runner.invoke(app, ["search", "--help"], env={"COLUMNS": "200"})
 
         assert result.exit_code == 0, f"search --help should succeed (FR-043): {result.stdout}"
         assert "--sort" in result.stdout.lower(), (
@@ -1027,7 +1028,8 @@ class TestFR043SearchSortOptions:
         runner = CliRunner()
 
         # Check help text includes --order flag
-        result = runner.invoke(app, ["search", "--help"])
+        # Use wide terminal (COLUMNS=200) to prevent Rich truncation in CI
+        result = runner.invoke(app, ["search", "--help"], env={"COLUMNS": "200"})
 
         assert result.exit_code == 0, f"search --help should succeed (FR-044): {result.stdout}"
         assert "--order" in result.stdout.lower(), (

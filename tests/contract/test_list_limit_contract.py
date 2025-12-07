@@ -419,13 +419,14 @@ class TestListLimitFlagContract:
         Expected to FAIL: --limit flag not in help text.
         """
         # Act: Run 'echomine list --help'
+        # Use wide terminal (COLUMNS=200) to prevent Rich truncation in CI
         result = subprocess.run(
             [*cli_command, "list", "--help"],
             check=False,
             capture_output=True,
             text=True,
             encoding="utf-8",
-            env={**os.environ, "PYTHONUTF8": "1"},
+            env={**os.environ, "PYTHONUTF8": "1", "COLUMNS": "200"},
         )
 
         # Assert: Exit code 0
