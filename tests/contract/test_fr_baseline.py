@@ -1010,6 +1010,8 @@ class TestFR043SearchSortOptions:
         # Monkey-patch Rich Console to prevent vertical truncation in CI
         # Rich's Console auto-detects terminal size and crops help text if height is small
         # We force a large height to ensure all options are displayed
+        import re
+
         import rich.console
         from typer.testing import CliRunner
 
@@ -1018,10 +1020,11 @@ class TestFR043SearchSortOptions:
         original_console_init = rich.console.Console.__init__
 
         def patched_console_init(self, *args, **kwargs):
-            # Force terminal height to prevent truncation
-            kwargs.setdefault("height", 1000)
+            # Force terminal dimensions to prevent truncation (override any existing values)
+            kwargs["height"] = 1000  # Use assignment, not setdefault
+            kwargs["width"] = 200
             # Ensure Rich treats this as a terminal (not a pipe)
-            kwargs.setdefault("force_terminal", True)
+            kwargs["force_terminal"] = True
             original_console_init(self, *args, **kwargs)
 
         monkeypatch.setattr(rich.console.Console, "__init__", patched_console_init)
@@ -1029,16 +1032,21 @@ class TestFR043SearchSortOptions:
         runner = CliRunner()
 
         # Check help text includes --sort flag
-        # terminal_width only sets horizontal width, not height
         result = runner.invoke(
             app,
             ["search", "--help"],
-            terminal_width=200,
         )
 
         assert result.exit_code == 0, f"search --help should succeed (FR-043): {result.stdout}"
-        assert "--sort" in result.stdout.lower(), (
-            f"search command should have --sort flag (FR-043): {result.stdout}"
+
+        # Strip ANSI escape codes before searching
+        # Rich formats each character separately (e.g., \x1b[1m-\x1b[0m\x1b[1m-sort\x1b[0m)
+        # So we must remove ANSI codes to find literal strings
+        ansi_escape = re.compile(r"\x1b\[[0-9;]*m")
+        clean_output = ansi_escape.sub("", result.stdout)
+
+        assert "--sort" in clean_output.lower(), (
+            f"search command should have --sort flag (FR-043): {clean_output}"
         )
 
     def test_fr044_cli_search_accepts_order_flag(self, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -1046,6 +1054,8 @@ class TestFR043SearchSortOptions:
         # Monkey-patch Rich Console to prevent vertical truncation in CI
         # Rich's Console auto-detects terminal size and crops help text if height is small
         # We force a large height to ensure all options are displayed
+        import re
+
         import rich.console
         from typer.testing import CliRunner
 
@@ -1054,10 +1064,11 @@ class TestFR043SearchSortOptions:
         original_console_init = rich.console.Console.__init__
 
         def patched_console_init(self, *args, **kwargs):
-            # Force terminal height to prevent truncation
-            kwargs.setdefault("height", 1000)
+            # Force terminal dimensions to prevent truncation (override any existing values)
+            kwargs["height"] = 1000  # Use assignment, not setdefault
+            kwargs["width"] = 200
             # Ensure Rich treats this as a terminal (not a pipe)
-            kwargs.setdefault("force_terminal", True)
+            kwargs["force_terminal"] = True
             original_console_init(self, *args, **kwargs)
 
         monkeypatch.setattr(rich.console.Console, "__init__", patched_console_init)
@@ -1065,14 +1076,19 @@ class TestFR043SearchSortOptions:
         runner = CliRunner()
 
         # Check help text includes --order flag
-        # terminal_width only sets horizontal width, not height
         result = runner.invoke(
             app,
             ["search", "--help"],
-            terminal_width=200,
         )
 
         assert result.exit_code == 0, f"search --help should succeed (FR-044): {result.stdout}"
-        assert "--order" in result.stdout.lower(), (
-            f"search command should have --order flag (FR-044): {result.stdout}"
+
+        # Strip ANSI escape codes before searching
+        # Rich formats each character separately (e.g., \x1b[1m-\x1b[0m\x1b[1m-order\x1b[0m)
+        # So we must remove ANSI codes to find literal strings
+        ansi_escape = re.compile(r"\x1b\[[0-9;]*m")
+        clean_output = ansi_escape.sub("", result.stdout)
+
+        assert "--order" in clean_output.lower(), (
+            f"search command should have --order flag (FR-044): {clean_output}"
         )
