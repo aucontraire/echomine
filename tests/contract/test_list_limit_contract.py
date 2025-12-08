@@ -420,13 +420,22 @@ class TestListLimitFlagContract:
         """
         # Act: Run 'echomine list --help'
         # Use wide terminal (COLUMNS=200) to prevent Rich truncation in CI
+        # Rich console respects COLUMNS environment variable for width
+        env = os.environ.copy()
+        env.update(
+            {
+                "PYTHONUTF8": "1",
+                "COLUMNS": "200",
+            }
+        )
+
         result = subprocess.run(
             [*cli_command, "list", "--help"],
             check=False,
             capture_output=True,
             text=True,
             encoding="utf-8",
-            env={**os.environ, "PYTHONUTF8": "1", "COLUMNS": "200"},
+            env=env,
         )
 
         # Assert: Exit code 0
