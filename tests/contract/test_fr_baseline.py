@@ -1014,9 +1014,15 @@ class TestFR043SearchSortOptions:
         runner = CliRunner()
 
         # Check help text includes --sort flag
-        # Use wide terminal width to prevent Rich truncation in CI
-        # terminal_width parameter is passed to Click's Context, not COLUMNS env var
-        result = runner.invoke(app, ["search", "--help"], terminal_width=200)
+        # Use wide terminal dimensions to prevent Rich truncation in CI
+        # COLUMNS controls horizontal width, LINES controls vertical height
+        # Rich truncates options list vertically if terminal height is too small
+        result = runner.invoke(
+            app,
+            ["search", "--help"],
+            env={"COLUMNS": "200", "LINES": "1000"},
+            terminal_width=200,
+        )
 
         assert result.exit_code == 0, f"search --help should succeed (FR-043): {result.stdout}"
         assert "--sort" in result.stdout.lower(), (
@@ -1032,9 +1038,15 @@ class TestFR043SearchSortOptions:
         runner = CliRunner()
 
         # Check help text includes --order flag
-        # Use wide terminal width to prevent Rich truncation in CI
-        # terminal_width parameter is passed to Click's Context, not COLUMNS env var
-        result = runner.invoke(app, ["search", "--help"], terminal_width=200)
+        # Use wide terminal dimensions to prevent Rich truncation in CI
+        # COLUMNS controls horizontal width, LINES controls vertical height
+        # Rich truncates options list vertically if terminal height is too small
+        result = runner.invoke(
+            app,
+            ["search", "--help"],
+            env={"COLUMNS": "200", "LINES": "1000"},
+            terminal_width=200,
+        )
 
         assert result.exit_code == 0, f"search --help should succeed (FR-044): {result.stdout}"
         assert "--order" in result.stdout.lower(), (

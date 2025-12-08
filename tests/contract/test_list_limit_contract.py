@@ -419,13 +419,15 @@ class TestListLimitFlagContract:
         Expected to FAIL: --limit flag not in help text.
         """
         # Act: Run 'echomine list --help'
-        # Use wide terminal (COLUMNS=200) to prevent Rich truncation in CI
-        # Rich console respects COLUMNS environment variable for width
+        # Use wide terminal dimensions to prevent Rich truncation in CI
+        # COLUMNS controls horizontal width, LINES controls vertical height
+        # Rich truncates options list vertically if terminal height is too small
         env = os.environ.copy()
         env.update(
             {
                 "PYTHONUTF8": "1",
                 "COLUMNS": "200",
+                "LINES": "1000",
             }
         )
 
