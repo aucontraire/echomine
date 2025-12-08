@@ -1019,24 +1019,24 @@ class TestUS3AS1ExportByTitleOutputValidation:
         lines = markdown.split("\n")
         first_message_idx = None
         for i, line in enumerate(lines):
-            if ("👤" in line or "🤖" in line) and line.startswith("##"):
+            if line.startswith("## User") or line.startswith("## Assistant"):
                 first_message_idx = i
                 break
 
         assert first_message_idx is not None, "Should have message headers"
 
-        # Extract metadata section (before first message)
+        # Extract YAML frontmatter section (before first message)
         metadata_section = "\n".join(lines[:first_message_idx])
 
-        # Validate metadata fields
-        assert "Python AsyncIO Tutorial" in metadata_section, (
-            "Metadata should include conversation title"
+        # Validate YAML frontmatter fields
+        assert "title: Python AsyncIO Tutorial" in metadata_section, (
+            "YAML frontmatter should include conversation title"
         )
-        assert any(marker in metadata_section for marker in ["2024-", "Created:", "Date:"]), (
-            "Metadata should include created date"
+        assert "created_at:" in metadata_section and "2024-" in metadata_section, (
+            "YAML frontmatter should include created_at field with ISO 8601 date"
         )
-        assert any(marker in metadata_section for marker in ["2 message", "Messages:", "Count:"]), (
-            "Metadata should include message count"
+        assert "message_count: 2" in metadata_section, (
+            "YAML frontmatter should include message_count field"
         )
 
     def test_export_by_title_stderr_shows_matched_title(
@@ -1157,6 +1157,8 @@ class TestUS3AS1ExportByTitleWorkflow:
 
         # Validate: Markdown format compliance
         assert "##" in markdown, "Should have markdown headers"
-        assert "👤" in markdown or "🤖" in markdown, "Should have emoji role indicators"
+        assert "## User" in markdown or "## Assistant" in markdown, (
+            "Should have User/Assistant role headers"
+        )
 
         # SUCCESS: US3-AS1 acceptance scenario PASSES

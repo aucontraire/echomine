@@ -1,30 +1,34 @@
-# Gmail API Management in Java
-
-Created: 2024-12-05T18:06:29+00:00
-Updated: 2024-12-05T20:29:31+00:00
-Messages: 8 messages
-
+---
+id: 6751eba5-2428-8005-ac4d-63619dbfb902
+title: Gmail API Management in Java
+created_at: 2024-12-05T18:06:29Z
+updated_at: 2024-12-05T20:29:31Z
+message_count: 8
+export_date: 2025-12-07T13:41:19Z
+exported_by: echomine
 ---
 
-## 👤 User · 2024-12-05T18:06:29+00:00
+# Gmail API Management in Java
+
+## User (`aaa205b2-64fd-468c-815c-246741985c42`) - 2024-12-05T18:06:29+00:00
 
 I want to build an app in Java that will help me manage my Gmail. Gmail's features are limited in creating a complex searching and bulk deleting of messages.
 
 ---
 
-## 🤖 Assistant · 2024-12-05T18:06:47+00:00
+## Assistant (`b5bd1f62-840a-435d-a79e-d0238a2ad8cf`) - 2024-12-05T18:06:47+00:00
 
 
 
 ---
 
-## 🤖 Assistant · 2024-12-05T18:06:47+00:00
+## Assistant (`bdc33ba8-bdf1-4388-957a-c83df732507e`) - 2024-12-05T18:06:47+00:00
 
 search("I want to build an app in Java that will help me manage my Gmail. Gmail's features are limited in creating a complex searching and bulk deleting of messages.")
 
 ---
 
-## 🤖 Assistant · 2024-12-05T18:06:47+00:00
+## Assistant (`6a557a21-cadc-4871-b8b7-8265d0645042`) - 2024-12-05T18:06:47+00:00
 
 To enhance your Gmail management capabilities, you can develop a Java application that leverages the Gmail API for advanced searching and bulk deletion of emails. Here's a structured approach to achieve this:
 
@@ -102,14 +106,14 @@ search("I want to build an app in Java that will help me manage my Gmail. Gmail'
 
 ---
 
-## 👤 User · 2024-12-05T20:17:53+00:00
+## User (`aaa27b98-4916-4cf7-ace3-0d01fcac687a`) - 2024-12-05T20:17:53+00:00
 
 I'm interested in how this is done:
 3. Implement OAuth 2.0 Authorization:
 
 ---
 
-## 🤖 Assistant · 2024-12-05T20:19:00+00:00
+## Assistant (`13153e93-ed94-4381-90e8-fcd6c66689a6`) - 2024-12-05T20:19:00+00:00
 
 Implementing OAuth 2.0 authorization in a Java application involves several steps to allow your app to access the Gmail API on behalf of a user. Here’s how to set it up:
 
@@ -262,13 +266,13 @@ By following this setup, you’ll have a fully functional OAuth 2.0 implementati
 
 ---
 
-## 👤 User · 2024-12-05T20:25:18+00:00
+## User (`aaa21630-5f3f-4d5d-80c6-8faf7e8fe0cf`) - 2024-12-05T20:25:18+00:00
 
 What dependencies should I add to the Spring Initializr?
 
 ---
 
-## 🤖 Assistant · 2024-12-05T20:26:00+00:00
+## Assistant (`8de74db8-2048-49c7-bfdc-40963bac9940`) - 2024-12-05T20:26:00+00:00
 
 When setting up a **Spring Boot application** for your Gmail management app using **Spring Initializr**, you’ll need the following dependencies to handle Gmail API interactions and OAuth 2.0 authorization effectively.
 

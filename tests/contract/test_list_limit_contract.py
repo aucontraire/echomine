@@ -409,7 +409,7 @@ class TestListLimitFlagContract:
         stderr = result.stderr
         assert len(stderr) > 0, "Error message should be on stderr"
 
-    def test_limit_flag_mentioned_in_help_text(self, cli_command: list[str]) -> None:
+    def test_limit_flag_mentioned_in_help_text(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Test that --limit flag is documented in help text.
 
         Validates:
@@ -418,27 +418,49 @@ class TestListLimitFlagContract:
 
         Expected to FAIL: --limit flag not in help text.
         """
+        # Monkey-patch Rich Console to prevent vertical truncation in CI
+        # Rich's Console auto-detects terminal size and crops help text if height is small
+        # We force a large height to ensure all options are displayed
+        import re
+
+        import rich.console
+        from typer.testing import CliRunner
+
+        from echomine.cli.app import app
+
+        original_console_init = rich.console.Console.__init__
+
+        def patched_console_init(self, *args, **kwargs):
+            # Force terminal dimensions to prevent truncation (override any existing values)
+            kwargs["height"] = 1000  # Use assignment, not setdefault
+            kwargs["width"] = 200
+            # Ensure Rich treats this as a terminal (not a pipe)
+            kwargs["force_terminal"] = True
+            original_console_init(self, *args, **kwargs)
+
+        monkeypatch.setattr(rich.console.Console, "__init__", patched_console_init)
+
+        runner = CliRunner()
+
         # Act: Run 'echomine list --help'
-        result = subprocess.run(
-            [*cli_command, "list", "--help"],
-            check=False,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            env={**os.environ, "PYTHONUTF8": "1"},
-        )
+        result = runner.invoke(app, ["list", "--help"])
 
         # Assert: Exit code 0
-        assert result.returncode == 0, "Help should exit with code 0"
+        assert result.exit_code == 0, "Help should exit with code 0"
+
+        # Strip ANSI escape codes before searching
+        # Rich formats each character separately (e.g., \x1b[1m-\x1b[0m\x1b[1m-limit\x1b[0m)
+        # So we must remove ANSI codes to find literal strings
+        ansi_escape = re.compile(r"\x1b\[[0-9;]*m")
+        clean_output = ansi_escape.sub("", result.stdout)
 
         # Assert: Help text contains --limit flag
-        stdout = result.stdout
-        assert "--limit" in stdout, "Help text should mention --limit flag"
+        assert "--limit" in clean_output, "Help text should mention --limit flag"
 
         # Assert: Help describes what --limit does
         # Should mention "limit" or "restrict" or "top N" or similar
         assert any(
-            keyword in stdout.lower() for keyword in ["restrict", "top", "maximum", "first"]
+            keyword in clean_output.lower() for keyword in ["restrict", "top", "maximum", "first"]
         ), "Help should describe what --limit does"
 
     def test_limit_flag_respects_sort_order_newest_first(

@@ -434,20 +434,94 @@ All post-match filters must be satisfied.
 
 ---
 
-### get
+### stats
 
-Retrieve specific conversation or message by ID with metadata display.
-
-The `get` command has two subcommands for retrieving different types of content.
-
-#### get conversation
-
-Retrieve and display a specific conversation by ID.
+Generate comprehensive statistics for your conversation export.
 
 **Usage:**
 
 ```bash
-echomine get conversation [OPTIONS] FILE_PATH CONVERSATION_ID
+echomine stats [OPTIONS] FILE_PATH
+```
+
+**Arguments:**
+
+- `FILE_PATH`: Path to OpenAI export JSON file (required)
+
+**Options:**
+
+- `--json`: Output as JSON (for programmatic use)
+- `--help`: Show help message
+
+**Examples:**
+
+```bash
+# View export statistics (human-readable)
+echomine stats export.json
+
+# JSON output for scripting
+echomine stats export.json --json | jq '.total_conversations'
+
+# Analyze message distribution
+echomine stats export.json --json | jq '.average_messages'
+```
+
+**Output (Human-Readable):**
+
+```
+Export Statistics
+═══════════════════════════════════════════════
+
+Total Conversations:  1,234
+Total Messages:       45,678
+Date Range:           2024-01-01 to 2024-12-07
+Average Messages:     37.0 per conversation
+
+Largest Conversation:
+  Title:     "Deep Python Discussion"
+  ID:        abc-123
+  Messages:  245
+
+Smallest Conversation:
+  Title:     "Quick Question"
+  ID:        xyz-789
+  Messages:  2
+```
+
+**Output (JSON):**
+
+```json
+{
+  "total_conversations": 1234,
+  "total_messages": 45678,
+  "date_range": {
+    "earliest": "2024-01-01T10:00:00Z",
+    "latest": "2024-12-07T15:30:00Z"
+  },
+  "average_messages": 37.0,
+  "largest_conversation": {
+    "id": "abc-123",
+    "title": "Deep Python Discussion",
+    "message_count": 245
+  },
+  "smallest_conversation": {
+    "id": "xyz-789",
+    "title": "Quick Question",
+    "message_count": 2
+  }
+}
+```
+
+---
+
+### get
+
+Retrieve and display a specific conversation by ID with Rich terminal formatting.
+
+**Usage:**
+
+```bash
+echomine get [OPTIONS] FILE_PATH CONVERSATION_ID
 ```
 
 **Arguments:**
@@ -457,47 +531,68 @@ echomine get conversation [OPTIONS] FILE_PATH CONVERSATION_ID
 
 **Options:**
 
-- `--format TEXT`: Output format: `table` (default) or `json`
-- `--verbose, -v`: Show full message content (table format only)
+- `--display TEXT`: Display mode: `full` (default, shows all messages), `summary` (metadata only), or `messages-only`
+- `--json`: Output as JSON (for programmatic use)
 - `--help`: Show help message
 
 **Examples:**
 
 ```bash
-# Get conversation (human-readable table)
-echomine get conversation export.json conv-abc123
+# Get conversation with full display (default)
+echomine get export.json conv-abc123
 
-# Get conversation with verbose output (show all messages)
-echomine get conversation export.json conv-abc123 --verbose
+# Show summary only (metadata, no messages)
+echomine get export.json conv-abc123 --display summary
+
+# Show messages only (no metadata header)
+echomine get export.json conv-abc123 --display messages-only
 
 # Get conversation as JSON
-echomine get conversation export.json conv-abc123 --format json
+echomine get export.json conv-abc123 --json
 
 # Pipe JSON to jq for processing
-echomine get conversation export.json conv-abc123 -f json | \
+echomine get export.json conv-abc123 --json | \
   jq '.messages[] | select(.role == "user") | .content'
 ```
 
-**Output (Table Format):**
+**Output (Full Display - Default):**
 
 ```
-Conversation Details
+Conversation: Python AsyncIO Tutorial
 ═══════════════════════════════════════════════
+
 ID:          conv-abc123
-Title:       Python AsyncIO Tutorial
 Created:     2023-11-14 22:13:20 UTC
 Updated:     2023-11-14 22:30:00 UTC
-Messages:    2 messages
+Messages:    2
 
-Message Summary:
+Messages:
 ───────────────────────────────────────────────
-Role                 Count
-───────────────────────────────────────────────
-user                     1
-assistant                1
+
+User (2023-11-14 22:13:20 UTC)
+Explain Python asyncio
+
+Assistant (2023-11-14 22:13:45 UTC)
+Python asyncio is a library to write concurrent code...
 ```
 
-**Output (JSON Format):**
+**Output (Summary Display):**
+
+```
+Conversation: Python AsyncIO Tutorial
+═══════════════════════════════════════════════
+
+ID:          conv-abc123
+Created:     2023-11-14 22:13:20 UTC
+Updated:     2023-11-14 22:30:00 UTC
+Messages:    2
+
+Role Breakdown:
+  user:      1 message
+  assistant: 1 message
+```
+
+**Output (JSON):**
 
 ```json
 {
@@ -518,101 +613,11 @@ assistant                1
 }
 ```
 
-#### get message
-
-Retrieve and display a specific message by ID with conversation context.
-
-**Usage:**
-
-```bash
-echomine get message [OPTIONS] FILE_PATH MESSAGE_ID
-```
-
-**Arguments:**
-
-- `FILE_PATH`: Path to OpenAI export JSON file (required)
-- `MESSAGE_ID`: Message ID to retrieve (required)
-
-**Options:**
-
-- `--format TEXT`: Output format: `table` (default) or `json`
-- `--conversation-id, -c TEXT`: Optional conversation ID hint for faster lookup
-- `--verbose, -v`: Show full content and conversation context (table format only)
-- `--help`: Show help message
-
-**Examples:**
-
-```bash
-# Get message (searches all conversations)
-echomine get message export.json msg-abc123
-
-# Get message with conversation hint (faster for large files)
-echomine get message export.json msg-abc123 -c conv-def456
-
-# Get message with verbose output
-echomine get message export.json msg-abc123 --verbose
-
-# Get message as JSON
-echomine get message export.json msg-abc123 --format json
-
-# Pipe JSON to jq for extracting content
-echomine get message export.json msg-abc123 -f json | jq '.message.content'
-```
-
-**Output (Table Format):**
-
-```
-Message Details
-═══════════════════════════════════════════════
-ID:          msg-abc123
-Role:        user
-Timestamp:   2023-11-14 22:13:20 UTC
-Parent ID:   None (root message)
-
-Content:
-───────────────────────────────────────────────
-Explain Python asyncio
-
-Conversation Context:
-───────────────────────────────────────────────
-Conversation ID:    conv-def456
-Title:              Python AsyncIO Tutorial
-Total Messages:     2
-```
-
-**Output (JSON Format):**
-
-```json
-{
-  "message": {
-    "id": "msg-abc123",
-    "role": "user",
-    "content": "Explain Python asyncio",
-    "timestamp": "2023-11-14T22:13:20Z",
-    "parent_id": null
-  },
-  "conversation": {
-    "id": "conv-def456",
-    "title": "Python AsyncIO Tutorial",
-    "created_at": "2023-11-14T22:13:20Z",
-    "updated_at": "2023-11-14T22:30:00Z",
-    "message_count": 2
-  }
-}
-```
-
-**Performance Note:**
-
-When using `get message` without the `--conversation-id` hint, the command searches through all conversations sequentially. For large files with many conversations, providing a conversation ID hint significantly improves performance:
-
-- **With hint**: O(N) where N = conversations until match
-- **Without hint**: O(N*M) where N = conversations, M = messages per conversation
-
 ---
 
 ### export
 
-Export a specific conversation to markdown or JSON format.
+Export a specific conversation to markdown, JSON, or CSV format.
 
 **Usage:**
 
@@ -628,20 +633,32 @@ echomine export [OPTIONS] FILE_PATH CONVERSATION_ID
 **Options:**
 
 - `--output PATH`: Output file path (if not specified, prints to stdout)
-- `--format TEXT`: Export format: `markdown` (default) or `json`
+- `--format TEXT`: Export format: `markdown` (default), `json`, or `csv`
+- `--fields TEXT`: CSV only - comma-separated field names (default: all fields)
+- `--no-metadata`: Markdown only - exclude YAML frontmatter (v1.1.0 compatibility)
 - `--help`: Show help message
 
 **Examples:**
 
 ```bash
-# Export to stdout (markdown, default)
+# Export to stdout (markdown with YAML frontmatter, default in v1.2.0)
 echomine export export.json conv-abc123
 
 # Export to markdown file
 echomine export export.json conv-abc123 --output algorithm.md
 
+# Export without YAML frontmatter (v1.1.0 style)
+echomine export export.json conv-abc123 --output algo.md --no-metadata
+
 # Export as JSON to file
 echomine export export.json conv-abc123 --format json --output algo.json
+
+# Export as CSV (v1.2.0+)
+echomine export export.json conv-abc123 --format csv --output algo.csv
+
+# CSV with specific fields only
+echomine export export.json conv-abc123 --format csv \
+  --fields "id,role,content,timestamp" --output messages.csv
 
 # Export JSON to stdout for piping
 echomine export export.json conv-abc123 -f json | jq '.messages | length'
@@ -658,7 +675,31 @@ for id in conv-abc123 conv-xyz789; do
 done
 ```
 
-**Output (Markdown):**
+**Output (Markdown with YAML Frontmatter - v1.2.0 Default):**
+
+```markdown
+---
+id: conv-abc123
+title: Python Async Best Practices
+created_at: 2024-01-15T10:30:00+00:00
+updated_at: 2024-01-15T12:45:00+00:00
+message_count: 42
+export_date: 2024-12-07T15:30:00+00:00
+exported_by: echomine
+---
+
+# Python Async Best Practices
+
+## User (`msg-001`) - 2024-01-15 10:30:15 UTC
+
+How do I properly use async/await in Python?
+
+## Assistant (`msg-002`) - 2024-01-15 10:30:45 UTC
+
+Here's a comprehensive guide to async/await in Python...
+```
+
+**Output (Markdown without Metadata - v1.1.0 Style):**
 
 ```markdown
 # Python Async Best Practices
@@ -681,10 +722,6 @@ How do I properly use async/await in Python?
 **Assistant** - 2024-01-15 10:30:45 UTC
 
 Here's a comprehensive guide to async/await in Python...
-
----
-
-...
 ```
 
 **Output (JSON):**
@@ -703,6 +740,14 @@ Here's a comprehensive guide to async/await in Python...
     }
   ]
 }
+```
+
+**Output (CSV - v1.2.0+):**
+
+```csv
+id,role,content,timestamp,parent_id
+msg-001,user,"How do I properly use async/await in Python?",2024-01-15T10:30:15Z,
+msg-002,assistant,"Here's a comprehensive guide to async/await in Python...",2024-01-15T10:30:45Z,msg-001
 ```
 
 ---

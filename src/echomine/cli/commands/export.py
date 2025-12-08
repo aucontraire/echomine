@@ -141,49 +141,43 @@ def export_conversation(
             case_sensitive=False,
         ),
     ] = "markdown",
+    no_metadata: Annotated[
+        bool,
+        typer.Option(
+            "--no-metadata",
+            help="Disable YAML frontmatter and message IDs in markdown export (FR-033)",
+        ),
+    ] = False,
 ) -> None:
-    """Export conversation to markdown or JSON format.
+    """[bold]Export conversation[/bold] to markdown or JSON format.
 
     Exports a single conversation from an OpenAI export file to either markdown
     or JSON format, either to stdout (default) or to a specified output file.
 
-    Examples:
-        # Export to stdout by conversation ID (markdown default)
-        $ echomine export export.json abc-123
+    [bold]Examples:[/bold]
+        [dim]# Export to stdout by conversation ID (markdown default)[/dim]
+        $ [green]echomine export[/green] export.json [yellow]abc-123[/yellow]
 
-        # Export to JSON format
-        $ echomine export export.json abc-123 --format json
+        [dim]# Export to JSON format[/dim]
+        $ [green]echomine export[/green] export.json [yellow]abc-123[/yellow] [cyan]--format[/cyan] json
 
-        # Export to file by conversation ID
-        $ echomine export export.json abc-123 --output conversation.md
+        [dim]# Export to file by conversation ID[/dim]
+        $ [green]echomine export[/green] export.json [yellow]abc-123[/yellow] [cyan]--output[/cyan] conversation.md
 
-        # Export as JSON to file
-        $ echomine export export.json abc-123 -f json -o conversation.json
+        [dim]# Export as JSON to file[/dim]
+        $ [green]echomine export[/green] export.json [yellow]abc-123[/yellow] [cyan]-f[/cyan] json [cyan]-o[/cyan] conversation.json
 
-        # Export by title
-        $ echomine export export.json --title "Python Tutorial" -o output.md
+        [dim]# Export by title[/dim]
+        $ [green]echomine export[/green] export.json [cyan]--title[/cyan] "Python Tutorial" [cyan]-o[/cyan] output.md
 
-        # Pipe to other tools
-        $ echomine export export.json abc-123 | pandoc -o output.pdf
-        $ echomine export export.json abc-123 -f json | jq '.messages[0]'
+        [dim]# Pipe to other tools[/dim]
+        $ [green]echomine export[/green] export.json [yellow]abc-123[/yellow] | pandoc -o output.pdf
+        $ [green]echomine export[/green] export.json [yellow]abc-123[/yellow] [cyan]-f[/cyan] json | jq '.messages[0]'
 
-    Args:
-        file_path: Path to OpenAI export JSON file
-        conversation_id: Conversation ID to export (mutually exclusive with --title)
-        title: Conversation title to search for (mutually exclusive with ID)
-        output: Output file path (default: stdout)
-        format: Output format: "markdown" (default) or "json"
-
-    Exit Codes:
-        0: Success
-        1: File not found, conversation not found, permission denied, parse error
-        2: Invalid arguments (both ID and --title, or neither provided)
-
-    Requirements:
-        - FR-018: Export command functionality
-        - FR-016: Support --title as alternative identifier
-        - CHK031: stdout for data, stderr for progress/errors
-        - CHK032: Proper exit codes 0/1/2
+    [bold]Exit Codes:[/bold]
+        [green]0[/green]: Success
+        [red]1[/red]: File not found, conversation not found, permission denied, parse error
+        [yellow]2[/yellow]: Invalid arguments (both ID and --title, or neither provided)
     """
     try:
         # Validation: Exactly one of conversation_id or --title must be provided
@@ -268,8 +262,15 @@ def export_conversation(
             output_content = conversation.model_dump_json(indent=2)
         else:
             # Export as markdown using MarkdownExporter
+            # FR-033: --no-metadata flag disables YAML frontmatter and message IDs
             exporter = MarkdownExporter()
-            output_content = exporter.export_conversation(file_path, actual_conversation_id)
+            include_metadata = not no_metadata
+            output_content = exporter.export_conversation(
+                file_path,
+                actual_conversation_id,
+                include_metadata=include_metadata,
+                include_message_ids=include_metadata,  # Disable both when --no-metadata
+            )
 
         # Write output
         if output:
@@ -282,7 +283,10 @@ def export_conversation(
                 output.write_text(output_content, encoding="utf-8")
                 console.print(f"[green]✓ Exported to {output}[/green]")
             except PermissionError:
-                console.print(f"[red]Error: Permission denied: {output}[/red]")
+                # FR-061: Permission denied on output file write
+                console.print(
+                    f"[red]Error: Permission denied: {output}. Check file write permissions.[/red]"
+                )
                 raise typer.Exit(code=1)
             except OSError as e:
                 console.print(f"[red]Error: Failed to write file: {e}[/red]")
@@ -301,8 +305,10 @@ def export_conversation(
         raise typer.Exit(code=1)
 
     except PermissionError:
-        # Permission denied when trying to read export file
-        console.print(f"[red]Error: Permission denied: {file_path}[/red]")
+        # Permission denied when trying to read export file (FR-061)
+        console.print(
+            f"[red]Error: Permission denied: {file_path}. Check file read permissions.[/red]"
+        )
         raise typer.Exit(code=1)
 
     except json.JSONDecodeError as e:

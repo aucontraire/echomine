@@ -10,6 +10,7 @@ Constitution Compliance:
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -17,6 +18,27 @@ import pytest
 
 # Golden master fixture directory
 GOLDEN_MASTER_DIR = Path(__file__).parent.parent / "fixtures" / "golden_master"
+
+
+def _normalize_export_date(content: str) -> str:
+    """Normalize export_date in YAML frontmatter for comparison.
+
+    The export_date changes with each run, so we replace it with a placeholder
+    to enable deterministic comparison.
+
+    Args:
+        content: Markdown content with YAML frontmatter
+
+    Returns:
+        Content with export_date normalized to placeholder value
+    """
+    # Replace export_date line with a fixed placeholder
+    return re.sub(
+        r"^export_date: \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$",
+        "export_date: NORMALIZED",
+        content,
+        flags=re.MULTILINE,
+    )
 
 
 class TestGoldenMasterConversations:
@@ -65,10 +87,11 @@ class TestGoldenMasterConversations:
 
         Validates:
         - Message order preserved
-        - Role headers with emoji (👤 User, 🤖 Assistant)
+        - Role headers (## User, ## Assistant)
         - ISO 8601 timestamps
         - Message separators (---)
         - Content accuracy
+        - YAML frontmatter metadata
 
         Args:
             golden_master_001: Tuple of (raw.json path, expected.md path)
@@ -91,11 +114,14 @@ class TestGoldenMasterConversations:
         # Load expected output
         expected_md = expected_path.read_text(encoding="utf-8")
 
-        # Compare outputs
-        assert actual_md == expected_md, (
+        # Compare outputs (normalize export_date since it changes each run)
+        actual_normalized = _normalize_export_date(actual_md)
+        expected_normalized = _normalize_export_date(expected_md)
+
+        assert actual_normalized == expected_normalized, (
             f"Markdown output doesn't match expected.\n\n"
-            f"Expected:\n{expected_md[:500]}...\n\n"
-            f"Actual:\n{actual_md[:500]}..."
+            f"Expected:\n{expected_normalized[:500]}...\n\n"
+            f"Actual:\n{actual_normalized[:500]}..."
         )
 
     def test_conversation_with_images(self, golden_master_002: tuple[Path, Path]) -> None:
@@ -106,6 +132,7 @@ class TestGoldenMasterConversations:
         - Image references included (not placeholders)
         - Image markdown syntax: ![Image](file-id-sanitized.png)
         - Text and images properly separated
+        - YAML frontmatter metadata
 
         Args:
             golden_master_002: Tuple of (raw.json path, expected.md path)
@@ -133,11 +160,14 @@ class TestGoldenMasterConversations:
         # Verify image references are present in expected output
         assert "![Image]" in expected_md, "Expected markdown should contain image references"
 
-        # Compare outputs
-        assert actual_md == expected_md, (
+        # Compare outputs (normalize export_date since it changes each run)
+        actual_normalized = _normalize_export_date(actual_md)
+        expected_normalized = _normalize_export_date(expected_md)
+
+        assert actual_normalized == expected_normalized, (
             f"Markdown output doesn't match expected.\n\n"
-            f"Expected:\n{expected_md[:500]}...\n\n"
-            f"Actual:\n{actual_md[:500]}..."
+            f"Expected:\n{expected_normalized[:500]}...\n\n"
+            f"Actual:\n{actual_normalized[:500]}..."
         )
 
     def test_conversation_with_code(self, golden_master_003: tuple[Path, Path]) -> None:
@@ -148,6 +178,7 @@ class TestGoldenMasterConversations:
         - Code block preservation
         - Syntax highlighting hints (if present)
         - Mixed content (text + code) handling
+        - YAML frontmatter metadata
 
         Args:
             golden_master_003: Tuple of (raw.json path, expected.md path)
@@ -172,11 +203,14 @@ class TestGoldenMasterConversations:
         # Load expected output
         expected_md = expected_path.read_text(encoding="utf-8")
 
-        # Compare outputs
-        assert actual_md == expected_md, (
+        # Compare outputs (normalize export_date since it changes each run)
+        actual_normalized = _normalize_export_date(actual_md)
+        expected_normalized = _normalize_export_date(expected_md)
+
+        assert actual_normalized == expected_normalized, (
             f"Markdown output doesn't match expected.\n\n"
-            f"Expected:\n{expected_md[:500]}...\n\n"
-            f"Actual:\n{actual_md[:500]}..."
+            f"Expected:\n{expected_normalized[:500]}...\n\n"
+            f"Actual:\n{actual_normalized[:500]}..."
         )
 
 
@@ -205,9 +239,10 @@ class TestGoldenMasterFileStructure:
         """Verify expected.md files follow the required format.
 
         Validates:
-        - Headers with emoji (## 👤 User, ## 🤖 Assistant)
+        - Headers with User/Assistant roles (## User, ## Assistant)
         - ISO 8601 timestamps in headers
         - Message separators (---)
+        - YAML frontmatter metadata
         - No blockquotes used for user messages
         """
         expected_dirs = ["001_simple_text", "002_with_images", "003_with_code"]
@@ -216,9 +251,9 @@ class TestGoldenMasterFileStructure:
             expected_md = GOLDEN_MASTER_DIR / dir_name / "expected.md"
             content = expected_md.read_text(encoding="utf-8")
 
-            # Verify headers with emoji
-            assert "## 👤 User" in content or "## 🤖 Assistant" in content, (
-                f"{dir_name}: Expected markdown should have headers with emoji"
+            # Verify headers with User/Assistant role names
+            assert "## User" in content or "## Assistant" in content, (
+                f"{dir_name}: Expected markdown should have headers with User/Assistant roles"
             )
 
             # Verify ISO 8601 timestamps (format: YYYY-MM-DDTHH:MM:SS+00:00)

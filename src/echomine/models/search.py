@@ -21,12 +21,19 @@ from __future__ import annotations
 from datetime import date
 from typing import Generic, Literal, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 # Generic type variable for conversation types
 # Not bound to allow compatibility with all conversation implementations
 ConversationT = TypeVar("ConversationT")
+
+
+# Type aliases for search result sorting (v1.2.0 Baseline Enhancement Package)
+# FR-043-045: Sort field options (score, date, title, messages)
+# FR-046-048: Sort order options (asc, desc)
+SortField = Literal["score", "date", "title", "messages"]
+SortOrder = Literal["asc", "desc"]
 
 
 class SearchQuery(BaseModel):
@@ -130,6 +137,54 @@ class SearchQuery(BaseModel):
         description="Filter to messages from specific role only",
     )
 
+    # NEW v1.2.0: Message count filtering (FR-004-008)
+    min_messages: int | None = Field(
+        default=None,
+        ge=1,
+        description="Minimum message count filter (inclusive, must be >= 1)",
+    )
+    max_messages: int | None = Field(
+        default=None,
+        ge=1,
+        description="Maximum message count filter (inclusive, must be >= 1)",
+    )
+
+    # NEW v1.2.0: Sort options (FR-043-048)
+    sort_by: SortField = Field(
+        default="score",
+        description="Sort field: score (relevance), date (created/updated), title, or messages (FR-043)",
+    )
+    sort_order: SortOrder = Field(
+        default="desc",
+        description="Sort order: asc (ascending) or desc (descending) (FR-044)",
+    )
+
+    @model_validator(mode="after")
+    def validate_message_count_bounds(self) -> SearchQuery:
+        """Validate min_messages <= max_messages when both are set (FR-005).
+
+        Raises:
+            ValueError: If min_messages > max_messages
+
+        Example:
+            ```python
+            # Valid: min <= max
+            query = SearchQuery(min_messages=5, max_messages=20)
+
+            # Invalid: min > max
+            try:
+                query = SearchQuery(min_messages=20, max_messages=5)
+            except ValidationError as e:
+                print(e)  # "min_messages (20) must be <= max_messages (5)"
+            ```
+        """
+        if self.min_messages is not None and self.max_messages is not None:
+            if self.min_messages > self.max_messages:
+                raise ValueError(
+                    f"min_messages ({self.min_messages}) must be <= max_messages ({self.max_messages})"
+                )
+        return self
+
     def has_keyword_search(self) -> bool:
         """Check if keyword search is requested.
 
@@ -201,6 +256,26 @@ class SearchQuery(BaseModel):
             ```
         """
         return self.exclude_keywords is not None and len(self.exclude_keywords) > 0
+
+    def has_message_count_filter(self) -> bool:
+        """Check if message count filtering is requested (FR-004).
+
+        Returns:
+            True if either min_messages or max_messages is set, False otherwise
+
+        Example:
+            ```python
+            query = SearchQuery(min_messages=10)
+            assert query.has_message_count_filter() is True
+
+            query2 = SearchQuery(max_messages=50)
+            assert query2.has_message_count_filter() is True
+
+            query3 = SearchQuery()
+            assert query3.has_message_count_filter() is False
+            ```
+        """
+        return self.min_messages is not None or self.max_messages is not None
 
 
 class SearchResult(BaseModel, Generic[ConversationT]):

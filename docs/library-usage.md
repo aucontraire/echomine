@@ -182,43 +182,45 @@ else:
     print("Conversation not found")
 ```
 
-### Get Message by ID
+### Calculate Statistics (v1.2.0+)
 
-Retrieve a specific message with its parent conversation context:
-
-```python
-# Search all conversations for the message
-result = adapter.get_message_by_id(export_file, "msg-def456")
-
-if result:
-    message, conversation = result
-    print(f"Message: {message.content}")
-    print(f"From conversation: {conversation.title}")
-    print(f"Role: {message.role}")
-    print(f"Timestamp: {message.timestamp}")
-else:
-    print("Message not found")
-```
-
-For better performance with large files, provide a conversation ID hint:
+Get comprehensive statistics about your export:
 
 ```python
-# Faster: search only within specified conversation
-result = adapter.get_message_by_id(
-    export_file,
-    "msg-def456",
-    conversation_id="conv-abc123"
-)
+from echomine import calculate_statistics, calculate_conversation_statistics
 
-if result:
-    message, conversation = result
-    print(f"Found message in {conversation.title}")
+# Export-level statistics (streaming, O(1) memory)
+stats = calculate_statistics(export_file)
+
+print(f"Total conversations: {stats.total_conversations}")
+print(f"Total messages: {stats.total_messages}")
+print(f"Date range: {stats.date_range.earliest} to {stats.date_range.latest}")
+print(f"Average messages: {stats.average_messages:.1f}")
+
+# Largest and smallest conversations
+if stats.largest_conversation:
+    largest = stats.largest_conversation
+    print(f"Largest: {largest.title} ({largest.message_count} messages)")
+
+if stats.smallest_conversation:
+    smallest = stats.smallest_conversation
+    print(f"Smallest: {smallest.title} ({smallest.message_count} messages)")
+
+# Per-conversation statistics
+conversation = adapter.get_conversation_by_id(export_file, "conv-abc123")
+if conversation:
+    conv_stats = calculate_conversation_statistics(conversation)
+
+    # Message counts by role
+    print(f"User messages: {conv_stats.message_count_by_role.user}")
+    print(f"Assistant messages: {conv_stats.message_count_by_role.assistant}")
+    print(f"System messages: {conv_stats.message_count_by_role.system}")
+
+    # Temporal patterns
+    print(f"Duration: {conv_stats.duration_seconds:.0f} seconds")
+    if conv_stats.average_gap_seconds:
+        print(f"Average gap: {conv_stats.average_gap_seconds:.1f} seconds")
 ```
-
-**Performance Note:**
-
-- Without `conversation_id`: O(N*M) - searches all conversations and their messages
-- With `conversation_id`: O(N) - searches only until the specified conversation is found
 
 ## Advanced Search Features (v1.1.0+)
 
@@ -813,6 +815,63 @@ for t in threads:
     t.start()
 for t in threads:
     t.join()
+```
+
+## Export Formats (v1.2.0+)
+
+### Markdown Export with YAML Frontmatter
+
+```python
+from echomine import OpenAIAdapter
+from echomine.exporters import MarkdownExporter
+from pathlib import Path
+
+adapter = OpenAIAdapter()
+exporter = MarkdownExporter()
+
+conversation = adapter.get_conversation_by_id(Path("export.json"), "conv-abc123")
+
+if conversation:
+    # Export with YAML frontmatter (default in v1.2.0)
+    markdown = exporter.export_conversation(conversation)
+    Path("chat.md").write_text(markdown)
+
+    # Export without frontmatter (v1.1.0 style)
+    markdown_plain = exporter.export_conversation(
+        conversation,
+        include_metadata=False,
+        include_message_ids=False
+    )
+    Path("chat_plain.md").write_text(markdown_plain)
+```
+
+### CSV Export
+
+```python
+from echomine import OpenAIAdapter, SearchQuery
+from echomine.exporters import CSVExporter
+from pathlib import Path
+
+adapter = OpenAIAdapter()
+exporter = CSVExporter()
+
+# Export search results to CSV
+query = SearchQuery(keywords=["python"], limit=100)
+results = list(adapter.search(Path("export.json"), query))
+
+# Conversation-level CSV
+csv_content = exporter.export_search_results(results)
+Path("results.csv").write_text(csv_content)
+
+# Message-level CSV
+csv_messages = exporter.export_messages_from_results(results)
+Path("messages.csv").write_text(csv_messages)
+
+# Export single conversation
+conversation = adapter.get_conversation_by_id(Path("export.json"), "conv-abc123")
+if conversation:
+    csv_single = exporter.export_conversation(conversation)
+    Path("conversation.csv").write_text(csv_single)
 ```
 
 ## Integration Examples

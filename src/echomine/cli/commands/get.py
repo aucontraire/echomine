@@ -14,21 +14,24 @@ Command Contract:
     Usage:
         echomine get conversation <file_path> <conversation_id> [OPTIONS]
         echomine get message <file_path> <message_id> [OPTIONS]
+        echomine get messages <file_path> <conversation_id> [OPTIONS]
 
     Arguments:
         file_path: Path to OpenAI export JSON file
         conversation_id: Conversation ID to retrieve
         message_id: Message ID to retrieve
 
-    Options (both subcommands):
-        --format, -f: Output format (table, json) [default: table]
-
     Options (conversation):
+        --format, -f: Output format (table, json) [default: table]
         --verbose, -v: Show full message content (not just counts)
 
     Options (message):
+        --format, -f: Output format (table, json) [default: table]
         --conversation-id, -c: Optional conversation ID hint for faster lookup
         --verbose, -v: Show full message content and conversation context
+
+    Options (messages - list all):
+        --json: Output full message objects as JSON array
 
     Exit Codes:
         0: Success (conversation/message found)
@@ -43,6 +46,7 @@ Breaking Change:
     The old flat command `echomine get <file> <id>` is replaced by:
     - `echomine get conversation <file> <id>` (explicit subcommand required)
     - `echomine get message <file> <id>` (new functionality)
+    - `echomine get messages <file> <conv_id>` (list all messages in conversation)
 
     This is a hard break with no deprecation period (pre-1.0 project).
 """
@@ -59,6 +63,7 @@ from pydantic import ValidationError as PydanticValidationError
 from rich.console import Console
 
 from echomine.adapters.openai import OpenAIAdapter
+from echomine.cli.formatters import get_role_color, is_rich_enabled
 from echomine.exceptions import ParseError
 from echomine.models.conversation import Conversation
 from echomine.models.message import Message
@@ -67,8 +72,9 @@ from echomine.models.message import Message
 # Typer app for get subcommands
 get_app = typer.Typer(
     name="get",
-    help="Retrieve conversation or message by ID",
+    help="[cyan]Retrieve[/cyan] conversation or message by ID",
     no_args_is_help=True,
+    rich_markup_mode="rich",
 )
 
 # Console for stderr output (errors only)
@@ -264,6 +270,339 @@ def _format_message_json(message: Message, conversation: Conversation) -> str:
     return json.dumps(msg_dict, indent=2, ensure_ascii=False) + "\n"
 
 
+def _format_messages_table(conversation: Conversation) -> str:
+    """Format messages as human-readable table (FR-026).
+
+    Args:
+        conversation: Conversation object with messages to format
+
+    Returns:
+        Formatted text output with messages in chronological order
+
+    Format:
+        Messages in "Title" (N messages)
+        ─────────────────────────────────────
+        msg-001  user       2024-01-15 10:30:05  Content preview (first 100 chars)...
+        msg-002  assistant  2024-01-15 10:30:47  Content preview (first 100 chars)...
+    """
+    lines = []
+
+    # Header with conversation title and message count
+    lines.append(f'Messages in "{conversation.title}" ({conversation.message_count} messages)')
+    lines.append("─" * 80)
+
+    # List messages in chronological order (oldest first)
+    # Messages are already sorted by timestamp in Conversation model
+    for message in conversation.messages:
+        # Format timestamp
+        timestamp_str = message.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Truncate content to first 100 characters (FR-026)
+        content = message.content
+        if len(content) > 100:
+            content = content[:97] + "..."
+
+        # Format: ID (left-aligned, 12 chars), role (10 chars), timestamp (19 chars), content
+        # Handle empty content gracefully (T078)
+        content_display = content if content else "(empty)"
+
+        line = f"{message.id:<12} {message.role:<10} {timestamp_str}  {content_display}"
+        lines.append(line)
+
+    return "\n".join(lines) + "\n"
+
+
+def _format_messages_json(conversation: Conversation) -> str:
+    """Format messages as JSON array (FR-027).
+
+    Args:
+        conversation: Conversation object with messages to format
+
+    Returns:
+        JSON string with array of message objects
+
+    Format:
+        [
+            {
+                "id": "msg-001",
+                "role": "user",
+                "timestamp": "2024-01-15T10:30:05Z",
+                "content": "Full message content",
+                "parent_id": null
+            },
+            ...
+        ]
+    """
+    # Build message array
+    messages_data = [
+        {
+            "id": msg.id,
+            "role": msg.role,
+            "timestamp": msg.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "content": msg.content,
+            "parent_id": msg.parent_id,
+        }
+        for msg in conversation.messages
+    ]
+
+    # Pretty-print JSON with 2-space indentation
+    return json.dumps(messages_data, indent=2, ensure_ascii=False) + "\n"
+
+
+# ============================================================================
+# Rich Formatting Functions (for TTY output)
+# ============================================================================
+
+
+def _format_messages_rich(conversation: Conversation) -> None:
+    """Format messages as Rich table for TTY output.
+
+    Displays messages in a colorful table with:
+    - Role-based coloring (user=green, assistant=blue, system=yellow)
+    - Dimmed IDs
+    - Green timestamps
+    - Cyan title in header
+
+    Args:
+        conversation: Conversation object with messages to format
+
+    Side Effects:
+        Prints Rich table to stdout using Console
+    """
+    from rich.table import Table
+
+    # Create console for stdout (not stderr)
+    stdout_console = Console()
+
+    # Create table with box borders
+    table = Table(
+        show_header=True,
+        header_style="bold cyan",
+        border_style="blue",
+        title=f'[cyan]Messages in "{conversation.title}"[/cyan] ({conversation.message_count} messages)',
+        title_style="bold cyan",
+    )
+
+    # Add columns
+    table.add_column("ID", style="dim", width=36)
+    table.add_column("Role", width=10)
+    table.add_column("Timestamp", style="green", width=19)
+    table.add_column("Content Preview", style="white")
+
+    # Add rows for each message
+    for message in conversation.messages:
+        # Format timestamp
+        timestamp_str = message.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Get role color
+        role_color = get_role_color(message.role)
+
+        # Truncate content to first 100 characters
+        content = message.content
+        if len(content) > 100:
+            content = content[:97] + "..."
+
+        # Handle empty content gracefully
+        content_display = content if content else "(empty)"
+
+        # Add row with colored role
+        table.add_row(
+            message.id,
+            f"[{role_color}]{message.role}[/{role_color}]",
+            timestamp_str,
+            content_display,
+        )
+
+    # Print table to stdout
+    stdout_console.print(table)
+
+
+def _format_conversation_rich(conversation: Conversation, verbose: bool = False) -> None:
+    """Format conversation as Rich Panel for TTY output.
+
+    Displays conversation details in a formatted panel with:
+    - Cyan title and headers
+    - Green timestamps
+    - Blue borders
+    - Role counts table with colored roles
+    - Optional verbose message details
+
+    Args:
+        conversation: Conversation object to format
+        verbose: Show full message content (not just counts)
+
+    Side Effects:
+        Prints Rich Panel to stdout using Console
+    """
+    from rich.panel import Panel
+    from rich.table import Table
+
+    # Create console for stdout (not stderr)
+    stdout_console = Console()
+
+    # Build content lines
+    content_parts = []
+
+    # Basic metadata
+    content_parts.append(f"[bold cyan]ID:[/bold cyan]       {conversation.id}")
+    content_parts.append(f"[bold cyan]Title:[/bold cyan]    [cyan]{conversation.title}[/cyan]")
+
+    # Timestamps
+    created_str = conversation.created_at.strftime("%Y-%m-%d %H:%M:%S")
+    updated_str = conversation.updated_at_or_created.strftime("%Y-%m-%d %H:%M:%S")
+    content_parts.append(f"[bold cyan]Created:[/bold cyan]  [green]{created_str} UTC[/green]")
+    content_parts.append(f"[bold cyan]Updated:[/bold cyan]  [green]{updated_str} UTC[/green]")
+    content_parts.append(f"[bold cyan]Messages:[/bold cyan] {conversation.message_count} messages")
+
+    content_parts.append("")  # Blank line
+
+    # Message summary by role
+    content_parts.append("[bold cyan]Message Summary:[/bold cyan]")
+
+    # Count messages by role
+    role_counts: Counter[str] = Counter(msg.role for msg in conversation.messages)
+
+    # Create small table for role counts
+    role_table = Table(show_header=True, header_style="bold", border_style="dim", box=None)
+    role_table.add_column("Role", style="bold")
+    role_table.add_column("Count", justify="right")
+
+    for role_name in ("user", "assistant", "system"):
+        count = role_counts[role_name]
+        if count > 0:
+            role_color = get_role_color(role_name)
+            role_table.add_row(
+                f"[{role_color}]{role_name}[/{role_color}]",
+                str(count),
+            )
+
+    # Verbose mode: show message details
+    if verbose:
+        content_parts.append("")
+        content_parts.append("[bold cyan]Messages:[/bold cyan]")
+        for i, msg in enumerate(conversation.messages, 1):
+            timestamp_str = msg.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            role_color = get_role_color(msg.role)
+
+            content_parts.append(
+                f"{i}. [{role_color}][{msg.role}][/{role_color}] [green]{timestamp_str}[/green]"
+            )
+
+            # Truncate long content
+            content = msg.content
+            if len(content) > 80:
+                content = content[:77] + "..."
+
+            content_parts.append(f"   {content}")
+
+            if i < len(conversation.messages):
+                content_parts.append("")
+
+    # Build final content
+    content = "\n".join(content_parts)
+
+    # Create panel
+    panel = Panel(
+        content,
+        title="[bold cyan]Conversation Details[/bold cyan]",
+        border_style="blue",
+        padding=(1, 2),
+    )
+
+    # Print panel
+    stdout_console.print(panel)
+
+    # Print role table separately for better layout
+    if not verbose:
+        stdout_console.print(role_table)
+
+
+def _format_message_rich(
+    message: Message, conversation: Conversation, verbose: bool = False
+) -> None:
+    """Format message as Rich Panel for TTY output.
+
+    Displays message details in a formatted panel with:
+    - Cyan headers
+    - Role-based coloring
+    - Green timestamps
+    - Blue borders
+    - Conversation context
+    - Optional verbose conversation messages
+
+    Args:
+        message: Message object to format
+        conversation: Parent conversation providing context
+        verbose: Show full content and conversation details
+
+    Side Effects:
+        Prints Rich Panel to stdout using Console
+    """
+    from rich.panel import Panel
+
+    # Create console for stdout (not stderr)
+    stdout_console = Console()
+
+    # Build content lines
+    content_parts = []
+
+    # Message metadata
+    role_color = get_role_color(message.role)
+    timestamp_str = message.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+
+    content_parts.append(f"[bold cyan]ID:[/bold cyan]         {message.id}")
+    content_parts.append(
+        f"[bold cyan]Role:[/bold cyan]       [{role_color}]{message.role}[/{role_color}]"
+    )
+    content_parts.append(f"[bold cyan]Timestamp:[/bold cyan]  [green]{timestamp_str} UTC[/green]")
+    content_parts.append(
+        f"[bold cyan]Parent ID:[/bold cyan]  {message.parent_id or 'None (root message)'}"
+    )
+
+    content_parts.append("")
+    content_parts.append("[bold cyan]Content:[/bold cyan]")
+
+    # Message content (truncate if not verbose)
+    content = message.content
+    if not verbose and len(content) > 200:
+        content = content[:197] + "..."
+
+    content_parts.append(content)
+
+    content_parts.append("")
+    content_parts.append("[bold cyan]Conversation Context:[/bold cyan]")
+    content_parts.append(f"[bold]Conversation ID:[/bold]  {conversation.id}")
+    content_parts.append(f"[bold]Title:[/bold]            [cyan]{conversation.title}[/cyan]")
+    content_parts.append(f"[bold]Total Messages:[/bold]   {conversation.message_count}")
+
+    # Verbose mode: show all conversation messages
+    if verbose:
+        content_parts.append("")
+        content_parts.append("[bold cyan]All Messages in Conversation:[/bold cyan]")
+        for i, msg in enumerate(conversation.messages, 1):
+            marker = "[bold yellow]>>>[/bold yellow]" if msg.id == message.id else "   "
+            msg_timestamp_str = msg.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            msg_role_color = get_role_color(msg.role)
+
+            content_parts.append(
+                f"{marker} {i}. [{msg_role_color}][{msg.role}][/{msg_role_color}] [green]{msg_timestamp_str}[/green]"
+            )
+
+    # Build final content
+    content = "\n".join(content_parts)
+
+    # Create panel
+    panel = Panel(
+        content,
+        title="[bold cyan]Message Details[/bold cyan]",
+        border_style="blue",
+        padding=(1, 2),
+    )
+
+    # Print panel
+    stdout_console.print(panel)
+
+
 # ============================================================================
 # Subcommand: get conversation
 # ============================================================================
@@ -306,23 +645,23 @@ def get_conversation(
         ),
     ] = False,
 ) -> None:
-    """Get conversation by ID and display metadata.
+    """[bold]Get conversation by ID[/bold] and display metadata.
 
     Retrieves a specific conversation from an OpenAI export file by its ID
     and displays its metadata in either human-readable table format or JSON.
 
-    Examples:
-        # Get conversation with table format (default)
-        $ echomine get conversation export.json abc-123-def
+    [bold]Examples:[/bold]
+        [dim]# Get conversation with table format (default)[/dim]
+        $ [green]echomine get conversation[/green] export.json [yellow]abc-123-def[/yellow]
 
-        # Get conversation with JSON format
-        $ echomine get conversation export.json abc-123-def --format json
+        [dim]# Get conversation with JSON format[/dim]
+        $ [green]echomine get conversation[/green] export.json [yellow]abc-123-def[/yellow] [cyan]--format[/cyan] json
 
-        # Get conversation with verbose output (show messages)
-        $ echomine get conversation export.json abc-123-def --verbose
+        [dim]# Get conversation with verbose output (show messages)[/dim]
+        $ [green]echomine get conversation[/green] export.json [yellow]abc-123-def[/yellow] [cyan]--verbose[/cyan]
 
-        # Pipe to jq
-        $ echomine get conversation export.json abc-123 -f json | jq '.messages[0].content'
+        [dim]# Pipe to jq[/dim]
+        $ [green]echomine get conversation[/green] export.json [yellow]abc-123[/yellow] [cyan]-f[/cyan] json | jq '.messages[0].content'
     """
     try:
         # Validate format option
@@ -358,11 +697,16 @@ def get_conversation(
         # Format output based on requested format
         if format_lower == "json":
             output = _format_conversation_json(conversation)
+            # Write JSON output to stdout (CHK031)
+            print(output, end="")
+        # Check if Rich should be enabled (TTY detection)
+        elif is_rich_enabled(json_flag=(format_lower == "json")):
+            # Use Rich formatter for TTY
+            _format_conversation_rich(conversation, verbose=verbose)
         else:
+            # Use plain text formatter for pipes/redirects
             output = _format_conversation_table(conversation, verbose=verbose)
-
-        # Write output to stdout (CHK031)
-        print(output, end="")
+            print(output, end="")
 
         # Success - return normally for exit code 0
         return
@@ -372,7 +716,10 @@ def get_conversation(
         raise typer.Exit(code=1) from None
 
     except PermissionError:
-        console.print(f"[red]Error: Permission denied: {file_path}[/red]")
+        # FR-061: Permission denied when reading export file
+        console.print(
+            f"[red]Error: Permission denied: {file_path}. Check file read permissions.[/red]"
+        )
         raise typer.Exit(code=1) from None
 
     except ParseError as e:
@@ -446,7 +793,7 @@ def get_message(
         ),
     ] = False,
 ) -> None:
-    """Get message by ID and display with conversation context.
+    """[bold]Get message by ID[/bold] and display with conversation context.
 
     Retrieves a specific message from an OpenAI export file by its ID
     and displays it with parent conversation context in either human-readable
@@ -454,26 +801,26 @@ def get_message(
 
     The message search can be optimized by providing a conversation ID hint.
 
-    Examples:
-        # Get message with table format (default)
-        $ echomine get message export.json msg-abc-123
+    [bold]Examples:[/bold]
+        [dim]# Get message with table format (default)[/dim]
+        $ [green]echomine get message[/green] export.json [yellow]msg-abc-123[/yellow]
 
-        # Get message with conversation hint (faster)
-        $ echomine get message export.json msg-abc-123 -c conv-def-456
+        [dim]# Get message with conversation hint (faster)[/dim]
+        $ [green]echomine get message[/green] export.json [yellow]msg-abc-123[/yellow] [cyan]-c[/cyan] conv-def-456
 
-        # Get message with JSON format
-        $ echomine get message export.json msg-abc-123 --format json
+        [dim]# Get message with JSON format[/dim]
+        $ [green]echomine get message[/green] export.json [yellow]msg-abc-123[/yellow] [cyan]--format[/cyan] json
 
-        # Get message with verbose output (full content + conversation messages)
-        $ echomine get message export.json msg-abc-123 --verbose
+        [dim]# Get message with verbose output (full content + conversation messages)[/dim]
+        $ [green]echomine get message[/green] export.json [yellow]msg-abc-123[/yellow] [cyan]--verbose[/cyan]
 
-        # Pipe to jq
-        $ echomine get message export.json msg-123 -f json | jq '.message.content'
+        [dim]# Pipe to jq[/dim]
+        $ [green]echomine get message[/green] export.json [yellow]msg-123[/yellow] [cyan]-f[/cyan] json | jq '.message.content'
 
-    Performance:
-        - With --conversation-id: O(N) where N = conversations until match
-        - Without --conversation-id: O(N*M) where N = conversations, M = messages
-        - For large files with many conversations, using -c is significantly faster
+    [bold]Performance:[/bold]
+        - With [cyan]--conversation-id[/cyan]: O(N) where N = conversations until match
+        - Without [cyan]--conversation-id[/cyan]: O(N*M) where N = conversations, M = messages
+        - For large files with many conversations, using [cyan]-c[/cyan] is significantly faster
     """
     try:
         # Validate format option
@@ -527,11 +874,16 @@ def get_message(
         # Format output based on requested format
         if format_lower == "json":
             output = _format_message_json(message, parent_conversation)
+            # Write JSON output to stdout (CHK031)
+            print(output, end="")
+        # Check if Rich should be enabled (TTY detection)
+        elif is_rich_enabled(json_flag=(format_lower == "json")):
+            # Use Rich formatter for TTY
+            _format_message_rich(message, parent_conversation, verbose=verbose)
         else:
+            # Use plain text formatter for pipes/redirects
             output = _format_message_table(message, parent_conversation, verbose=verbose)
-
-        # Write output to stdout (CHK031)
-        print(output, end="")
+            print(output, end="")
 
         # Success - return normally for exit code 0
         return
@@ -541,7 +893,135 @@ def get_message(
         raise typer.Exit(code=1) from None
 
     except PermissionError:
-        console.print(f"[red]Error: Permission denied: {file_path}[/red]")
+        # FR-061: Permission denied when reading export file
+        console.print(
+            f"[red]Error: Permission denied: {file_path}. Check file read permissions.[/red]"
+        )
+        raise typer.Exit(code=1) from None
+
+    except ParseError as e:
+        console.print(f"[red]Error: Invalid JSON in export file: {e}[/red]")
+        raise typer.Exit(code=1) from None
+
+    except PydanticValidationError as e:
+        console.print(f"[red]Error: Validation failed: {e}[/red]")
+        raise typer.Exit(code=1) from None
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(code=130) from None
+
+    except typer.Exit:
+        # Re-raise typer.Exit to preserve exit code
+        raise
+
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(code=1) from None
+
+
+# ============================================================================
+# Subcommand: get messages (plural - list all messages in conversation)
+# ============================================================================
+
+
+@get_app.command(name="messages")
+def get_messages(
+    file_path: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to OpenAI export file",
+            exists=False,  # Manual check for exit code 1
+            file_okay=True,
+            dir_okay=False,
+            readable=False,  # Manual check for exit code 1
+            resolve_path=True,
+        ),
+    ],
+    conversation_id: Annotated[
+        str,
+        typer.Argument(
+            help="Conversation ID to list messages from",
+        ),
+    ],
+    json_output: Annotated[
+        bool,
+        typer.Option(
+            "--json",
+            help="Output full message objects as JSON array",
+        ),
+    ] = False,
+) -> None:
+    """[bold]List all messages[/bold] in a conversation.
+
+    Retrieves all messages from a specific conversation and displays them
+    in chronological order (oldest first). Messages are shown with ID, role,
+    timestamp, and content preview (first 100 characters).
+
+    [bold]Examples:[/bold]
+        [dim]# List messages in human-readable format[/dim]
+        $ [green]echomine get messages[/green] export.json [yellow]abc-123-def[/yellow]
+
+        [dim]# List messages as JSON[/dim]
+        $ [green]echomine get messages[/green] export.json [yellow]abc-123-def[/yellow] [cyan]--json[/cyan]
+
+        [dim]# Pipe to jq[/dim]
+        $ [green]echomine get messages[/green] export.json [yellow]abc-123[/yellow] [cyan]--json[/cyan] | jq '.[0].content'
+
+    [bold]Exit Codes:[/bold]
+        [green]0[/green]: Success
+        [red]1[/red]: Conversation not found, file not found, permission denied
+        [yellow]2[/yellow]: Invalid arguments
+    """
+    try:
+        # Check file exists (manual check for exit code 1)
+        if not file_path.exists():
+            console.print(f"[red]Error: File not found: {file_path}[/red]")
+            raise typer.Exit(code=1)
+
+        # Retrieve conversation using library method
+        adapter = OpenAIAdapter()
+
+        # Show progress indicator (only for table format, not JSON)
+        conversation: Conversation | None = None
+        if not json_output:
+            with console.status("[bold green]Searching for conversation..."):
+                conversation = adapter.get_conversation_by_id(file_path, conversation_id)
+        else:
+            # No progress indicator for JSON (keeps output clean)
+            conversation = adapter.get_conversation_by_id(file_path, conversation_id)
+
+        # Check if conversation was found
+        if conversation is None:
+            console.print(f"[red]Error: Conversation not found: {conversation_id}[/red]")
+            raise typer.Exit(code=1)
+
+        # Format output based on requested format
+        if json_output:
+            output = _format_messages_json(conversation)
+            # Write JSON output to stdout (CHK031)
+            print(output, end="")
+        # Check if Rich should be enabled (TTY detection)
+        elif is_rich_enabled(json_flag=json_output):
+            # Use Rich formatter for TTY
+            _format_messages_rich(conversation)
+        else:
+            # Use plain text formatter for pipes/redirects
+            output = _format_messages_table(conversation)
+            print(output, end="")
+
+        # Success - return normally for exit code 0
+        return
+
+    except FileNotFoundError:
+        console.print(f"[red]Error: File not found: {file_path}[/red]")
+        raise typer.Exit(code=1) from None
+
+    except PermissionError:
+        # FR-061: Permission denied when reading export file
+        console.print(
+            f"[red]Error: Permission denied: {file_path}. Check file read permissions.[/red]"
+        )
         raise typer.Exit(code=1) from None
 
     except ParseError as e:

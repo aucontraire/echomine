@@ -299,8 +299,10 @@ def test_export_default_format_is_markdown(
     # Assert: Exit code 0
     assert result.returncode == 0
 
-    # Assert: stdout contains markdown (starts with heading)
-    assert result.stdout.startswith("# "), f"Expected markdown output, got: {result.stdout[:100]}"
+    # Assert: stdout contains markdown (starts with YAML frontmatter)
+    assert result.stdout.startswith("---"), (
+        f"Expected markdown output starting with YAML frontmatter (---), got: {result.stdout[:100]}"
+    )
 
     # Assert: NOT JSON (would fail json.loads)
     with pytest.raises(json.JSONDecodeError):

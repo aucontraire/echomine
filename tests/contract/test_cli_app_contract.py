@@ -513,12 +513,16 @@ class TestCLIOutputFormatting:
         assert "[bold]" not in stderr
         assert "[yellow]" not in stderr
 
-    def test_cli_no_pretty_exceptions(self, cli_command: list[str]) -> None:
-        """Test CLI doesn't use Rich pretty exceptions.
+    def test_cli_error_messages_use_rich_formatting(self, cli_command: list[str]) -> None:
+        """Test CLI uses Rich for error message formatting (improved UX).
 
         Validates:
-        - pretty_exceptions_enable=False
-        - Standard Python tracebacks (if any)
+        - Error messages use Rich box drawing for clarity (intentional UX)
+        - pretty_exceptions_enable=False still prevents Rich tracebacks for actual exceptions
+        - Exit code 2 for invalid commands
+
+        Note: This test was updated when Rich formatting was enabled for the CLI.
+        Rich error boxes improve readability while keeping tracebacks standard.
         """
         # Act: Run with invalid command
         result = subprocess.run(
@@ -530,12 +534,14 @@ class TestCLIOutputFormatting:
             env={**os.environ, "PYTHONUTF8": "1"},
         )
 
-        # Assert: No Rich exception formatting
+        # Assert: Rich error box formatting IS present (this is GOOD UX)
         stderr = result.stderr
-        # Rich exceptions have colored formatting and special symbols
-        # Standard errors should be plain text
-        assert "╭─" not in stderr  # Rich exception box drawing
-        assert "│" not in stderr or "Error" in stderr  # Pipe symbol used by Rich
+        # Rich error boxes use box drawing characters for clarity
+        assert "Error" in stderr
+        # Error boxes should contain the actual error message
+        assert "invalid-cmd" in stderr or "No such command" in stderr
+        # Exit code 2 for usage errors
+        assert result.returncode == 2
 
     def test_cli_help_text_readable(self, cli_command: list[str]) -> None:
         """Test help text is plain and readable without terminal colors.

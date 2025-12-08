@@ -8,17 +8,29 @@ Constitution Compliance:
     - FR-018: Human-readable output with simple text tables
     - FR-019: Pipeline-friendly output (works with grep, awk, head)
     - CHK040: Simple text table format without Rich dependency for table rendering
+    - FR-036: Rich table format for enhanced terminal output
+    - FR-037: Score color coding (>0.7 green, 0.4-0.7 yellow, <0.4 red)
+    - FR-038: Role color coding (user=green, assistant=blue, system=yellow)
+    - FR-040: Rich disabled when stdout not TTY
+    - FR-041: Rich disabled with --json flag
 
 Architecture:
-    - format_text_table(): Default human-readable output
+    - format_text_table(): Default human-readable output (plain text)
     - format_json(): Machine-readable JSON for pipelines (NDJSON)
+    - create_rich_table(): Rich table format for TTY output
+    - get_score_color(): Color coding for relevance scores
+    - get_role_color(): Color coding for message roles
+    - is_rich_enabled(): TTY detection for Rich formatting
     - Both functions are pure: input -> output, no I/O
 """
 
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING
+import sys
+from typing import TYPE_CHECKING, Literal
+
+from rich.table import Table
 
 
 if TYPE_CHECKING:
@@ -360,3 +372,279 @@ def format_search_results_json(
 
     # FR-305: Pretty-print with 2-space indentation
     return json.dumps(output, indent=2, ensure_ascii=False) + "\n"
+
+
+# ============================================================================
+# Rich Formatting Functions (FR-036 to FR-041)
+# ============================================================================
+
+
+def get_score_color(score: float) -> str:
+    """Get color name for relevance score based on threshold.
+
+    Color Coding (FR-037):
+        - > 0.7: green (high relevance)
+        - 0.4 - 0.7: yellow (medium relevance)
+        - < 0.4: red (low relevance)
+
+    Args:
+        score: Relevance score (0.0 to 1.0)
+
+    Returns:
+        Color name string compatible with Rich styling
+
+    Example:
+        >>> get_score_color(0.85)
+        'green'
+        >>> get_score_color(0.55)
+        'yellow'
+        >>> get_score_color(0.25)
+        'red'
+
+    Requirements:
+        - FR-037: Score color coding
+    """
+    if score > 0.7:
+        return "green"
+    if score >= 0.4:
+        return "yellow"
+    return "red"
+
+
+def get_role_color(role: str) -> str:
+    """Get color name for message role.
+
+    Color Coding (FR-038):
+        - user: green
+        - assistant: blue
+        - system: yellow
+        - other: white (default)
+
+    Args:
+        role: Message role string
+
+    Returns:
+        Color name string compatible with Rich styling
+
+    Example:
+        >>> get_role_color("user")
+        'green'
+        >>> get_role_color("assistant")
+        'blue'
+        >>> get_role_color("system")
+        'yellow'
+
+    Requirements:
+        - FR-038: Role color coding
+    """
+    role_colors: dict[str, str] = {
+        "user": "green",
+        "assistant": "blue",
+        "system": "yellow",
+    }
+    return role_colors.get(role, "white")
+
+
+def is_rich_enabled(json_flag: bool, force: bool = False) -> bool:
+    """Check if Rich formatting should be enabled.
+
+    Rich formatting is enabled when:
+        1. stdout is a TTY (not piped or redirected)
+        2. --json flag is NOT set
+        3. OR force=True (for testing/debugging)
+
+    Args:
+        json_flag: True if --json flag is set
+        force: Force Rich on regardless of TTY (for testing)
+
+    Returns:
+        True if Rich should be used, False for plain text
+
+    Example:
+        >>> is_rich_enabled(json_flag=False)  # TTY
+        True
+        >>> is_rich_enabled(json_flag=True)  # --json set
+        False
+
+    Requirements:
+        - FR-040: Rich disabled when stdout not TTY
+        - FR-041: Rich disabled with --json flag
+    """
+    # Force flag overrides all checks (for testing)
+    if force:
+        return True
+
+    # --json flag disables Rich (FR-041)
+    if json_flag:
+        return False
+
+    # Check if stdout is TTY (FR-040)
+    return sys.stdout.isatty()
+
+
+def create_rich_table(conversations: list[Conversation]) -> Table:
+    """Create Rich table for conversation list display.
+
+    Creates a visually enhanced table with:
+        - Box borders with Unicode characters
+        - Column headers (ID, Title, Messages, Created)
+        - Right-aligned message count
+        - Formatted timestamps
+
+    Args:
+        conversations: List of Conversation objects to display
+
+    Returns:
+        Rich Table instance ready for console.print()
+
+    Example:
+        >>> table = create_rich_table([conversation1, conversation2])
+        >>> console = Console()
+        >>> console.print(table)
+
+    Requirements:
+        - FR-036: Rich table format for list/search results
+    """
+    # Create table with box borders
+    table = Table(show_header=True, header_style="bold cyan", border_style="blue")
+
+    # Add columns with alignment
+    table.add_column("ID", style="dim", width=36)
+    table.add_column("Title", style="cyan", width=30)
+    table.add_column("Messages", justify="right", style="magenta")
+    table.add_column("Created", style="green")
+
+    # Add rows
+    for conv in conversations:
+        # Format timestamp (remove timezone for display)
+        created = conv.created_at.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Truncate title if needed
+        title = conv.title
+        if len(title) > 30:
+            title = title[:27] + "..."
+
+        # Add row
+        table.add_row(
+            conv.id,
+            title,
+            str(conv.message_count),
+            created,
+        )
+
+    return table
+
+
+def create_rich_search_table(results: list[SearchResult[Conversation]]) -> Table:
+    """Create Rich table for search results with colored scores.
+
+    Creates a visually enhanced table with:
+        - Box borders with Unicode characters
+        - Column headers (Score, ID, Title, Snippet, Created, Messages)
+        - Color-coded scores (FR-037: >0.7 green, 0.4-0.7 yellow, <0.4 red)
+        - Right-aligned message count
+        - Formatted timestamps
+
+    Args:
+        results: List of SearchResult objects to display
+
+    Returns:
+        Rich Table instance ready for console.print()
+
+    Example:
+        >>> table = create_rich_search_table([result1, result2])
+        >>> console = Console()
+        >>> console.print(table)
+
+    Requirements:
+        - FR-036: Rich table format for search results
+        - FR-037: Score color coding
+    """
+    # Create table with box borders
+    table = Table(show_header=True, header_style="bold cyan", border_style="blue")
+
+    # Add columns with alignment
+    table.add_column("Score", justify="right", style="bold")
+    table.add_column("ID", style="dim", width=36)
+    table.add_column("Title", style="cyan", width=30)
+    table.add_column("Snippet", style="white", width=40)
+    table.add_column("Created", style="green")
+    table.add_column("Messages", justify="right", style="magenta")
+
+    # Add rows with color-coded scores
+    for result in results:
+        conv = result.conversation
+
+        # Format score with color (FR-037)
+        score_color = get_score_color(result.score)
+        score_text = f"[{score_color}]{result.score:.2f}[/{score_color}]"
+
+        # Format timestamp
+        created = conv.created_at.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Truncate title if needed
+        title = conv.title
+        if len(title) > 30:
+            title = title[:27] + "..."
+
+        # Truncate snippet if needed
+        snippet = result.snippet or ""
+        if len(snippet) > 40:
+            snippet = snippet[:37] + "..."
+
+        # Add row
+        table.add_row(
+            score_text,
+            conv.id,
+            title,
+            snippet,
+            created,
+            str(conv.message_count),
+        )
+
+    return table
+
+
+def resolve_format_conflict(
+    format: str, json: bool, json_comes_last: bool
+) -> Literal["text", "json", "csv"]:
+    """Resolve conflicting format flags with last-wins policy.
+
+    When both --format and --json flags are specified, the last flag wins.
+    Emits a warning to stderr about the conflict.
+
+    Args:
+        format: Value of --format flag (e.g., "csv", "text", "json")
+        json: True if --json flag is set
+        json_comes_last: True if --json appeared after --format in args
+
+    Returns:
+        Final format choice based on last-wins policy
+
+    Example:
+        >>> resolve_format_conflict("csv", True, json_comes_last=True)
+        'json'  # --json wins
+        >>> resolve_format_conflict("csv", True, json_comes_last=False)
+        'csv'  # --format wins
+
+    Requirements:
+        - FR-041a: Conflicting format flags - last wins with warning
+    """
+    # Check if there's a conflict
+    # Conflict occurs when --json is set AND --format is not "json"
+    if json and format != "json":
+        # Emit warning to stderr
+        if json_comes_last:
+            winner = "JSON"
+            sys.stderr.write(
+                f"WARNING: Conflicting output formats: using {winner} (last flag wins)\n"
+            )
+            return "json"
+        winner = format.upper()
+        sys.stderr.write(f"WARNING: Conflicting output formats: using {winner} (last flag wins)\n")
+        return format  # type: ignore[return-value]
+
+    # No conflict - use json if flag set, otherwise format
+    if json:
+        return "json"
+    return format  # type: ignore[return-value]

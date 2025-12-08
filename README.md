@@ -18,6 +18,9 @@ Echomine is a Python library and CLI tool for parsing, searching, and exporting 
 - **Memory Efficient**: Stream-based parsing handles 1GB+ files with constant memory usage
 - **Advanced Search**: BM25 relevance ranking with exact phrase matching, boolean logic, role filtering, and keyword exclusion
 - **Message Snippets**: Automatic preview generation for search results with match context
+- **Statistics & Analytics**: Calculate export statistics, conversation metrics, and temporal patterns
+- **Rich CLI Output**: Color-coded terminal formatting, tables, progress bars, and syntax highlighting
+- **Multiple Export Formats**: Export to Markdown (with YAML frontmatter), JSON, or CSV
 - **Type Safe**: Strict typing with Pydantic v2 and mypy --strict compliance
 - **Library First**: All CLI capabilities available as importable Python library
 - **Multi-Provider Ready**: Adapter pattern supports multiple AI export formats
@@ -93,7 +96,15 @@ for result in adapter.search(export_file, query):
     print(f"[{result.score:.2f}] {result.conversation.title}")
     print(f"  Snippet: {result.snippet}")
 
-# 4. Get specific conversation by ID
+# 4. Calculate statistics (v1.2.0+)
+from echomine import calculate_statistics
+
+stats = calculate_statistics(export_file)
+print(f"Total conversations: {stats.total_conversations}")
+print(f"Total messages: {stats.total_messages}")
+print(f"Average messages: {stats.average_messages:.1f}")
+
+# 5. Get specific conversation by ID
 conversation = adapter.get_conversation_by_id(export_file, "conv-abc123")
 if conversation:
     print(f"Found: {conversation.title}")
@@ -129,20 +140,20 @@ echomine search export.json --title "Project"
 # Filter by date range
 echomine search export.json --from-date "2024-01-01" --to-date "2024-03-31"
 
-# Get conversation by ID
-echomine get conversation export.json conv-abc123
+# View export statistics (v1.2.0+)
+echomine stats export.json
 
-# Get message by ID (with conversation hint for performance)
-echomine get message export.json msg-def456 -c conv-abc123
+# Get conversation by ID (v1.2.0+)
+echomine get export.json conv-abc123
 
-# Export conversation to markdown (default)
+# Export conversation to markdown with YAML frontmatter (v1.2.0+)
 echomine export export.json conv-abc123 --output algo.md
 
 # Export as JSON
 echomine export export.json conv-abc123 --format json --output algo.json
 
-# JSON to stdout for piping
-echomine export export.json conv-abc123 -f json | jq '.messages | length'
+# Export as CSV (v1.2.0+)
+echomine export export.json conv-abc123 --format csv --output algo.csv
 
 # JSON output for search results
 echomine search export.json --keywords "python" --json | jq '.results[].title'

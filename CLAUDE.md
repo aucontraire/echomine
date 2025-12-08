@@ -9,6 +9,7 @@
 ## Active Technologies
 - Python 3.12+ (existing stack, mypy --strict compliant) (002-advanced-search)
 - File system only (JSON exports, no database) (002-advanced-search)
+- Python 3.12+ (existing stack, mypy --strict compliant) + Pydantic v2.6+, ijson 3.2+, typer 0.9+, rich 13.0+, structlog 23.0+ (003-baseline-enhancements)
 
 ### Core Stack
 - **Python 3.12+**: Required for modern type hints (PEP 695, improved generics)
@@ -615,10 +616,10 @@ logger.error(
 ---
 
 ## Recent Changes
+- 003-baseline-enhancements: Added Python 3.12+ (existing stack, mypy --strict compliant) + Pydantic v2.6+, ijson 3.2+, typer 0.9+, rich 13.0+, structlog 23.0+
 - 002-advanced-search: Added Python 3.12+ (existing stack, mypy --strict compliant)
 
 - 2025-11-22: Added comprehensive development guidelines, agent coordination, constitution principles
-- 2025-11-21: Initial project setup from Specify template (001-ai-chat-parser)
 
 <!-- MANUAL ADDITIONS START -->
 <!-- Add project-specific notes, tips, or warnings here -->

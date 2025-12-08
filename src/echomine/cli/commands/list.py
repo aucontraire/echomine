@@ -36,10 +36,18 @@ from typing import Annotated
 
 import typer
 from pydantic import ValidationError as PydanticValidationError
+from rich.console import Console
 
 from echomine.adapters.openai import OpenAIAdapter
-from echomine.cli.formatters import format_json, format_text_table
+from echomine.cli.formatters import (
+    create_rich_table,
+    format_json,
+    format_text_table,
+    is_rich_enabled,
+)
 from echomine.exceptions import ParseError, ValidationError
+from echomine.export.csv import CSVExporter
+from echomine.models.conversation import Conversation
 
 
 def list_conversations(
@@ -68,39 +76,51 @@ def list_conversations(
             min=1,
         ),
     ] = None,
+    sort: Annotated[
+        str,
+        typer.Option(
+            "--sort",
+            help="Sort by: date (default), title, or messages",
+            case_sensitive=False,
+        ),
+    ] = "date",
+    order: Annotated[
+        str,
+        typer.Option(
+            "--order",
+            help="Sort order: asc or desc (default varies by field)",
+            case_sensitive=False,
+        ),
+    ] = "",
 ) -> None:
-    """List all conversations from export file.
+    """[bold]List all conversations[/bold] from export file.
 
     Streams conversations from the export file and outputs them to stdout
     in either human-readable text table format or machine-readable JSON.
 
-    Examples:
-        # List conversations in text table format (default)
-        $ echomine list export.json
+    [bold]Examples:[/bold]
+        [dim]# List conversations in text table format (default)[/dim]
+        $ [green]echomine list[/green] export.json
 
-        # List conversations in JSON format
-        $ echomine list export.json --format json
+        [dim]# List conversations in JSON format[/dim]
+        $ [green]echomine list[/green] export.json [cyan]--format[/cyan] json
 
-        # Pipeline with grep
-        $ echomine list export.json | grep "Python"
+        [dim]# Sort by title ascending[/dim]
+        $ [green]echomine list[/green] export.json [cyan]--sort[/cyan] title [cyan]--order[/cyan] asc
 
-        # Pipeline with jq
-        $ echomine list export.json --format json | jq '.[0].title'
+        [dim]# Limit to top 10 most recent[/dim]
+        $ [green]echomine list[/green] export.json [cyan]--limit[/cyan] 10
 
-    Args:
-        file_path: Path to OpenAI export JSON file
-        format: Output format ('text' or 'json')
+        [dim]# Pipeline with grep[/dim]
+        $ [green]echomine list[/green] export.json | grep "Python"
 
-    Exit Codes:
-        0: Success
-        1: File not found, permission denied, parse error, validation error
-        2: Invalid arguments (handled by Typer)
+        [dim]# Pipeline with jq[/dim]
+        $ [green]echomine list[/green] export.json [cyan]--format[/cyan] json | jq '.[0].title'
 
-    Requirements:
-        - CHK031: Data to stdout, errors to stderr
-        - CHK032: Exit codes 0/1/2
-        - FR-018: Human-readable output
-        - FR-019: Pipeline-friendly
+    [bold]Exit Codes:[/bold]
+        [green]0[/green]: Success
+        [red]1[/red]: File not found, permission denied, parse error, validation error
+        [yellow]2[/yellow]: Invalid arguments (handled by Typer)
     """
     # Validate limit parameter (for direct calls bypassing Typer CLI validation)
     # Must be outside try block to avoid being caught by Exception handler
@@ -114,12 +134,33 @@ def list_conversations(
     try:
         # Validate format option
         format_lower = format.lower()
-        if format_lower not in ("text", "json"):
+        if format_lower not in ("text", "json", "csv"):
             typer.echo(
-                f"Error: Invalid format '{format}'. Must be 'text' or 'json'.",
+                f"Error: Invalid format '{format}'. Must be 'text', 'json', or 'csv'.",
                 err=True,
             )
             raise typer.Exit(code=1)
+
+        # Validate sort option (FR-048a)
+        sort_lower = sort.lower()
+        if sort_lower not in ("date", "title", "messages"):
+            typer.echo(
+                f"Error: Invalid --sort '{sort}'. Must be 'date', 'title', or 'messages'.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+
+        # Determine default sort order based on field (FR-048c)
+        # date=desc (newest first), title=asc (A-Z), messages=desc (largest first)
+        order_lower = ("asc" if sort_lower == "title" else "desc") if order == "" else order.lower()
+
+        # Validate order option
+        if order_lower not in ("asc", "desc"):
+            typer.echo(
+                f"Error: Invalid --order '{order}'. Must be 'asc' or 'desc'.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
 
         # Check file exists (manual check for better error message)
         if not file_path.exists():
@@ -133,22 +174,65 @@ def list_conversations(
         adapter = OpenAIAdapter()
         conversations = list(adapter.stream_conversations(file_path))
 
-        # Sort by created_at descending (newest first) per FR-440
-        conversations.sort(key=lambda c: c.created_at, reverse=True)
+        # Sort conversations based on parameters (FR-048a-c)
+        def get_list_sort_key(conv: Conversation) -> tuple[float | str | int, str]:
+            """Get sort key for list command.
+
+            Returns tuple for multi-level sorting:
+            - Primary: sort field value
+            - Secondary: conversation_id (tie-breaker)
+
+            FR-046a: For date sort, use updated_at or fall back to created_at
+            FR-047: Title sort is case-insensitive
+            """
+            if sort_lower == "date":
+                # Use updated_at if present, otherwise created_at
+                sort_date = conv.updated_at if conv.updated_at is not None else conv.created_at
+                primary_key: float | str | int = sort_date.timestamp()
+            elif sort_lower == "title":
+                # Case-insensitive title sort
+                primary_key = conv.title.lower()
+            elif sort_lower == "messages":
+                # Sort by message count
+                primary_key = conv.message_count
+            else:
+                # Should never happen due to validation above, but defensive
+                primary_key = conv.created_at.timestamp()
+
+            # Tie-breaking by conversation_id (ascending)
+            return (primary_key, conv.id)
+
+        # Apply sorting
+        reverse_sort = order_lower == "desc"
+        conversations.sort(key=get_list_sort_key, reverse=reverse_sort)
 
         # Apply limit if specified (FR-443)
         if limit is not None:
             conversations = conversations[:limit]
 
         # Format output based on requested format
-        if format_lower == "json":
+        if format_lower == "csv":
+            # Conversation-level CSV output (FR-049, FR-050)
+            exporter = CSVExporter()
+            output = exporter.export_conversations(conversations)
+            typer.echo(output, nl=False)
+        elif format_lower == "json":
             output = format_json(conversations)
+            # Write JSON output to stdout (CHK031)
+            typer.echo(output, nl=False)
         else:
-            output = format_text_table(conversations)
+            # Check if Rich formatting should be used (FR-036, FR-040, FR-041)
+            use_rich = is_rich_enabled(json_flag=False)
 
-        # Write output to stdout (CHK031)
-        # Use nl=False to avoid extra newline (formatters include trailing newline)
-        typer.echo(output, nl=False)
+            if use_rich:
+                # Rich table output (FR-036)
+                table = create_rich_table(conversations)
+                console = Console()
+                console.print(table)
+            else:
+                # Plain text table output (default for pipes/redirects)
+                output = format_text_table(conversations)
+                typer.echo(output, nl=False)
 
         # Return normally for success (exit code 0)
         # Don't raise typer.Exit for success case
@@ -163,9 +247,9 @@ def list_conversations(
         raise typer.Exit(code=1)
 
     except PermissionError:
-        # Permission denied when trying to read file
+        # Permission denied when trying to read file (FR-061)
         typer.echo(
-            f"Error: Permission denied: {file_path}",
+            f"Error: Permission denied: {file_path}. Check file read permissions.",
             err=True,
         )
         raise typer.Exit(code=1)

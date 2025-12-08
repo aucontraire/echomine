@@ -37,36 +37,40 @@ from echomine.cli.commands.export import export_conversation
 from echomine.cli.commands.get import get_app
 from echomine.cli.commands.list import list_conversations
 from echomine.cli.commands.search import search_conversations
+from echomine.cli.commands.stats import stats_command
 
 
 # Create Typer application
 app = typer.Typer(
     name="echomine",
-    help="Library-first tool for parsing AI conversation exports",
-    epilog="""Examples:
-  # List all conversations
-  echomine list export.json
+    help="[bold cyan]Library-first tool for parsing AI conversation exports[/bold cyan]",
+    epilog="""[bold]Examples:[/bold]
+  [dim]# List all conversations[/dim]
+  [green]echomine list[/green] export.json
 
-  # Get conversation by ID
-  echomine get conversation export.json <conversation-id>
+  [dim]# Get conversation by ID[/dim]
+  [green]echomine get conversation[/green] export.json [yellow]<conversation-id>[/yellow]
 
-  # Get message by ID
-  echomine get message export.json <message-id>
+  [dim]# List all messages in a conversation[/dim]
+  [green]echomine get messages[/green] export.json [yellow]<conversation-id>[/yellow]
 
-  # Search by keywords
-  echomine search export.json -k python,algorithm
+  [dim]# Get message by ID[/dim]
+  [green]echomine get message[/green] export.json [yellow]<message-id>[/yellow]
 
-  # Filter by title and date range
-  echomine search export.json -t "Debug" --from-date 2024-01-01
+  [dim]# Search by keywords[/dim]
+  [green]echomine search[/green] export.json [cyan]-k[/cyan] python,algorithm
 
-  # Export conversation to markdown
-  echomine export export.json <conversation-id> --output chat.md
+  [dim]# Filter by title and date range[/dim]
+  [green]echomine search[/green] export.json [cyan]-t[/cyan] "Debug" [cyan]--from-date[/cyan] 2024-01-01
 
-For more help: echomine COMMAND --help""",
+  [dim]# Export conversation to markdown[/dim]
+  [green]echomine export[/green] export.json [yellow]<conversation-id>[/yellow] [cyan]--output[/cyan] chat.md
+
+[dim]For more help:[/dim] [green]echomine COMMAND --help[/green]""",
     add_completion=False,  # Disable shell completion for simplicity
     no_args_is_help=False,  # Handled manually in callback to support --version
     pretty_exceptions_enable=False,  # Disable pretty exceptions for simpler output
-    rich_markup_mode=None,  # Disable Rich markup for cleaner output
+    rich_markup_mode="rich",  # Enable Rich markup for colorful output
 )
 
 
@@ -96,11 +100,18 @@ def callback(
         raise typer.Exit(0)
 
 
-# Register commands
-app.command(name="list", help="List all conversations from export file")(list_conversations)
+# Register commands with Rich-styled help text
+app.command(name="list", help="[cyan]List[/cyan] all conversations from export file")(
+    list_conversations
+)
 app.add_typer(get_app, name="get")  # Hierarchical command group (conversation, message)
-app.command(name="search", help="Search conversations by keywords")(search_conversations)
-app.command(name="export", help="Export conversation to markdown format")(export_conversation)
+app.command(name="search", help="[cyan]Search[/cyan] conversations by keywords")(
+    search_conversations
+)
+app.command(name="export", help="[cyan]Export[/cyan] conversation to markdown format")(
+    export_conversation
+)
+app.command(name="stats", help="[cyan]Display[/cyan] export-level statistics")(stats_command)
 
 
 def _configure_encoding() -> None:
@@ -145,10 +156,10 @@ def main() -> None:
         # Re-raise to preserve exit code
         raise
     except KeyboardInterrupt:  # pragma: no cover
-        # User interrupted with Ctrl+C
-        # Exit cleanly without error message
+        # User interrupted with Ctrl+C (FR-062)
+        # Exit with code 130 (standard for SIGINT: 128 + 2)
         typer.echo("", err=True)
-        sys.exit(1)
+        sys.exit(130)
     except Exception as e:  # pragma: no cover
         # Unexpected error not caught by command
         # This is a safety net - commands should handle their own errors
