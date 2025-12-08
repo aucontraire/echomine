@@ -83,7 +83,25 @@ for result in adapter.search(export_file, query):
     print(f"  Matched: {len(result.matched_message_ids)} messages")
 ```
 
-### 4. Get Specific Conversation
+### 4. Calculate Statistics (v1.2.0+)
+
+Get comprehensive export statistics:
+
+```python
+from echomine import calculate_statistics
+
+# Export-level statistics
+stats = calculate_statistics(export_file)
+print(f"Total conversations: {stats.total_conversations}")
+print(f"Total messages: {stats.total_messages}")
+print(f"Average messages: {stats.average_messages:.1f}")
+
+if stats.largest_conversation:
+    print(f"Largest: {stats.largest_conversation.title} "
+          f"({stats.largest_conversation.message_count} messages)")
+```
+
+### 5. Get Specific Conversation
 
 Retrieve a conversation by ID:
 
@@ -152,14 +170,43 @@ echomine search export.json \
 
 See [CLI Usage](cli-usage.md#how-search-filters-combine) for detailed filter logic.
 
-### Export to Markdown or JSON
+### View Statistics (v1.2.0+)
 
 ```bash
-# Export specific conversation as markdown (default)
+# View export statistics
+echomine stats export.json
+
+# JSON output for scripting
+echomine stats export.json --json
+```
+
+### Get Conversation by ID (v1.2.0+)
+
+```bash
+# Display full conversation
+echomine get export.json conv-abc123
+
+# Summary only
+echomine get export.json conv-abc123 --display summary
+
+# JSON output
+echomine get export.json conv-abc123 --json
+```
+
+### Export to Markdown, JSON, or CSV (v1.2.0+)
+
+```bash
+# Export as markdown with YAML frontmatter (default in v1.2.0)
 echomine export export.json conv-abc123 --output algo.md
+
+# Export without frontmatter (v1.1.0 style)
+echomine export export.json conv-abc123 --output algo.md --no-metadata
 
 # Export as JSON (for programmatic use)
 echomine export export.json conv-abc123 --format json --output conversation.json
+
+# Export as CSV (v1.2.0+)
+echomine export export.json conv-abc123 --format csv --output messages.csv
 
 # Export JSON to stdout for piping
 echomine export export.json conv-abc123 -f json | jq '.messages[0].content'
