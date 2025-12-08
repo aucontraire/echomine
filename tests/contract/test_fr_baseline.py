@@ -1005,22 +1005,34 @@ class TestFR043SearchSortOptions:
         assert query.sort_by == "score", "Default sort_by must be 'score' (FR-045)"
         assert query.sort_order == "desc", "Default sort_order must be 'desc' (FR-045)"
 
-    def test_fr043_cli_search_accepts_sort_flag(self) -> None:
+    def test_fr043_cli_search_accepts_sort_flag(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Verify search command accepts --sort flag (FR-043)."""
+        # Monkey-patch Rich Console to prevent vertical truncation in CI
+        # Rich's Console auto-detects terminal size and crops help text if height is small
+        # We force a large height to ensure all options are displayed
+        import rich.console
         from typer.testing import CliRunner
 
         from echomine.cli.app import app
 
+        original_console_init = rich.console.Console.__init__
+
+        def patched_console_init(self, *args, **kwargs):
+            # Force terminal height to prevent truncation
+            kwargs.setdefault("height", 1000)
+            # Ensure Rich treats this as a terminal (not a pipe)
+            kwargs.setdefault("force_terminal", True)
+            original_console_init(self, *args, **kwargs)
+
+        monkeypatch.setattr(rich.console.Console, "__init__", patched_console_init)
+
         runner = CliRunner()
 
         # Check help text includes --sort flag
-        # Use wide terminal dimensions to prevent Rich truncation in CI
-        # COLUMNS controls horizontal width, LINES controls vertical height
-        # Rich truncates options list vertically if terminal height is too small
+        # terminal_width only sets horizontal width, not height
         result = runner.invoke(
             app,
             ["search", "--help"],
-            env={"COLUMNS": "200", "LINES": "1000"},
             terminal_width=200,
         )
 
@@ -1029,22 +1041,34 @@ class TestFR043SearchSortOptions:
             f"search command should have --sort flag (FR-043): {result.stdout}"
         )
 
-    def test_fr044_cli_search_accepts_order_flag(self) -> None:
+    def test_fr044_cli_search_accepts_order_flag(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Verify search command accepts --order flag (FR-044)."""
+        # Monkey-patch Rich Console to prevent vertical truncation in CI
+        # Rich's Console auto-detects terminal size and crops help text if height is small
+        # We force a large height to ensure all options are displayed
+        import rich.console
         from typer.testing import CliRunner
 
         from echomine.cli.app import app
 
+        original_console_init = rich.console.Console.__init__
+
+        def patched_console_init(self, *args, **kwargs):
+            # Force terminal height to prevent truncation
+            kwargs.setdefault("height", 1000)
+            # Ensure Rich treats this as a terminal (not a pipe)
+            kwargs.setdefault("force_terminal", True)
+            original_console_init(self, *args, **kwargs)
+
+        monkeypatch.setattr(rich.console.Console, "__init__", patched_console_init)
+
         runner = CliRunner()
 
         # Check help text includes --order flag
-        # Use wide terminal dimensions to prevent Rich truncation in CI
-        # COLUMNS controls horizontal width, LINES controls vertical height
-        # Rich truncates options list vertically if terminal height is too small
+        # terminal_width only sets horizontal width, not height
         result = runner.invoke(
             app,
             ["search", "--help"],
-            env={"COLUMNS": "200", "LINES": "1000"},
             terminal_width=200,
         )
 

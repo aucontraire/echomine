@@ -409,7 +409,7 @@ class TestListLimitFlagContract:
         stderr = result.stderr
         assert len(stderr) > 0, "Error message should be on stderr"
 
-    def test_limit_flag_mentioned_in_help_text(self, cli_command: list[str]) -> None:
+    def test_limit_flag_mentioned_in_help_text(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Test that --limit flag is documented in help text.
 
         Validates:
@@ -418,30 +418,33 @@ class TestListLimitFlagContract:
 
         Expected to FAIL: --limit flag not in help text.
         """
-        # Act: Run 'echomine list --help'
-        # Use wide terminal dimensions to prevent Rich truncation in CI
-        # COLUMNS controls horizontal width, LINES controls vertical height
-        # Rich truncates options list vertically if terminal height is too small
-        env = os.environ.copy()
-        env.update(
-            {
-                "PYTHONUTF8": "1",
-                "COLUMNS": "200",
-                "LINES": "1000",
-            }
-        )
+        # Monkey-patch Rich Console to prevent vertical truncation in CI
+        # Rich's Console auto-detects terminal size and crops help text if height is small
+        # We force a large height to ensure all options are displayed
+        import rich.console
+        from typer.testing import CliRunner
 
-        result = subprocess.run(
-            [*cli_command, "list", "--help"],
-            check=False,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            env=env,
-        )
+        from echomine.cli.app import app
+
+        original_console_init = rich.console.Console.__init__
+
+        def patched_console_init(self, *args, **kwargs):
+            # Force terminal height to prevent truncation
+            kwargs.setdefault("height", 1000)
+            # Ensure Rich treats this as a terminal (not a pipe)
+            kwargs.setdefault("force_terminal", True)
+            original_console_init(self, *args, **kwargs)
+
+        monkeypatch.setattr(rich.console.Console, "__init__", patched_console_init)
+
+        runner = CliRunner()
+
+        # Act: Run 'echomine list --help'
+        # terminal_width only sets horizontal width, not height
+        result = runner.invoke(app, ["list", "--help"], terminal_width=200)
 
         # Assert: Exit code 0
-        assert result.returncode == 0, "Help should exit with code 0"
+        assert result.exit_code == 0, "Help should exit with code 0"
 
         # Assert: Help text contains --limit flag
         stdout = result.stdout
