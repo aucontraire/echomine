@@ -31,13 +31,14 @@ from __future__ import annotations
 
 import threading
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
 
 if TYPE_CHECKING:
-    from echomine import Conversation, SearchResult
+    from echomine import Conversation
+    from echomine.models.search import SearchResult
 
 
 # ============================================================================
@@ -241,7 +242,7 @@ def test_concurrent_search_operations(
 
     adapter = OpenAIAdapter()
 
-    results: dict[int, list[SearchResult]] = {}
+    results: dict[int, list[SearchResult[Any]]] = {}
     errors: list[Exception] = []
     lock = threading.Lock()
 

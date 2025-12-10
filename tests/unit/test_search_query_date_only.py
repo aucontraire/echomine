@@ -158,7 +158,7 @@ class TestSearchQueryDateOnlySupport:
 
         # Act & Assert: Attempt to modify frozen field
         with pytest.raises(ValidationError, match="Instance is frozen"):
-            query.from_date = date(2025, 1, 1)  # type: ignore[misc]
+            query.from_date = date(2025, 1, 1)
 
     def test_search_query_model_copy_with_date_only(self) -> None:
         """Test model_copy works with date-only queries.

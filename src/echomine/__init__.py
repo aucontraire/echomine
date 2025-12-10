@@ -54,10 +54,11 @@ License:
     AGPL-3.0 License - See LICENSE file for details
 """
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 __author__ = "Echomine Contributors"
 
 # Public API imports (T061-T062)
+from echomine.adapters.claude import ClaudeAdapter
 from echomine.adapters.openai import OpenAIAdapter
 from echomine.exceptions import (
     EchomineError,
@@ -100,6 +101,7 @@ __all__: list[str] = [
     "RoleCount",
     "ExportMetadata",
     # Adapters
+    "ClaudeAdapter",
     "OpenAIAdapter",
     # Exporters
     "CSVExporter",

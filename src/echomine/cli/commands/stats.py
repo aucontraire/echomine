@@ -1,8 +1,8 @@
 """Stats command implementation for conversation statistics.
 
 This module implements the 'stats' command for displaying aggregate statistics
-about conversation exports, including message counts, date ranges, and
-conversation summaries.
+about conversation exports (supports OpenAI and Claude), including message counts,
+date ranges, and conversation summaries.
 
 Constitution Compliance:
     - Principle I: Library-first (delegates to echomine.statistics library)
@@ -294,6 +294,15 @@ def stats_command(
             help="Show statistics for specific conversation ID (FR-018)",
         ),
     ] = None,
+    provider: Annotated[
+        str | None,
+        typer.Option(
+            "--provider",
+            "-p",
+            help="Export provider (openai or claude). Auto-detected if omitted.",
+            case_sensitive=False,
+        ),
+    ] = None,
 ) -> None:
     """[bold]Display statistics[/bold] for export or conversation.
 
@@ -337,11 +346,11 @@ def stats_command(
         # Branch based on --conversation option (FR-018)
         if conversation_id is not None:
             # Per-conversation statistics (FR-018, FR-019, FR-020, FR-021)
-            from echomine.adapters.openai import OpenAIAdapter
+            from echomine.cli.provider import get_adapter
             from echomine.statistics import calculate_conversation_statistics
 
-            # Get conversation by ID using OpenAIAdapter (Library-first)
-            adapter = OpenAIAdapter()
+            # Get conversation by ID using appropriate adapter (Library-first)
+            adapter = get_adapter(provider, file_path)
             conversation = adapter.get_conversation_by_id(file_path, conversation_id)
 
             # Check if conversation was found (FR-018)
@@ -376,6 +385,11 @@ def stats_command(
                 typer.echo(f"Analyzing conversations... {count} processed", err=True)
                 progress_displayed = True
 
+        # Get appropriate adapter (Library-first, multi-provider support)
+        from echomine.cli.provider import get_adapter
+
+        adapter = get_adapter(provider, file_path)
+
         # Calculate statistics using library function (Principle I: Library-first)
         # Use Rich progress indicator for visual feedback
         if not json_output:
@@ -389,13 +403,14 @@ def stats_command(
 
                 stats = calculate_statistics(
                     file_path,
+                    adapter=adapter,
                     progress_callback=on_progress,
                 )
 
                 progress.update(task, completed=True)
         else:
             # No progress indicator for JSON output (stdout must be clean)
-            stats = calculate_statistics(file_path)
+            stats = calculate_statistics(file_path, adapter=adapter)
 
         # Display statistics (stdout)
         if json_output:

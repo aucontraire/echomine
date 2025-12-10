@@ -1,7 +1,7 @@
 """Search command implementation.
 
 This module implements the 'search' command for searching conversations
-by keywords with BM25 relevance ranking.
+by keywords with BM25 relevance ranking (supports OpenAI and Claude exports).
 
 Constitution Compliance:
     - Principle I: Library-first (delegates to OpenAIAdapter.search)
@@ -48,13 +48,13 @@ import typer
 from pydantic import ValidationError as PydanticValidationError
 from rich.console import Console
 
-from echomine.adapters.openai import OpenAIAdapter
 from echomine.cli.formatters import (
     create_rich_search_table,
     format_search_results,
     format_search_results_json,
     is_rich_enabled,
 )
+from echomine.cli.provider import get_adapter
 from echomine.exceptions import ParseError, ValidationError
 from echomine.export.csv import CSVExporter
 from echomine.models.search import SearchQuery
@@ -257,6 +257,15 @@ def search_conversations(
             help="Output message-level CSV (mutually exclusive with --format csv)",
         ),
     ] = False,
+    provider: Annotated[
+        str | None,
+        typer.Option(
+            "--provider",
+            "-p",
+            help="Export provider (openai or claude). Auto-detected if omitted.",
+            case_sensitive=False,
+        ),
+    ] = None,
 ) -> None:
     """[bold]Search conversations[/bold] by keywords with BM25 relevance ranking.
 
@@ -486,8 +495,8 @@ def search_conversations(
         # Track execution time (FR-303)
         start_time = time.time()
 
-        # Search conversations
-        adapter = OpenAIAdapter()
+        # Search conversations with appropriate adapter
+        adapter = get_adapter(provider, file_path)
         results = list(
             adapter.search(
                 file_path,

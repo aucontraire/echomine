@@ -1,0 +1,175 @@
+[
+  {
+    "uuid": "valid-conv-001",
+    "name": "Valid Conversation Before Errors",
+    "summary": "This conversation is valid and should parse successfully",
+    "created_at": "2025-10-01T10:00:00.000000Z",
+    "updated_at": "2025-10-01T10:00:10.000000Z",
+    "account": {
+      "uuid": "acc-valid-001"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-valid-001",
+        "text": "Valid message",
+        "content": [
+          {
+            "type": "text",
+            "text": "Valid message"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-01T10:00:05.000000Z",
+        "updated_at": "2025-10-01T10:00:05.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "name": "Missing UUID Field",
+    "summary": "This conversation is missing the required uuid field",
+    "created_at": "2025-10-02T11:00:00.000000Z",
+    "updated_at": "2025-10-02T11:00:10.000000Z",
+    "account": {
+      "uuid": "acc-malformed-001"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-malformed-001",
+        "text": "This message's parent conversation has no UUID",
+        "content": [
+          {
+            "type": "text",
+            "text": "This message's parent conversation has no UUID"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-02T11:00:05.000000Z",
+        "updated_at": "2025-10-02T11:00:05.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "invalid-timestamp-conv",
+    "name": "Invalid Timestamp Format",
+    "summary": "This conversation has invalid timestamp format",
+    "created_at": "not-a-valid-iso-timestamp",
+    "updated_at": "2025-10-03T12:00:10.000000Z",
+    "account": {
+      "uuid": "acc-malformed-002"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-malformed-002",
+        "text": "Parent conversation has invalid timestamp",
+        "content": [
+          {
+            "type": "text",
+            "text": "Parent conversation has invalid timestamp"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-03T12:00:05.000000Z",
+        "updated_at": "2025-10-03T12:00:05.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "valid-conv-002",
+    "name": "Valid Conversation with Malformed Message",
+    "summary": "The conversation is valid but contains a message missing required fields",
+    "created_at": "2025-10-04T13:00:00.000000Z",
+    "updated_at": "2025-10-04T13:00:30.000000Z",
+    "account": {
+      "uuid": "acc-mixed-001"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-valid-before-error",
+        "text": "This message is valid",
+        "content": [
+          {
+            "type": "text",
+            "text": "This message is valid"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-04T13:00:05.000000Z",
+        "updated_at": "2025-10-04T13:00:05.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "text": "Missing UUID and sender fields",
+        "content": [
+          {
+            "type": "text",
+            "text": "Missing UUID and sender fields"
+          }
+        ],
+        "created_at": "2025-10-04T13:00:15.000000Z",
+        "updated_at": "2025-10-04T13:00:15.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-valid-after-error",
+        "text": "This message is also valid",
+        "content": [
+          {
+            "type": "text",
+            "text": "This message is also valid"
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-10-04T13:00:25.000000Z",
+        "updated_at": "2025-10-04T13:00:25.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "empty-messages-conv",
+    "name": "Empty Messages Array - Valid Edge Case",
+    "summary": "This conversation has zero messages but is structurally valid",
+    "created_at": "2025-10-05T14:00:00.000000Z",
+    "updated_at": "2025-10-05T14:00:00.000000Z",
+    "account": {
+      "uuid": "acc-edge-001"
+    },
+    "chat_messages": []
+  },
+  {
+    "uuid": "valid-conv-003",
+    "name": "Valid Conversation After Errors",
+    "summary": "This conversation should parse successfully after previous malformed entries",
+    "created_at": "2025-10-06T15:00:00.000000Z",
+    "updated_at": "2025-10-06T15:00:10.000000Z",
+    "account": {
+      "uuid": "acc-valid-002"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-valid-final",
+        "text": "Final valid message",
+        "content": [
+          {
+            "type": "text",
+            "text": "Final valid message"
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-10-06T15:00:05.000000Z",
+        "updated_at": "2025-10-06T15:00:05.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  }
+]

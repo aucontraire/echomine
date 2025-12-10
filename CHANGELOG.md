@@ -25,6 +25,77 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A
 
+## [1.3.0] - 2025-12-10
+
+### Added
+
+#### Multi-Provider Support: Anthropic Claude
+
+- **ClaudeAdapter**: Full-featured adapter for Anthropic Claude conversation exports
+  - Library: `from echomine import ClaudeAdapter`
+  - Streaming parser with O(1) memory usage (same performance as OpenAI adapter)
+  - Supports all core operations: stream_conversations, search, get_conversation_by_id, get_message_by_id
+  - Handles Claude-specific export schema (chat_messages, content blocks, tool use)
+  - Graceful handling of empty conversations and malformed entries
+
+- **Auto-Detection**: Automatic provider detection from export file structure
+  - Library: `from echomine.cli.provider import detect_provider, get_adapter`
+  - Inspects JSON structure to identify provider (chat_messages → Claude, mapping → OpenAI)
+  - Zero-configuration usage - works automatically in all CLI commands
+  - O(1) memory usage (streams first conversation only)
+
+- **Provider Selection Flag**: Explicit provider control across all CLI commands
+  - CLI: `--provider {openai,claude}` flag on list, search, get, export, stats commands
+  - Bypasses auto-detection for faster startup or ambiguous exports
+  - Backwards compatible - auto-detection used when flag omitted
+
+#### Claude Export Format Support
+
+- **Field Mappings**: Claude export schema mapped to unified Conversation model
+  - uuid → id (conversation and message identifiers)
+  - name → title (with "(No title)" fallback for empty names)
+  - chat_messages → messages (flat message array structure)
+  - sender ("human"/"assistant") → role ("user"/"assistant")
+
+- **Content Block Extraction**: Intelligent handling of Claude's multi-block content structure
+  - Extracts text from content[type=text] blocks
+  - Skips tool_use and tool_result blocks (tool invocations ignored)
+  - Fallback to text field if content blocks empty
+  - Multi-block concatenation with newline separator
+
+- **Timestamp Handling**: Timezone-aware parsing with fallback strategy
+  - Parses ISO 8601 timestamps with Z suffix (Zulu/UTC)
+  - Message timestamps fall back to conversation created_at if missing
+  - All timestamps normalized to UTC
+
+- **Empty Conversation Support**: Graceful handling of zero-message conversations
+  - Placeholder message inserted to satisfy Conversation model constraints
+  - Marked with is_placeholder metadata flag
+  - Prevents validation errors while maintaining data integrity
+
+### Changed
+
+- All CLI commands now support both OpenAI and Claude exports via auto-detection
+- Library exports updated: `from echomine import ClaudeAdapter` now available
+- Provider detection integrated into CLI command initialization
+
+### Documentation
+
+- Complete specification: `specs/004-claude-adapter/spec.md`
+- Implementation plan: `specs/004-claude-adapter/plan.md`
+- Task breakdown: `specs/004-claude-adapter/tasks.md`
+- Library API contracts: `specs/004-claude-adapter/contracts/library_api.md`
+- CLI contracts: `specs/004-claude-adapter/contracts/cli_spec.md`
+- Quickstart guide: `specs/004-claude-adapter/quickstart.md`
+
+### Quality Metrics
+
+- Test coverage: 95%+ on ClaudeAdapter code paths
+- mypy --strict: 0 errors
+- ruff check: All passed
+- Added 80+ new tests for Claude parsing, provider detection, and CLI integration
+- Contract tests validate Claude export schema compliance
+
 ## [1.2.0] - 2025-12-07
 
 ### Added
@@ -262,7 +333,8 @@ Each release includes:
 
 ---
 
-[Unreleased]: https://github.com/aucontraire/echomine/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/aucontraire/echomine/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/aucontraire/echomine/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/aucontraire/echomine/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/aucontraire/echomine/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/aucontraire/echomine/compare/v1.0.1...v1.0.2

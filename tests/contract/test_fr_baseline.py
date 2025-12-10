@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -210,10 +211,20 @@ class TestFR016CalculateStatisticsSignature:
         """Verify calculate_statistics() return type is ExportStatistics (FR-016)."""
         import typing
 
+        import echomine.statistics
+        from echomine.adapters.claude import ClaudeAdapter
+        from echomine.adapters.openai import OpenAIAdapter
         from echomine.statistics import calculate_statistics
 
-        # Get type hints
-        hints = typing.get_type_hints(calculate_statistics)
+        # Get type hints with module globals augmented with TYPE_CHECKING imports
+        # Since OpenAIAdapter and ClaudeAdapter are only imported under TYPE_CHECKING,
+        # we need to provide them explicitly to resolve the type annotations
+        namespace = {
+            **vars(echomine.statistics),
+            "OpenAIAdapter": OpenAIAdapter,
+            "ClaudeAdapter": ClaudeAdapter,
+        }
+        hints = typing.get_type_hints(calculate_statistics, globalns=namespace)
 
         # Verify return type hint exists
         assert "return" in hints, "calculate_statistics() must have return type hint (FR-016)"
@@ -1019,7 +1030,7 @@ class TestFR043SearchSortOptions:
 
         original_console_init = rich.console.Console.__init__
 
-        def patched_console_init(self, *args, **kwargs):
+        def patched_console_init(self: Any, *args: Any, **kwargs: Any) -> None:
             # Force terminal dimensions to prevent truncation (override any existing values)
             kwargs["height"] = 1000  # Use assignment, not setdefault
             kwargs["width"] = 200
@@ -1063,7 +1074,7 @@ class TestFR043SearchSortOptions:
 
         original_console_init = rich.console.Console.__init__
 
-        def patched_console_init(self, *args, **kwargs):
+        def patched_console_init(self: Any, *args: Any, **kwargs: Any) -> None:
             # Force terminal dimensions to prevent truncation (override any existing values)
             kwargs["height"] = 1000  # Use assignment, not setdefault
             kwargs["width"] = 200

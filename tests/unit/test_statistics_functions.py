@@ -23,6 +23,7 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+from echomine.adapters.openai import OpenAIAdapter
 from echomine.models.conversation import Conversation
 from echomine.models.message import Message
 from echomine.models.statistics import RoleCount
@@ -92,7 +93,8 @@ class TestCalculateStatistics:
         export_file.write_text(json.dumps(export_data))
 
         # Calculate statistics
-        stats = calculate_statistics(export_file)
+        adapter = OpenAIAdapter()
+        stats = calculate_statistics(export_file, adapter=adapter)
 
         # Verify ExportStatistics returned
         assert stats.total_conversations == 2
@@ -117,7 +119,8 @@ class TestCalculateStatistics:
         export_file.write_text("[]")
 
         # Calculate statistics
-        stats = calculate_statistics(export_file)
+        adapter = OpenAIAdapter()
+        stats = calculate_statistics(export_file, adapter=adapter)
 
         # Verify zeros for empty export
         assert stats.total_conversations == 0
@@ -144,7 +147,8 @@ class TestCalculateStatistics:
         export_file.write_text(json.dumps(export_data))
 
         # Calculate statistics (should skip all entries)
-        stats = calculate_statistics(export_file)
+        adapter = OpenAIAdapter()
+        stats = calculate_statistics(export_file, adapter=adapter)
 
         # Verify zeros with skipped_count
         assert stats.total_conversations == 0
@@ -195,7 +199,10 @@ class TestCalculateStatistics:
             progress_calls.append(count)
 
         # Calculate statistics with progress callback
-        stats = calculate_statistics(export_file, progress_callback=progress_callback)
+        adapter = OpenAIAdapter()
+        stats = calculate_statistics(
+            export_file, adapter=adapter, progress_callback=progress_callback
+        )
 
         # Verify progress callback invoked at 100, 200
         assert 100 in progress_calls
@@ -259,7 +266,8 @@ class TestCalculateStatistics:
             skip_calls.append((conversation_id, reason))
 
         # Calculate statistics with on_skip callback
-        stats = calculate_statistics(export_file, on_skip=on_skip_callback)
+        adapter = OpenAIAdapter()
+        stats = calculate_statistics(export_file, adapter=adapter, on_skip=on_skip_callback)
 
         # Verify on_skip invoked for conv-2
         assert len(skip_calls) == 1

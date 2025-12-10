@@ -28,6 +28,7 @@ Requirements Validated:
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -53,7 +54,7 @@ def message_count_test_export(tmp_path: Path) -> Path:
     """
     import json
 
-    def create_conversation(conv_id: str, message_count: int) -> dict:
+    def create_conversation(conv_id: str, message_count: int) -> dict[str, Any]:
         """Helper to create conversation with specific message count."""
         mapping = {}
         for i in range(message_count):

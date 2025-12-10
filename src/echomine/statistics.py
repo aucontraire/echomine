@@ -25,8 +25,8 @@ from __future__ import annotations
 import logging
 from datetime import datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from echomine.adapters.openai import OpenAIAdapter
 from echomine.models.conversation import Conversation
 from echomine.models.protocols import OnSkipCallback, ProgressCallback
 from echomine.models.statistics import (
@@ -37,6 +37,11 @@ from echomine.models.statistics import (
 )
 
 
+if TYPE_CHECKING:
+    from echomine.adapters.claude import ClaudeAdapter
+    from echomine.adapters.openai import OpenAIAdapter
+
+
 # Module logger for operational visibility
 logger = logging.getLogger(__name__)
 
@@ -44,6 +49,7 @@ logger = logging.getLogger(__name__)
 def calculate_statistics(
     file_path: Path,
     *,
+    adapter: OpenAIAdapter | ClaudeAdapter,
     progress_callback: ProgressCallback | None = None,
     on_skip: OnSkipCallback | None = None,
 ) -> ExportStatistics:
@@ -60,7 +66,8 @@ def calculate_statistics(
         - Tracks only aggregate statistics (counts, min/max, dates)
 
     Args:
-        file_path: Path to OpenAI export JSON file
+        file_path: Path to export JSON file (OpenAI or Claude format)
+        adapter: ConversationProvider adapter (OpenAIAdapter or ClaudeAdapter)
         progress_callback: Optional callback invoked every 100 conversations (FR-069)
         on_skip: Optional callback for malformed entries (conversation_id, reason)
 
@@ -74,10 +81,14 @@ def calculate_statistics(
     Example:
         ```python
         from pathlib import Path
+        from echomine.cli.provider import get_adapter
         from echomine.statistics import calculate_statistics
 
+        # Get appropriate adapter (auto-detect or explicit)
+        adapter = get_adapter(None, Path("export.json"))
+
         # Basic usage
-        stats = calculate_statistics(Path("export.json"))
+        stats = calculate_statistics(Path("export.json"), adapter=adapter)
         print(f"Total: {stats.total_conversations} conversations")
         print(f"Messages: {stats.total_messages}")
         print(f"Average: {stats.average_messages:.1f} per conversation")
@@ -88,6 +99,7 @@ def calculate_statistics(
 
         stats = calculate_statistics(
             Path("export.json"),
+            adapter=adapter,
             progress_callback=on_progress
         )
 
@@ -99,6 +111,7 @@ def calculate_statistics(
 
         stats = calculate_statistics(
             Path("export.json"),
+            adapter=adapter,
             on_skip=on_skip_entry
         )
         print(f"Skipped {len(skipped)} malformed entries")
@@ -109,6 +122,7 @@ def calculate_statistics(
         - FR-003: O(1) memory usage via streaming
         - FR-060a: Structured logging
         - SC-001: Memory usage <1GB for large exports
+        - FR-046: Multi-provider support via adapter parameter
     """
     logger.info("calculate_statistics", extra={"file_name": str(file_path)})
 
@@ -121,8 +135,7 @@ def calculate_statistics(
     smallest_conversation: ConversationSummary | None = None
     skipped_count = 0
 
-    # Use OpenAIAdapter for streaming (O(1) memory)
-    adapter = OpenAIAdapter()
+    # Use provided adapter for streaming (O(1) memory)
 
     # Wrap on_skip to track skipped_count
     def on_skip_wrapper(conversation_id: str, reason: str) -> None:

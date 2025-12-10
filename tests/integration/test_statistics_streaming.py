@@ -16,6 +16,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from echomine.adapters.openai import OpenAIAdapter
+
 
 class TestStatisticsStreaming:
     """Test calculate_statistics() streaming behavior (T045)."""
@@ -68,7 +70,8 @@ class TestStatisticsStreaming:
         export_file.write_text(json.dumps(export_data))
 
         # Calculate statistics (should stream, not load entire file)
-        stats = calculate_statistics(export_file)
+        adapter = OpenAIAdapter()
+        stats = calculate_statistics(export_file, adapter=adapter)
 
         # Verify all conversations processed
         assert stats.total_conversations == 1000
@@ -118,7 +121,8 @@ class TestStatisticsStreaming:
         export_file.write_text(json.dumps(export_data))
 
         # Calculate statistics (should skip malformed, process valid)
-        stats = calculate_statistics(export_file)
+        adapter = OpenAIAdapter()
+        stats = calculate_statistics(export_file, adapter=adapter)
 
         # Verify graceful degradation
         assert stats.total_conversations == 500

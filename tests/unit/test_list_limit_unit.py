@@ -121,7 +121,7 @@ class TestListLimitParameter:
             conversations.append(conv)
 
         # Mock the adapter to return our conversations
-        with patch("echomine.cli.commands.list.OpenAIAdapter") as mock_adapter_class:
+        with patch("echomine.cli.commands.list.get_adapter") as mock_adapter_class:
             mock_adapter = MagicMock()
             mock_adapter.stream_conversations.return_value = conversations
             mock_adapter_class.return_value = mock_adapter
@@ -176,7 +176,7 @@ class TestListLimitParameter:
             )
             conversations.append(conv)
 
-        with patch("echomine.cli.commands.list.OpenAIAdapter") as mock_adapter_class:
+        with patch("echomine.cli.commands.list.get_adapter") as mock_adapter_class:
             mock_adapter = MagicMock()
             mock_adapter.stream_conversations.return_value = conversations
             mock_adapter_class.return_value = mock_adapter
@@ -226,7 +226,7 @@ class TestListLimitParameter:
             )
             conversations.append(conv)
 
-        with patch("echomine.cli.commands.list.OpenAIAdapter") as mock_adapter_class:
+        with patch("echomine.cli.commands.list.get_adapter") as mock_adapter_class:
             mock_adapter = MagicMock()
             mock_adapter.stream_conversations.return_value = conversations
             mock_adapter_class.return_value = mock_adapter
@@ -273,7 +273,7 @@ class TestListLimitParameter:
             )
             conversations.append(conv)
 
-        with patch("echomine.cli.commands.list.OpenAIAdapter") as mock_adapter_class:
+        with patch("echomine.cli.commands.list.get_adapter") as mock_adapter_class:
             mock_adapter = MagicMock()
             mock_adapter.stream_conversations.return_value = conversations
             mock_adapter_class.return_value = mock_adapter
@@ -322,7 +322,7 @@ class TestListLimitParameter:
             )
             conversations.append(conv)
 
-        with patch("echomine.cli.commands.list.OpenAIAdapter") as mock_adapter_class:
+        with patch("echomine.cli.commands.list.get_adapter") as mock_adapter_class:
             mock_adapter = MagicMock()
             mock_adapter.stream_conversations.return_value = conversations
             mock_adapter_class.return_value = mock_adapter
@@ -455,7 +455,7 @@ class TestListLimitEdgeCases:
         test_file = tmp_path / "test.json"
         test_file.write_text("[]")
 
-        with patch("echomine.cli.commands.list.OpenAIAdapter") as mock_adapter_class:
+        with patch("echomine.cli.commands.list.get_adapter") as mock_adapter_class:
             mock_adapter = MagicMock()
             mock_adapter.stream_conversations.return_value = []  # Empty
             mock_adapter_class.return_value = mock_adapter
@@ -500,7 +500,7 @@ class TestListLimitEdgeCases:
             )
             conversations.append(conv)
 
-        with patch("echomine.cli.commands.list.OpenAIAdapter") as mock_adapter_class:
+        with patch("echomine.cli.commands.list.get_adapter") as mock_adapter_class:
             mock_adapter = MagicMock()
             mock_adapter.stream_conversations.return_value = conversations
             mock_adapter_class.return_value = mock_adapter

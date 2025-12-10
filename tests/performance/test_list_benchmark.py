@@ -36,7 +36,6 @@ import pytest
 from echomine.adapters.openai import OpenAIAdapter
 from echomine.constants import (
     MAX_BATCH_SIZE,
-    PROGRESS_UPDATE_INTERVAL,
     TARGET_WORKING_SET,
 )
 
@@ -305,27 +304,11 @@ class TestListPerformance:
         - Verify interval is ~100 conversations
         """
         pytest.skip("Progress callbacks deferred to future implementation")
-
-        # Verify correct count
-        assert len(conversations) == 10000
-
-        # Verify progress callbacks occurred
-        assert len(progress_tracker) > 0, "Progress callback should be invoked"
-
-        # Verify callback frequency (CHK135: every 100 items)
-        expected_callbacks = 10000 // PROGRESS_UPDATE_INTERVAL  # 100 callbacks
-        assert len(progress_tracker) >= expected_callbacks - 5, (
-            f"Expected ~{expected_callbacks} progress callbacks "
-            f"(every {PROGRESS_UPDATE_INTERVAL} items), got {len(progress_tracker)}"
-        )
-
-        # Verify incremental counts
-        assert progress_tracker[0] >= PROGRESS_UPDATE_INTERVAL, (
-            f"First progress should be at {PROGRESS_UPDATE_INTERVAL}, got {progress_tracker[0]}"
-        )
-        assert progress_tracker[-1] == 10000, (
-            f"Final progress should be 10000, got {progress_tracker[-1]}"
-        )
+        # TODO: Implement when progress callbacks are added
+        # assert len(conversations) == 10000
+        # assert len(progress_tracker) > 0, "Progress callback should be invoked"
+        # expected_callbacks = 10000 // PROGRESS_UPDATE_INTERVAL  # 100 callbacks
+        # assert len(progress_tracker) >= expected_callbacks - 5
 
     def test_batch_size_constraint(self, large_export_10k: Path) -> None:
         """Validate batch size respects MAX_BATCH_SIZE constant (CHK007).
@@ -503,59 +486,5 @@ class TestStressScenarios:
         Run explicitly with: pytest -m slow
         """
         pytest.skip("Stress test: run explicitly with pytest -m slow")
-
-        # Generate 50K conversations fixture
-        import json
-
-        conversations = []
-        for i in range(50000):
-            # Minimal conversation structure
-            conversations.append(
-                {
-                    "id": f"stress-{i:06d}",
-                    "title": f"Stress {i}",
-                    "create_time": 1710000000.0 + i,
-                    "update_time": 1710000000.0 + i + 1,
-                    "mapping": {
-                        f"msg-{i}": {
-                            "id": f"msg-{i}",
-                            "message": {
-                                "id": f"msg-{i}",
-                                "author": {"role": "user"},
-                                "content": {"content_type": "text", "parts": ["Q"]},
-                                "create_time": 1710000000.0 + i,
-                                "update_time": None,
-                                "metadata": {},
-                            },
-                            "parent": None,
-                            "children": [],
-                        }
-                    },
-                    "moderation_results": [],
-                    "current_node": f"msg-{i}",
-                }
-            )
-
-        stress_file = tmp_path / "stress_50k.json"
-        with stress_file.open("w") as f:
-            json.dump(conversations, f)
-
-        # Run stress test
-        adapter = OpenAIAdapter()
-
-        tracemalloc.start()
-        start = time.perf_counter()
-
-        conversations_parsed = list(adapter.stream_conversations(stress_file))
-
-        elapsed = time.perf_counter() - start
-        current, peak = tracemalloc.get_traced_memory()
-        tracemalloc.stop()
-
-        print("\n50K Stress Test Results:")
-        print(f"  Time: {elapsed:.2f}s")
-        print(f"  Peak Memory: {peak / (1024 * 1024):.2f} MB")
-        print(f"  Throughput: {50000 / elapsed:.0f} conversations/s")
-
-        assert len(conversations_parsed) == 50000
-        assert peak < 1024 * 1024 * 1024, "Memory should stay under 1GB"
+        # TODO: Implement when stress testing is needed
+        # Generate 50K conversations and test streaming performance

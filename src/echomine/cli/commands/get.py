@@ -1,7 +1,7 @@
 """Get command implementation with subcommands for conversation and message retrieval.
 
 This module implements the hierarchical 'get' command for retrieving and displaying
-specific conversations or messages by ID with metadata details.
+specific conversations or messages by ID with metadata details (supports OpenAI and Claude).
 
 Constitution Compliance:
     - Principle I: Library-first (delegates to OpenAIAdapter methods)
@@ -62,8 +62,8 @@ import typer
 from pydantic import ValidationError as PydanticValidationError
 from rich.console import Console
 
-from echomine.adapters.openai import OpenAIAdapter
 from echomine.cli.formatters import get_role_color, is_rich_enabled
+from echomine.cli.provider import get_adapter
 from echomine.exceptions import ParseError
 from echomine.models.conversation import Conversation
 from echomine.models.message import Message
@@ -644,6 +644,15 @@ def get_conversation(
             help="Show full message content (table format only)",
         ),
     ] = False,
+    provider: Annotated[
+        str | None,
+        typer.Option(
+            "--provider",
+            "-p",
+            help="Export provider (openai or claude). Auto-detected if omitted.",
+            case_sensitive=False,
+        ),
+    ] = None,
 ) -> None:
     """[bold]Get conversation by ID[/bold] and display metadata.
 
@@ -677,8 +686,8 @@ def get_conversation(
             console.print(f"[red]Error: File not found: {file_path}[/red]")
             raise typer.Exit(code=1)
 
-        # Retrieve conversation using library method
-        adapter = OpenAIAdapter()
+        # Retrieve conversation using library method with appropriate adapter
+        adapter = get_adapter(provider, file_path)
 
         # Show progress indicator (only for table format, not JSON)
         conversation: Conversation | None = None
@@ -792,6 +801,15 @@ def get_message(
             help="Show full content and conversation context (table format only)",
         ),
     ] = False,
+    provider: Annotated[
+        str | None,
+        typer.Option(
+            "--provider",
+            "-p",
+            help="Export provider (openai or claude). Auto-detected if omitted.",
+            case_sensitive=False,
+        ),
+    ] = None,
 ) -> None:
     """[bold]Get message by ID[/bold] and display with conversation context.
 
@@ -836,8 +854,8 @@ def get_message(
             console.print(f"[red]Error: File not found: {file_path}[/red]")
             raise typer.Exit(code=1)
 
-        # Retrieve message using library method
-        adapter = OpenAIAdapter()
+        # Retrieve message using library method with appropriate adapter
+        adapter = get_adapter(provider, file_path)
 
         # Show progress indicator (only for table format, not JSON)
         result: tuple[Message, Conversation] | None = None
@@ -951,6 +969,15 @@ def get_messages(
             help="Output full message objects as JSON array",
         ),
     ] = False,
+    provider: Annotated[
+        str | None,
+        typer.Option(
+            "--provider",
+            "-p",
+            help="Export provider (openai or claude). Auto-detected if omitted.",
+            case_sensitive=False,
+        ),
+    ] = None,
 ) -> None:
     """[bold]List all messages[/bold] in a conversation.
 
@@ -979,8 +1006,8 @@ def get_messages(
             console.print(f"[red]Error: File not found: {file_path}[/red]")
             raise typer.Exit(code=1)
 
-        # Retrieve conversation using library method
-        adapter = OpenAIAdapter()
+        # Retrieve conversation using library method with appropriate adapter
+        adapter = get_adapter(provider, file_path)
 
         # Show progress indicator (only for table format, not JSON)
         conversation: Conversation | None = None

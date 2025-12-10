@@ -103,7 +103,7 @@ class Message(BaseModel):
         description="Message creation time (timezone-aware UTC, per FR-244)",
     )
     parent_id: str | None = Field(
-        None,
+        default=None,
         description="Parent message ID for threading (None for root, per FR-276)",
     )
 

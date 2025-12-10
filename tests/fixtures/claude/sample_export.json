@@ -1,0 +1,252 @@
+[
+  {
+    "uuid": "5551eb71-ada2-45bd-8f91-0c4945a1e5a6",
+    "name": "Python Code Review - Binary Search Implementation",
+    "summary": "Discussion about implementing efficient binary search algorithm with edge case handling",
+    "created_at": "2025-10-01T18:42:27.303515Z",
+    "updated_at": "2025-10-01T18:42:33.904627Z",
+    "account": {
+      "uuid": "acc-001-uuid"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-001-uuid",
+        "text": "Can you review my binary search implementation?",
+        "content": [
+          {
+            "type": "text",
+            "text": "Can you review my binary search implementation?\n\n```python\ndef binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n```"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-01T18:42:28.370875Z",
+        "updated_at": "2025-10-01T18:42:28.370875Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-002-uuid",
+        "text": "Your binary search implementation looks solid! It correctly handles the standard algorithm with proper boundary conditions.",
+        "content": [
+          {
+            "type": "text",
+            "text": "Your binary search implementation looks solid! It correctly handles the standard algorithm with proper boundary conditions. The time complexity is O(log n) and space complexity is O(1).\n\nHere are a few observations:\n\n1. **Overflow protection**: Using `(left + right) // 2` is safe in Python, but in languages like C++/Java, you'd want `left + (right - left) // 2`\n2. **Input validation**: Consider adding checks for empty arrays\n3. **Type hints**: For production code, add type annotations\n\nHere's an enhanced version:\n\n```python\ndef binary_search(arr: list[int], target: int) -> int:\n    \"\"\"Binary search for target in sorted array.\n    \n    Args:\n        arr: Sorted list of integers\n        target: Value to find\n        \n    Returns:\n        Index of target if found, -1 otherwise\n    \"\"\"\n    if not arr:\n        return -1\n        \n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n```"
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-10-01T18:42:33.904627Z",
+        "updated_at": "2025-10-01T18:42:33.904627Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "7892bc45-def3-4a21-9c12-3d5e6f7a8b9c",
+    "name": "Multi-turn Technical Discussion with Attachments",
+    "summary": "Extended conversation about database optimization with multiple exchanges and file references",
+    "created_at": "2025-10-05T09:15:42.123456Z",
+    "updated_at": "2025-10-05T09:28:17.987654Z",
+    "account": {
+      "uuid": "acc-002-uuid"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-101-uuid",
+        "text": "I need help optimizing my database queries. I've attached the slow query log.",
+        "content": [
+          {
+            "type": "text",
+            "text": "I need help optimizing my database queries. I've attached the slow query log."
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-05T09:15:43.500000Z",
+        "updated_at": "2025-10-05T09:15:43.500000Z",
+        "attachments": [
+          {
+            "id": "att-001",
+            "file_name": "slow_query_log.txt",
+            "file_size": 4096,
+            "file_type": "text/plain",
+            "extracted_content": "SELECT * FROM users WHERE created_at > '2025-01-01' ORDER BY id DESC LIMIT 1000;"
+          }
+        ],
+        "files": [
+          "slow_query_log.txt"
+        ]
+      },
+      {
+        "uuid": "msg-102-uuid",
+        "text": "I can see several optimization opportunities in your query log. Let me analyze them.",
+        "content": [
+          {
+            "type": "text",
+            "text": "I can see several optimization opportunities in your query log. Let me analyze them:\n\n1. **Missing index on created_at**: The query scans the entire table\n2. **SELECT * antipattern**: Only fetch columns you need\n3. **Large LIMIT without pagination**: Consider cursor-based pagination\n\nRecommended changes:\n\n```sql\n-- Add index\nCREATE INDEX idx_users_created_at ON users(created_at DESC);\n\n-- Optimize query\nSELECT id, email, username, created_at \nFROM users \nWHERE created_at > '2025-01-01' \nORDER BY created_at DESC \nLIMIT 1000;\n```"
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-10-05T09:17:22.750000Z",
+        "updated_at": "2025-10-05T09:17:22.750000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-103-uuid",
+        "text": "Great! Should I create a composite index instead?",
+        "content": [
+          {
+            "type": "text",
+            "text": "Great! Should I create a composite index instead? We often filter by both created_at and status fields together."
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-05T09:25:10.123456Z",
+        "updated_at": "2025-10-05T09:25:10.123456Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-104-uuid",
+        "text": "Yes, a composite index would be more efficient for multi-column filtering.",
+        "content": [
+          {
+            "type": "text",
+            "text": "Yes, a composite index would be more efficient for multi-column filtering. Here's the recommended approach:\n\n```sql\n-- Composite index: most selective column first\nCREATE INDEX idx_users_status_created_at \nON users(status, created_at DESC);\n\n-- Query that benefits from this index\nSELECT id, email, username, status, created_at\nFROM users\nWHERE status = 'active' \n  AND created_at > '2025-01-01'\nORDER BY created_at DESC\nLIMIT 1000;\n```\n\n**Key principle**: Place the most selective column (status) first in the index, followed by the range/sort column (created_at)."
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-10-05T09:28:17.987654Z",
+        "updated_at": "2025-10-05T09:28:17.987654Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a6b7",
+    "name": "Quick Question",
+    "summary": "",
+    "created_at": "2025-11-12T14:30:00.000000Z",
+    "updated_at": "2025-11-12T14:30:15.500000Z",
+    "account": {
+      "uuid": "acc-003-uuid"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-201-uuid",
+        "text": "What is the difference between async and await in Python?",
+        "content": [
+          {
+            "type": "text",
+            "text": "What is the difference between async and await in Python?"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-12T14:30:01.250000Z",
+        "updated_at": "2025-11-12T14:30:01.250000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-202-uuid",
+        "text": "async and await are keywords for asynchronous programming in Python.",
+        "content": [
+          {
+            "type": "text",
+            "text": "**async** and **await** are keywords for asynchronous programming in Python:\n\n- **async**: Defines a coroutine function (async def)\n- **await**: Pauses execution until an awaitable completes\n\nExample:\n```python\nimport asyncio\n\nasync def fetch_data():\n    await asyncio.sleep(1)  # Simulate I/O\n    return \"data\"\n\nasync def main():\n    result = await fetch_data()\n    print(result)\n\nasyncio.run(main())\n```\n\nKey point: **await** can only be used inside **async** functions."
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-12T14:30:15.500000Z",
+        "updated_at": "2025-11-12T14:30:15.500000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "f9e8d7c6-b5a4-4321-9876-fedcba098765",
+    "name": "",
+    "summary": "Conversation with no explicit title",
+    "created_at": "2025-11-20T10:00:00.000000Z",
+    "updated_at": "2025-11-20T10:00:30.000000Z",
+    "account": {
+      "uuid": "acc-004-uuid"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-301-uuid",
+        "text": "Hello",
+        "content": [
+          {
+            "type": "text",
+            "text": "Hello"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-20T10:00:05.000000Z",
+        "updated_at": "2025-11-20T10:00:05.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-302-uuid",
+        "text": "Hi! How can I assist you today?",
+        "content": [
+          {
+            "type": "text",
+            "text": "Hi! How can I assist you today?"
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-20T10:00:30.000000Z",
+        "updated_at": "2025-11-20T10:00:30.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+    "name": "Very Long Title That Exceeds Typical Display Width - Testing Truncation and Rendering Behavior with Extended Text Content",
+    "summary": "Testing how the system handles conversations with exceptionally long titles that may need truncation in various UI contexts",
+    "created_at": "2025-12-01T16:45:00.000000Z",
+    "updated_at": "2025-12-01T16:45:20.000000Z",
+    "account": {
+      "uuid": "acc-005-uuid"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-401-uuid",
+        "text": "Testing long title handling",
+        "content": [
+          {
+            "type": "text",
+            "text": "Testing long title handling"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-12-01T16:45:10.000000Z",
+        "updated_at": "2025-12-01T16:45:10.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-402-uuid",
+        "text": "Confirmed - the title is quite long!",
+        "content": [
+          {
+            "type": "text",
+            "text": "Confirmed - the title is quite long!"
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-12-01T16:45:20.000000Z",
+        "updated_at": "2025-12-01T16:45:20.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  }
+]
