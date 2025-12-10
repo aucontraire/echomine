@@ -1,7 +1,7 @@
 """Export command implementation.
 
 This module implements the 'export' command for exporting conversations
-to markdown or JSON format.
+to markdown or JSON format (supports OpenAI and Claude exports).
 
 Constitution Compliance:
     - Principle I: Library-first (delegates to MarkdownExporter / Pydantic serialization)
@@ -41,7 +41,7 @@ from typing import Annotated, Literal
 import typer
 from rich.console import Console
 
-from echomine.adapters import OpenAIAdapter
+from echomine.cli.provider import get_adapter
 from echomine.export import MarkdownExporter
 
 
@@ -148,6 +148,15 @@ def export_conversation(
             help="Disable YAML frontmatter and message IDs in markdown export (FR-033)",
         ),
     ] = False,
+    provider: Annotated[
+        str | None,
+        typer.Option(
+            "--provider",
+            "-p",
+            help="Export provider (openai or claude). Auto-detected if omitted.",
+            case_sensitive=False,
+        ),
+    ] = None,
 ) -> None:
     """[bold]Export conversation[/bold] to markdown or JSON format.
 
@@ -222,8 +231,8 @@ def export_conversation(
             # Use provided conversation ID
             actual_conversation_id = conversation_id  # type: ignore[assignment]
 
-        # Load conversation using OpenAIAdapter
-        adapter = OpenAIAdapter()
+        # Load conversation using appropriate adapter
+        adapter = get_adapter(provider, file_path)
         conversation = None
 
         # Show progress indicator (only if writing to file, not stdout)
@@ -263,11 +272,11 @@ def export_conversation(
         else:
             # Export as markdown using MarkdownExporter
             # FR-033: --no-metadata flag disables YAML frontmatter and message IDs
+            # Use export_conversation_from_model for multi-provider support
             exporter = MarkdownExporter()
             include_metadata = not no_metadata
-            output_content = exporter.export_conversation(
-                file_path,
-                actual_conversation_id,
+            output_content = exporter.export_conversation_from_model(
+                conversation,
                 include_metadata=include_metadata,
                 include_message_ids=include_metadata,  # Disable both when --no-metadata
             )

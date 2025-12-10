@@ -234,7 +234,7 @@ class TestSearchZeroResultsWithTTY:
 
         # Mock sys.stderr.isatty() to return True
         with (
-            patch("echomine.cli.commands.search.OpenAIAdapter", return_value=mock_adapter),
+            patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter),
             patch("sys.stderr.isatty", return_value=True),
         ):
             # Act: Search with no results
@@ -283,7 +283,7 @@ class TestSearchZeroResultsWithTTY:
 
         # Mock sys.stderr.isatty() to return False (piped/redirected)
         with (
-            patch("echomine.cli.commands.search.OpenAIAdapter", return_value=mock_adapter),
+            patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter),
             patch("sys.stderr.isatty", return_value=False),
         ):
             # Act: Search with no results
@@ -346,7 +346,7 @@ class TestSearchErrorHandlers:
 
         from click.exceptions import Exit
 
-        with patch("echomine.cli.commands.search.OpenAIAdapter", return_value=mock_adapter):
+        with patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter):
             # Act & Assert: Exits with code 1
             with pytest.raises(Exit) as exc_info:
                 search_conversations(
@@ -391,7 +391,7 @@ class TestSearchErrorHandlers:
 
         from click.exceptions import Exit
 
-        with patch("echomine.cli.commands.search.OpenAIAdapter", return_value=mock_adapter):
+        with patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter):
             # Act & Assert: Exits with code 1
             with pytest.raises(Exit) as exc_info:
                 search_conversations(
@@ -436,7 +436,7 @@ class TestSearchErrorHandlers:
 
         from click.exceptions import Exit
 
-        with patch("echomine.cli.commands.search.OpenAIAdapter", return_value=mock_adapter):
+        with patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter):
             # Act & Assert: Exits with code 130
             with pytest.raises(Exit) as exc_info:
                 search_conversations(
@@ -481,7 +481,7 @@ class TestSearchErrorHandlers:
 
         from click.exceptions import Exit
 
-        with patch("echomine.cli.commands.search.OpenAIAdapter", return_value=mock_adapter):
+        with patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter):
             # Act & Assert: Exits with code 1
             with pytest.raises(Exit) as exc_info:
                 search_conversations(
@@ -550,7 +550,7 @@ class TestSearchEdgeCases:
 
         # Mock the formatter to avoid issues
         with (
-            patch("echomine.cli.commands.search.OpenAIAdapter", return_value=mock_adapter),
+            patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter),
             patch(
                 "echomine.cli.commands.search.format_search_results",
                 return_value="formatted output\n",
@@ -593,7 +593,7 @@ class TestSearchEdgeCases:
         mock_adapter = MagicMock(spec=OpenAIAdapter)
         mock_adapter.search.return_value = iter([])
 
-        with patch("echomine.cli.commands.search.OpenAIAdapter", return_value=mock_adapter):
+        with patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter):
             # Act: Search without limit
             search_conversations(
                 file_path=export_file,

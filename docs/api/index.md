@@ -21,6 +21,7 @@ Data models built with Pydantic v2 for strict validation and type safety:
 Provider-specific implementations for parsing conversation exports:
 
 - **[OpenAI Adapter](adapters/openai.md)**: ChatGPT conversation export parser
+- **[Claude Adapter](adapters/claude.md)**: Anthropic Claude conversation export parser
 - **[Protocols](adapters/protocols.md)**: ConversationProvider protocol definition
 
 ### Search

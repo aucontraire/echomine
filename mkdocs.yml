@@ -99,6 +99,7 @@ nav:
           - Search: api/models/search.md
       - Adapters:
           - OpenAI Adapter: api/adapters/openai.md
+          - Claude Adapter: api/adapters/claude.md
           - Protocols: api/adapters/protocols.md
       - Search: api/search/ranking.md
       - CLI: api/cli/commands.md

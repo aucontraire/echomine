@@ -5,6 +5,7 @@ enabling O(1) memory consumption regardless of export file size.
 
 Public API:
     - OpenAIAdapter: Streams conversations from OpenAI ChatGPT export files
+    - ClaudeAdapter: Streams conversations from Anthropic Claude export files
 
 Constitution Compliance:
     - Principle VIII: Memory-efficient streaming (FR-003)
@@ -12,7 +13,8 @@ Constitution Compliance:
     - FR-122: ijson streaming parser for O(1) memory
 """
 
+from echomine.adapters.claude import ClaudeAdapter
 from echomine.adapters.openai import OpenAIAdapter
 
 
-__all__ = ["OpenAIAdapter"]
+__all__ = ["ClaudeAdapter", "OpenAIAdapter"]

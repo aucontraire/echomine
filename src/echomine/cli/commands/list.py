@@ -1,7 +1,7 @@
 """List command implementation.
 
 This module implements the 'list' command for listing all conversations
-from an OpenAI export file.
+from an OpenAI or Claude export file (auto-detected or explicit).
 
 Constitution Compliance:
     - Principle I: Library-first (delegates to OpenAIAdapter)
@@ -38,13 +38,13 @@ import typer
 from pydantic import ValidationError as PydanticValidationError
 from rich.console import Console
 
-from echomine.adapters.openai import OpenAIAdapter
 from echomine.cli.formatters import (
     create_rich_table,
     format_json,
     format_text_table,
     is_rich_enabled,
 )
+from echomine.cli.provider import get_adapter
 from echomine.exceptions import ParseError, ValidationError
 from echomine.export.csv import CSVExporter
 from echomine.models.conversation import Conversation
@@ -92,6 +92,15 @@ def list_conversations(
             case_sensitive=False,
         ),
     ] = "",
+    provider: Annotated[
+        str | None,
+        typer.Option(
+            "--provider",
+            "-p",
+            help="Export provider (openai or claude). Auto-detected if omitted.",
+            case_sensitive=False,
+        ),
+    ] = None,
 ) -> None:
     """[bold]List all conversations[/bold] from export file.
 
@@ -170,8 +179,8 @@ def list_conversations(
             )
             raise typer.Exit(code=1)
 
-        # Stream conversations from file
-        adapter = OpenAIAdapter()
+        # Get appropriate adapter (auto-detect or explicit provider)
+        adapter = get_adapter(provider, file_path)
         conversations = list(adapter.stream_conversations(file_path))
 
         # Sort conversations based on parameters (FR-048a-c)

@@ -241,7 +241,6 @@ class TestGetConversationCoverage:
                     {
                         "type": "value_error",
                         "loc": ("field",),
-                        "msg": "Invalid value",
                         "input": "bad_value",
                         "ctx": {"error": ValueError("Test validation error")},
                     }
@@ -584,7 +583,6 @@ class TestGetMessagesCoverage:
                     {
                         "type": "value_error",
                         "loc": ("field",),
-                        "msg": "Invalid value",
                         "input": "bad_value",
                         "ctx": {"error": ValueError("Test validation error")},
                     }

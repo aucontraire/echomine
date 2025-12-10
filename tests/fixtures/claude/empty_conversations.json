@@ -1,0 +1,141 @@
+[
+  {
+    "uuid": "empty-conv-001",
+    "name": "Conversation Started But Never Continued",
+    "summary": "User started a conversation but never sent a message",
+    "created_at": "2025-11-01T08:00:00.000000Z",
+    "updated_at": "2025-11-01T08:00:00.000000Z",
+    "account": {
+      "uuid": "acc-empty-001"
+    },
+    "chat_messages": []
+  },
+  {
+    "uuid": "empty-conv-002",
+    "name": "Draft Conversation",
+    "summary": "",
+    "created_at": "2025-11-05T12:30:00.000000Z",
+    "updated_at": "2025-11-05T12:30:00.000000Z",
+    "account": {
+      "uuid": "acc-empty-002"
+    },
+    "chat_messages": []
+  },
+  {
+    "uuid": "empty-conv-003",
+    "name": "",
+    "summary": "Empty conversation with no title or messages",
+    "created_at": "2025-11-10T15:45:00.000000Z",
+    "updated_at": "2025-11-10T15:45:00.000000Z",
+    "account": {
+      "uuid": "acc-empty-003"
+    },
+    "chat_messages": []
+  },
+  {
+    "uuid": "valid-conv-between-empty",
+    "name": "Valid Conversation Between Empty Ones",
+    "summary": "This conversation has actual messages and should parse successfully",
+    "created_at": "2025-11-12T10:00:00.000000Z",
+    "updated_at": "2025-11-12T10:00:30.000000Z",
+    "account": {
+      "uuid": "acc-valid-001"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-between-001",
+        "text": "This conversation is not empty",
+        "content": [
+          {
+            "type": "text",
+            "text": "This conversation is not empty"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-12T10:00:10.000000Z",
+        "updated_at": "2025-11-12T10:00:10.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-between-002",
+        "text": "Confirmed! It has messages.",
+        "content": [
+          {
+            "type": "text",
+            "text": "Confirmed! It has messages."
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-12T10:00:30.000000Z",
+        "updated_at": "2025-11-12T10:00:30.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "empty-conv-004",
+    "name": "Placeholder Conversation",
+    "summary": "Created as a placeholder but never used",
+    "created_at": "2025-11-15T09:00:00.000000Z",
+    "updated_at": "2025-11-15T09:00:00.000000Z",
+    "account": {
+      "uuid": "acc-empty-004"
+    },
+    "chat_messages": []
+  },
+  {
+    "uuid": "empty-conv-005",
+    "name": "Test Conversation Creation",
+    "summary": "Used to test conversation creation flow but no messages added",
+    "created_at": "2025-11-20T14:00:00.000000Z",
+    "updated_at": "2025-11-20T14:00:00.000000Z",
+    "account": {
+      "uuid": "acc-empty-005"
+    },
+    "chat_messages": []
+  },
+  {
+    "uuid": "valid-conv-final",
+    "name": "Final Valid Conversation",
+    "summary": "Last conversation in the export with actual content",
+    "created_at": "2025-11-25T16:30:00.000000Z",
+    "updated_at": "2025-11-25T16:30:45.000000Z",
+    "account": {
+      "uuid": "acc-valid-002"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-final-001",
+        "text": "Testing empty conversation handling",
+        "content": [
+          {
+            "type": "text",
+            "text": "Testing empty conversation handling"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-25T16:30:15.000000Z",
+        "updated_at": "2025-11-25T16:30:15.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-final-002",
+        "text": "Empty conversations are valid and should be handled gracefully by the parser.",
+        "content": [
+          {
+            "type": "text",
+            "text": "Empty conversations are valid and should be handled gracefully by the parser. They represent conversations that were created but never had any messages added to them."
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-25T16:30:45.000000Z",
+        "updated_at": "2025-11-25T16:30:45.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  }
+]

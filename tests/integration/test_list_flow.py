@@ -475,7 +475,7 @@ class TestListConversationsIntegration:
 
         # Assert: Modifying frozen field should raise error
         with pytest.raises(Exception):  # Pydantic raises ValidationError or AttributeError
-            first_conv.title = "Modified title"  # type: ignore[misc]
+            first_conv.title = "Modified title"
 
     def test_message_count_is_accurate(self, realistic_openai_export: Path) -> None:
         """Test that message_count reflects actual number of messages.

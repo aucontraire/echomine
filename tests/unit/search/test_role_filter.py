@@ -133,10 +133,9 @@ class TestRoleFilterBasic:
         role_filter = None
 
         # No filtering when role_filter is None
-        if role_filter is None:
-            filtered = messages
-        else:
-            filtered = [m for m in messages if m.role == role_filter]
+        filtered = (
+            messages if role_filter is None else [m for m in messages if m.role == role_filter]
+        )
 
         assert len(filtered) == 3
 

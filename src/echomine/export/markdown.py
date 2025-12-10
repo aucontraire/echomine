@@ -14,7 +14,11 @@ from __future__ import annotations
 import json
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+
+if TYPE_CHECKING:
+    from echomine.models.conversation import Conversation
 
 
 class MarkdownExporter:
@@ -48,6 +52,112 @@ class MarkdownExporter:
         - Minimal dependencies: Uses only standard library + echomine models
     """
 
+    def export_conversation_from_model(
+        self,
+        conversation: Conversation,
+        *,
+        include_metadata: bool = True,
+        include_message_ids: bool = True,
+    ) -> str:
+        """Export a Conversation model to markdown format (multi-provider support).
+
+        This method works with any provider (OpenAI, Claude, etc.) by accepting
+        a Conversation object directly instead of parsing provider-specific JSON.
+
+        Args:
+            conversation: Conversation model to export
+            include_metadata: Include YAML frontmatter (default: True) (FR-030, FR-035)
+            include_message_ids: Include message IDs in headers (default: True) (FR-035)
+
+        Returns:
+            Markdown string formatted for VS Code preview
+
+        Example:
+            ```python
+            from echomine.cli.provider import get_adapter
+            from echomine.export import MarkdownExporter
+
+            # Get conversation using appropriate adapter
+            adapter = get_adapter(None, Path("export.json"))
+            conversation = adapter.get_conversation_by_id(Path("export.json"), "abc-123")
+
+            # Export to markdown
+            exporter = MarkdownExporter()
+            md = exporter.export_conversation_from_model(conversation)
+            print(md)
+            ```
+
+        Multi-Provider Support:
+            - Works with OpenAI, Claude, and future providers
+            - Uses normalized Conversation model (provider-agnostic)
+            - Constitution Principle VII: Multi-provider adapter pattern
+        """
+        lines = []
+
+        # Render YAML frontmatter if enabled (FR-030, FR-031)
+        if include_metadata:
+            lines.append("---")
+            lines.append(f"id: {conversation.id}")
+            lines.append(f"title: {conversation.title}")
+            lines.append(f"created_at: {conversation.created_at.strftime('%Y-%m-%dT%H:%M:%SZ')}")
+            if conversation.updated_at:
+                lines.append(
+                    f"updated_at: {conversation.updated_at.strftime('%Y-%m-%dT%H:%M:%SZ')}"
+                )
+            lines.append(f"message_count: {conversation.message_count}")
+            export_date = datetime.now(UTC)
+            lines.append(f"export_date: {export_date.strftime('%Y-%m-%dT%H:%M:%SZ')}")
+            lines.append("exported_by: echomine")
+            lines.append("---")
+            lines.append("")
+
+        # Always render title heading
+        lines.append(f"# {conversation.title}")
+        lines.append("")
+
+        # Render inline metadata fields only when frontmatter disabled (backward compatibility)
+        if not include_metadata:
+            lines.append(f"Created: {conversation.created_at.strftime('%Y-%m-%dT%H:%M:%S+00:00')}")
+            if conversation.updated_at:
+                lines.append(
+                    f"Updated: {conversation.updated_at.strftime('%Y-%m-%dT%H:%M:%S+00:00')}"
+                )
+            message_str = "message" if conversation.message_count == 1 else "messages"
+            lines.append(f"Messages: {conversation.message_count} {message_str}")
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+
+        # Render messages
+        for i, message in enumerate(conversation.messages):
+            # Render header with optional message ID and timestamp
+            role_name = "User" if message.role == "user" else "Assistant"
+            timestamp = message.timestamp.strftime("%Y-%m-%dT%H:%M:%S+00:00")
+
+            # Build header with optional message ID (FR-032)
+            if include_message_ids:
+                lines.append(f"## {role_name} (`{message.id}`) - {timestamp}")
+            else:
+                # Backward compatibility: keep emojis when IDs disabled
+                emoji = "👤" if message.role == "user" else "🤖"
+                lines.append(f"## {emoji} {role_name} · {timestamp}")
+
+            lines.append("")
+
+            # Render content, stripping trailing whitespace from each line
+            content_lines = message.content.strip().split("\n")
+            content = "\n".join(line.rstrip() for line in content_lines)
+            lines.append(content)
+
+            # Add separator between messages (but not after last)
+            if i < len(conversation.messages) - 1:
+                lines.append("")
+                lines.append("---")
+                lines.append("")
+
+        # Add trailing newline for POSIX text file compliance
+        return "\n".join(lines) + "\n"
+
     def export_conversation(
         self,
         export_file: Path,
@@ -56,7 +166,10 @@ class MarkdownExporter:
         include_metadata: bool = True,
         include_message_ids: bool = True,
     ) -> str:
-        """Export a single conversation to markdown format.
+        """Export a single conversation to markdown format (OpenAI format only).
+
+        DEPRECATED: This method only supports OpenAI format. For multi-provider
+        support, use export_conversation_from_model() instead.
 
         Args:
             export_file: Path to OpenAI export JSON file

@@ -1,0 +1,461 @@
+[
+  {
+    "uuid": "tool-conv-001",
+    "name": "Code Execution with Tools",
+    "summary": "Conversation demonstrating tool use for code execution and file operations",
+    "created_at": "2025-11-01T09:00:00.000000Z",
+    "updated_at": "2025-11-01T09:05:30.000000Z",
+    "account": {
+      "uuid": "acc-tool-001"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-tool-001",
+        "text": "Can you write a Python script to calculate fibonacci numbers and save it to a file?",
+        "content": [
+          {
+            "type": "text",
+            "text": "Can you write a Python script to calculate fibonacci numbers and save it to a file?"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-01T09:00:05.000000Z",
+        "updated_at": "2025-11-01T09:00:05.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-tool-002",
+        "text": "I'll create a Python script for calculating Fibonacci numbers and save it to a file.",
+        "content": [
+          {
+            "type": "text",
+            "text": "I'll create a Python script for calculating Fibonacci numbers and save it to a file."
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_01A2B3C4D5E6F7",
+            "name": "write_file",
+            "input": {
+              "path": "fibonacci.py",
+              "content": "def fibonacci(n):\n    \"\"\"Calculate nth Fibonacci number.\"\"\"\n    if n <= 1:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)\n\ndef fibonacci_sequence(count):\n    \"\"\"Generate Fibonacci sequence.\"\"\"\n    return [fibonacci(i) for i in range(count)]\n\nif __name__ == \"__main__\":\n    print(fibonacci_sequence(10))\n"
+            }
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-01T09:01:15.000000Z",
+        "updated_at": "2025-11-01T09:01:15.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-tool-003",
+        "text": "",
+        "content": [
+          {
+            "type": "tool_result",
+            "tool_use_id": "toolu_01A2B3C4D5E6F7",
+            "content": "File written successfully to fibonacci.py (285 bytes)"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-01T09:01:20.000000Z",
+        "updated_at": "2025-11-01T09:01:20.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-tool-004",
+        "text": "Now let's test the script by running it.",
+        "content": [
+          {
+            "type": "text",
+            "text": "Now let's test the script by running it."
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_02B3C4D5E6F7A8",
+            "name": "execute_code",
+            "input": {
+              "language": "python",
+              "code": "exec(open('fibonacci.py').read())"
+            }
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-01T09:02:00.000000Z",
+        "updated_at": "2025-11-01T09:02:00.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-tool-005",
+        "text": "",
+        "content": [
+          {
+            "type": "tool_result",
+            "tool_use_id": "toolu_02B3C4D5E6F7A8",
+            "content": "[0, 1, 1, 2, 3, 5, 8, 13, 21, 34]"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-01T09:02:05.000000Z",
+        "updated_at": "2025-11-01T09:02:05.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-tool-006",
+        "text": "Perfect! The script works correctly and generates the first 10 Fibonacci numbers.",
+        "content": [
+          {
+            "type": "text",
+            "text": "Perfect! The script works correctly and generates the first 10 Fibonacci numbers: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]"
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-01T09:02:30.000000Z",
+        "updated_at": "2025-11-01T09:02:30.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "tool-conv-002",
+    "name": "Web Search and Analysis",
+    "summary": "Using web search tool to gather information and analyze results",
+    "created_at": "2025-11-05T14:30:00.000000Z",
+    "updated_at": "2025-11-05T14:35:45.000000Z",
+    "account": {
+      "uuid": "acc-tool-002"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-search-001",
+        "text": "What are the latest Python 3.12 features?",
+        "content": [
+          {
+            "type": "text",
+            "text": "What are the latest Python 3.12 features?"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-05T14:30:10.000000Z",
+        "updated_at": "2025-11-05T14:30:10.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-search-002",
+        "text": "",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_03C4D5E6F7A8B9",
+            "name": "web_search",
+            "input": {
+              "query": "Python 3.12 new features release notes"
+            }
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-05T14:30:15.000000Z",
+        "updated_at": "2025-11-05T14:30:15.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-search-003",
+        "text": "",
+        "content": [
+          {
+            "type": "tool_result",
+            "tool_use_id": "toolu_03C4D5E6F7A8B9",
+            "content": "Found 5 results:\n1. Python 3.12.0 Release Notes - docs.python.org\n   - PEP 695: Type Parameter Syntax\n   - PEP 701: f-string improvements\n   - Performance improvements (up to 5% faster)\n2. What's New in Python 3.12 - Real Python\n3. Python 3.12 Release Highlights - python.org"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-05T14:30:25.000000Z",
+        "updated_at": "2025-11-05T14:30:25.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-search-004",
+        "text": "Based on the search results, here are the key Python 3.12 features:",
+        "content": [
+          {
+            "type": "text",
+            "text": "Based on the search results, here are the key Python 3.12 features:\n\n1. **PEP 695: Type Parameter Syntax**\n   - New syntax for generic classes and functions\n   - Example: `def max[T](a: T, b: T) -> T:`\n\n2. **PEP 701: f-string Improvements**\n   - More powerful f-string expressions\n   - Support for nested quotes and multiline expressions\n\n3. **Performance Improvements**\n   - Up to 5% faster than Python 3.11\n   - Continued work on the \"Faster CPython\" project\n\n4. **Better Error Messages**\n   - More precise error locations\n   - Improved suggestions for typos\n\nThese features make Python 3.12 a significant upgrade!"
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-05T14:35:45.000000Z",
+        "updated_at": "2025-11-05T14:35:45.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "tool-conv-003",
+    "name": "Mixed Text and Tool Blocks",
+    "summary": "Messages containing both text and tool use blocks in various combinations",
+    "created_at": "2025-11-10T10:00:00.000000Z",
+    "updated_at": "2025-11-10T10:10:00.000000Z",
+    "account": {
+      "uuid": "acc-tool-003"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-mixed-001",
+        "text": "Let me check the current directory and list files.",
+        "content": [
+          {
+            "type": "text",
+            "text": "Let me check the current directory and list files."
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_04D5E6F7A8B9C0",
+            "name": "bash",
+            "input": {
+              "command": "pwd && ls -la"
+            }
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-10T10:01:00.000000Z",
+        "updated_at": "2025-11-10T10:01:00.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-mixed-002",
+        "text": "",
+        "content": [
+          {
+            "type": "tool_result",
+            "tool_use_id": "toolu_04D5E6F7A8B9C0",
+            "content": "/home/user/project\ntotal 24\ndrwxr-xr-x 3 user user 4096 Nov 10 10:00 .\ndrwxr-xr-x 5 user user 4096 Nov 10 09:50 ..\n-rw-r--r-- 1 user user  256 Nov 10 10:00 main.py\n-rw-r--r-- 1 user user  128 Nov 10 10:00 config.json"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-10T10:01:05.000000Z",
+        "updated_at": "2025-11-10T10:01:05.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-mixed-003",
+        "text": "I can see you have main.py and config.json. Let me read both files to understand your project structure.",
+        "content": [
+          {
+            "type": "text",
+            "text": "I can see you have main.py and config.json. Let me read both files to understand your project structure."
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_05E6F7A8B9C0D1",
+            "name": "read_file",
+            "input": {
+              "path": "main.py"
+            }
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_06F7A8B9C0D1E2",
+            "name": "read_file",
+            "input": {
+              "path": "config.json"
+            }
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-10T10:02:00.000000Z",
+        "updated_at": "2025-11-10T10:02:00.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-mixed-004",
+        "text": "",
+        "content": [
+          {
+            "type": "tool_result",
+            "tool_use_id": "toolu_05E6F7A8B9C0D1",
+            "content": "import json\n\ndef main():\n    with open('config.json') as f:\n        config = json.load(f)\n    print(f\"App: {config['name']}\")\n\nif __name__ == '__main__':\n    main()"
+          },
+          {
+            "type": "tool_result",
+            "tool_use_id": "toolu_06F7A8B9C0D1E2",
+            "content": "{\n  \"name\": \"MyApp\",\n  \"version\": \"1.0.0\",\n  \"debug\": true\n}"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-10T10:02:10.000000Z",
+        "updated_at": "2025-11-10T10:02:10.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-mixed-005",
+        "text": "Your project looks good! It's a simple Python app that loads configuration from JSON.",
+        "content": [
+          {
+            "type": "text",
+            "text": "Your project looks good! It's a simple Python app that loads configuration from JSON. The structure is clean and follows best practices:\n\n- **main.py**: Entry point that loads config\n- **config.json**: Application settings\n\nThe code correctly uses context managers for file handling. Well done!"
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-10T10:05:00.000000Z",
+        "updated_at": "2025-11-10T10:05:00.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "tool-conv-004",
+    "name": "Tool-Only Messages",
+    "summary": "Messages that contain ONLY tool blocks without any text blocks",
+    "created_at": "2025-11-15T11:00:00.000000Z",
+    "updated_at": "2025-11-15T11:05:00.000000Z",
+    "account": {
+      "uuid": "acc-tool-004"
+    },
+    "chat_messages": [
+      {
+        "uuid": "msg-toolonly-001",
+        "text": "Run a quick calculation for me: what is 42 * 137?",
+        "content": [
+          {
+            "type": "text",
+            "text": "Run a quick calculation for me: what is 42 * 137?"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-15T11:00:05.000000Z",
+        "updated_at": "2025-11-15T11:00:05.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-toolonly-002",
+        "text": "",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_07A8B9C0D1E2F3",
+            "name": "calculator",
+            "input": {
+              "expression": "42 * 137"
+            }
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-15T11:00:10.000000Z",
+        "updated_at": "2025-11-15T11:00:10.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-toolonly-003",
+        "text": "",
+        "content": [
+          {
+            "type": "tool_result",
+            "tool_use_id": "toolu_07A8B9C0D1E2F3",
+            "content": "5754"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-15T11:00:12.000000Z",
+        "updated_at": "2025-11-15T11:00:12.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-toolonly-004",
+        "text": "The result is 5754.",
+        "content": [
+          {
+            "type": "text",
+            "text": "The result is 5754."
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-15T11:00:15.000000Z",
+        "updated_at": "2025-11-15T11:00:15.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-toolonly-005",
+        "text": "Now check if that number is prime",
+        "content": [
+          {
+            "type": "text",
+            "text": "Now check if that number is prime"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-15T11:01:00.000000Z",
+        "updated_at": "2025-11-15T11:01:00.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-toolonly-006",
+        "text": "",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_08B9C0D1E2F3A4",
+            "name": "check_prime",
+            "input": {
+              "number": 5754
+            }
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-15T11:01:05.000000Z",
+        "updated_at": "2025-11-15T11:01:05.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-toolonly-007",
+        "text": "",
+        "content": [
+          {
+            "type": "tool_result",
+            "tool_use_id": "toolu_08B9C0D1E2F3A4",
+            "content": "false (factors: 2, 3, 7, 137)"
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-15T11:01:08.000000Z",
+        "updated_at": "2025-11-15T11:01:08.000000Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "msg-toolonly-008",
+        "text": "No, 5754 is not prime. It has factors: 2, 3, 7, and 137.",
+        "content": [
+          {
+            "type": "text",
+            "text": "No, 5754 is not prime. It has factors: 2, 3, 7, and 137."
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-15T11:01:15.000000Z",
+        "updated_at": "2025-11-15T11:01:15.000000Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  }
+]

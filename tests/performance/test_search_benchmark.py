@@ -387,25 +387,14 @@ class TestSearchPerformance:
         Expected to FAIL: Progress callback not implemented.
         """
         pytest.skip("Progress callbacks deferred to future implementation")
-
-        adapter = OpenAIAdapter()
-        query = SearchQuery(keywords=["python"], limit=1000)
-
-        progress_calls = []
-
-        def progress_callback(count: int) -> None:
-            progress_calls.append(count)
-
-        # Search with progress callback
-        results = list(
-            adapter.search(large_export_10k_search, query, progress_callback=progress_callback)
-        )
-
-        # Verify progress callbacks occurred
-        assert len(progress_calls) > 0, "Progress callback should be invoked"
-        assert len(progress_calls) >= 50, (
-            f"Expected ~100 progress callbacks (every 100 items), got {len(progress_calls)}"
-        )
+        # TODO: Implement when progress callbacks are added
+        # adapter = OpenAIAdapter()
+        # query = SearchQuery(keywords=["python"], limit=1000)
+        # progress_calls = []
+        # def progress_callback(count: int) -> None:
+        #     progress_calls.append(count)
+        # results = list(adapter.search(large_export_10k_search, query, progress_callback=progress_callback))
+        # assert len(progress_calls) > 0, "Progress callback should be invoked"
 
     def test_bm25_scoring_performance(self, large_export_10k_search: Path, benchmark: Any) -> None:
         """Benchmark BM25 scoring computation performance.

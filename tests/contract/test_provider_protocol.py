@@ -24,6 +24,7 @@ Architectural Coverage:
 """
 
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -385,9 +386,9 @@ class TestConversationProviderSearchProtocol:
 
         # Assert: Modifying frozen field should raise error
         with pytest.raises(Exception):  # Pydantic raises ValidationError
-            query.keywords = ["modified"]  # type: ignore[misc]
+            query.keywords = ["modified"]
 
-    def test_search_result_immutability(self, sample_conversation_data: dict) -> None:
+    def test_search_result_immutability(self, sample_conversation_data: dict[str, Any]) -> None:
         """Test that SearchResult is immutable (frozen Pydantic model).
 
         Validates:
@@ -424,7 +425,7 @@ class TestConversationProviderSearchProtocol:
 
         # Assert: Modifying frozen field should raise error
         with pytest.raises(Exception):  # Pydantic raises ValidationError
-            result.score = 0.95  # type: ignore[misc]
+            result.score = 0.95
 
 
 @pytest.mark.contract

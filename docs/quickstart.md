@@ -21,13 +21,46 @@ pip install -e ".[dev]"
 ### Basic Setup
 
 ```python
-from echomine import OpenAIAdapter, SearchQuery
+from echomine import OpenAIAdapter, ClaudeAdapter, SearchQuery
 from pathlib import Path
 
-# Create adapter for ChatGPT exports
-adapter = OpenAIAdapter()
+# Create adapter for your provider
+adapter = OpenAIAdapter()  # For ChatGPT exports
+# adapter = ClaudeAdapter()  # For Claude exports
+
 export_file = Path("path/to/conversations.json")
 ```
+
+### Multi-Provider Support (v1.3.0+)
+
+Echomine supports both OpenAI ChatGPT and Anthropic Claude exports:
+
+```python
+from echomine import OpenAIAdapter, ClaudeAdapter
+from pathlib import Path
+
+# OpenAI ChatGPT exports
+openai_adapter = OpenAIAdapter()
+for conv in openai_adapter.stream_conversations(Path("chatgpt_export.json")):
+    print(f"ChatGPT: {conv.title}")
+
+# Anthropic Claude exports
+claude_adapter = ClaudeAdapter()
+for conv in claude_adapter.stream_conversations(Path("claude_export.json")):
+    print(f"Claude: {conv.title}")
+
+# Auto-detection (CLI only - see CLI Usage section)
+from echomine.cli.provider import detect_provider, get_adapter
+
+provider = detect_provider(Path("export.json"))  # Returns "openai" or "claude"
+adapter = get_adapter(None, Path("export.json"))  # Auto-detects and returns appropriate adapter
+```
+
+**Key Differences:**
+- Both adapters share the same interface (stream_conversations, search, get_conversation_by_id, etc.)
+- Both use O(1) memory streaming with ijson
+- Export formats differ but are normalized to the same Conversation/Message models
+- Claude adapter handles content blocks and tool use automatically
 
 ### 1. List All Conversations
 
@@ -115,6 +148,23 @@ if conversation:
 
 ## CLI Usage
 
+### Multi-Provider Support (v1.3.0+)
+
+All CLI commands support both OpenAI and Claude exports via auto-detection:
+
+```bash
+# Auto-detect provider (default - works for both OpenAI and Claude)
+echomine list export.json
+
+# Explicit provider selection (bypasses auto-detection)
+echomine list chatgpt_export.json --provider openai
+echomine list claude_export.json --provider claude
+
+# Search works the same across providers
+echomine search export.json --keywords "python" --provider claude
+echomine search export.json --keywords "python" --provider openai
+```
+
 ### List Conversations
 
 ```bash
@@ -126,6 +176,9 @@ echomine list conversations.json --json
 
 # Limit to 10 most recent
 echomine list conversations.json --limit 10
+
+# Claude export with explicit provider (v1.3.0+)
+echomine list claude_export.json --provider claude
 ```
 
 ### Search

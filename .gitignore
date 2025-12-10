@@ -68,6 +68,9 @@ main.py
 # Local data files (real user exports - private)
 data/
 
+# Large generated test fixtures (can be regenerated)
+tests/fixtures/claude/large_export.json
+
 # Context file for Claude Code crash recovery
 docs/context.md
 

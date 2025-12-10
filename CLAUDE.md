@@ -616,10 +616,10 @@ logger.error(
 ---
 
 ## Recent Changes
+- 004-claude-adapter: Added Python 3.12+ (existing stack, mypy --strict compliant) + Pydantic v2.6+, ijson 3.2+, typer 0.9+, rich 13.0+, structlog 23.0+
 - 003-baseline-enhancements: Added Python 3.12+ (existing stack, mypy --strict compliant) + Pydantic v2.6+, ijson 3.2+, typer 0.9+, rich 13.0+, structlog 23.0+
 - 002-advanced-search: Added Python 3.12+ (existing stack, mypy --strict compliant)
 
-- 2025-11-22: Added comprehensive development guidelines, agent coordination, constitution principles
 
 <!-- MANUAL ADDITIONS START -->
 <!-- Add project-specific notes, tips, or warnings here -->

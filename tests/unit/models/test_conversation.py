@@ -72,13 +72,13 @@ def test_conversation_fields_are_immutable() -> None:
 
     # Attempting to modify fields should raise ValidationError or AttributeError
     with pytest.raises((ValidationError, AttributeError)):
-        conversation.title = "Modified Title"  # type: ignore[misc]
+        conversation.title = "Modified Title"
 
     with pytest.raises((ValidationError, AttributeError)):
-        conversation.id = "conv-modified"  # type: ignore[misc]
+        conversation.id = "conv-modified"
 
     with pytest.raises((ValidationError, AttributeError)):
-        conversation.messages = []  # type: ignore[misc]
+        conversation.messages = []
 
 
 def test_conversation_model_copy_creates_modified_instance() -> None:
@@ -215,13 +215,13 @@ def test_message_fields_are_immutable() -> None:
 
     # Attempting to modify fields should raise ValidationError or AttributeError
     with pytest.raises((ValidationError, AttributeError)):
-        message.content = "Modified content"  # type: ignore[misc]
+        message.content = "Modified content"
 
     with pytest.raises((ValidationError, AttributeError)):
-        message.role = "assistant"  # type: ignore[misc]
+        message.role = "assistant"
 
     with pytest.raises((ValidationError, AttributeError)):
-        message.id = "msg-modified"  # type: ignore[misc]
+        message.id = "msg-modified"
 
 
 def test_message_model_copy_creates_modified_instance() -> None:
@@ -277,13 +277,13 @@ def test_search_query_fields_are_immutable() -> None:
 
     # Attempting to modify fields should raise ValidationError or AttributeError
     with pytest.raises((ValidationError, AttributeError)):
-        query.keywords = ["modified"]  # type: ignore[misc]
+        query.keywords = ["modified"]
 
     with pytest.raises((ValidationError, AttributeError)):
-        query.limit = 50  # type: ignore[misc]
+        query.limit = 50
 
     with pytest.raises((ValidationError, AttributeError)):
-        query.title_filter = "Modified"  # type: ignore[misc]
+        query.title_filter = "Modified"
 
 
 def test_search_query_model_copy_creates_modified_instance() -> None:
@@ -327,7 +327,7 @@ def test_search_query_keywords_list_is_immutable() -> None:
 
     # The query itself is frozen
     with pytest.raises((ValidationError, AttributeError)):
-        query.keywords = ["modified"]  # type: ignore[misc]
+        query.keywords = ["modified"]
 
     # Note: The list itself might be mutable (Python limitation), but
     # reassignment should be blocked. Best practice is to not modify
@@ -375,13 +375,13 @@ def test_search_result_fields_are_immutable() -> None:
 
     # Attempting to modify fields should raise ValidationError or AttributeError
     with pytest.raises((ValidationError, AttributeError)):
-        result.score = 0.95  # type: ignore[misc]
+        result.score = 0.95
 
     with pytest.raises((ValidationError, AttributeError)):
-        result.conversation = conversation  # type: ignore[misc]
+        result.conversation = conversation
 
     with pytest.raises((ValidationError, AttributeError)):
-        result.matched_message_ids = []  # type: ignore[misc]
+        result.matched_message_ids = []
 
 
 def test_search_result_model_copy_creates_modified_instance() -> None:
@@ -474,10 +474,10 @@ def test_nested_messages_in_conversation_are_immutable() -> None:
     message = conversation.messages[0]
 
     with pytest.raises((ValidationError, AttributeError)):
-        message.content = "Modified content"  # type: ignore[misc]
+        message.content = "Modified content"
 
     with pytest.raises((ValidationError, AttributeError)):
-        message.role = "assistant"  # type: ignore[misc]
+        message.role = "assistant"
 
 
 def test_conversation_in_search_result_is_immutable() -> None:
@@ -514,7 +514,7 @@ def test_conversation_in_search_result_is_immutable() -> None:
 
     # Nested conversation should be immutable
     with pytest.raises((ValidationError, AttributeError)):
-        result.conversation.title = "Modified"  # type: ignore[misc]
+        result.conversation.title = "Modified"
 
 
 # ============================================================================

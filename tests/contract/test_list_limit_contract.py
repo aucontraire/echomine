@@ -422,6 +422,7 @@ class TestListLimitFlagContract:
         # Rich's Console auto-detects terminal size and crops help text if height is small
         # We force a large height to ensure all options are displayed
         import re
+        from typing import Any
 
         import rich.console
         from typer.testing import CliRunner
@@ -430,7 +431,7 @@ class TestListLimitFlagContract:
 
         original_console_init = rich.console.Console.__init__
 
-        def patched_console_init(self, *args, **kwargs):
+        def patched_console_init(self: Any, *args: Any, **kwargs: Any) -> None:
             # Force terminal dimensions to prevent truncation (override any existing values)
             kwargs["height"] = 1000  # Use assignment, not setdefault
             kwargs["width"] = 200

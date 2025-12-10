@@ -2,6 +2,7 @@
 
 **Library-first tool for parsing AI conversation exports with search, filtering, and markdown export**
 
+![Beta](https://img.shields.io/badge/status-beta-yellow?style=flat-square)
 [![PyPI Downloads](https://img.shields.io/pepy/dt/echomine)](https://pepy.tech/project/echomine)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Type Checked](https://img.shields.io/badge/mypy-strict-blue.svg)](https://mypy.readthedocs.io/)
@@ -11,7 +12,7 @@
 
 ## Overview
 
-Echomine is a Python library and CLI tool for parsing, searching, and exporting AI conversation exports. Initially designed for ChatGPT exports, it uses a multi-provider adapter pattern to support future AI platforms (Claude, Gemini, etc.).
+Echomine is a Python library and CLI tool for parsing, searching, and exporting AI conversation exports. Built with a multi-provider adapter pattern, it currently supports OpenAI ChatGPT and Anthropic Claude exports, with extensibility for future AI platforms (Gemini, etc.).
 
 ### Key Features
 
@@ -23,7 +24,7 @@ Echomine is a Python library and CLI tool for parsing, searching, and exporting 
 - **Multiple Export Formats**: Export to Markdown (with YAML frontmatter), JSON, or CSV
 - **Type Safe**: Strict typing with Pydantic v2 and mypy --strict compliance
 - **Library First**: All CLI capabilities available as importable Python library
-- **Multi-Provider Ready**: Adapter pattern supports multiple AI export formats
+- **Multi-Provider Support**: OpenAI ChatGPT and Anthropic Claude exports with auto-detection
 
 ### Design Principles
 
@@ -62,11 +63,12 @@ pip install echomine
 ### Library API (Primary Interface)
 
 ```python
-from echomine import OpenAIAdapter, SearchQuery
+from echomine import OpenAIAdapter, ClaudeAdapter, SearchQuery
 from pathlib import Path
 
-# Initialize adapter (stateless, reusable)
-adapter = OpenAIAdapter()
+# Initialize adapter for your provider (stateless, reusable)
+adapter = OpenAIAdapter()  # For ChatGPT exports
+# adapter = ClaudeAdapter()  # For Claude exports
 export_file = Path("conversations.json")
 
 # 1. List all conversations (discovery)
@@ -113,8 +115,12 @@ if conversation:
 ### CLI Usage (Built on Library)
 
 ```bash
-# List all conversations
+# Auto-detect provider (default - works for both OpenAI and Claude)
 echomine list export.json
+
+# Explicit provider selection (v1.3.0+)
+echomine list export.json --provider claude
+echomine list export.json --provider openai
 
 # Search by keywords
 echomine search export.json --keywords "algorithm,design" --limit 10
