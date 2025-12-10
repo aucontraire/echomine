@@ -299,3 +299,24 @@ def test_detect_real_openai_fixture() -> None:
 
     result = detect_provider(fixture_path)
     assert result == "openai"
+
+
+# Coverage gap: Line 175 - invalid provider value
+def test_get_adapter_invalid_provider_raises_error() -> None:
+    """Test line 175: get_adapter raises ValueError for invalid provider string.
+
+    Given an invalid provider string (not "openai", "claude", or None)
+    When get_adapter() is called
+    Then it raises ValueError with clear error message
+    """
+    from echomine.cli.provider import get_adapter
+
+    # Invalid provider value
+    with pytest.raises(ValueError) as exc_info:
+        get_adapter("invalid-provider", Path("any.json"))
+
+    error_msg = str(exc_info.value)
+    assert "Invalid provider" in error_msg
+    assert "invalid-provider" in error_msg
+    assert "openai" in error_msg
+    assert "claude" in error_msg
