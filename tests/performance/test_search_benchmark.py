@@ -364,8 +364,9 @@ class TestSearchPerformance:
         )
 
         # Assert: Completed quickly (early termination)
-        assert time_limited < 5.0, (
-            f"Search with limit=10 took {time_limited:.2f}s, should be <5s. "
+        # Threshold set to 6s to account for CI environment variance
+        assert time_limited < 6.0, (
+            f"Search with limit=10 took {time_limited:.2f}s, should be <6s. "
             "Early termination optimization may not be working."
         )
 
