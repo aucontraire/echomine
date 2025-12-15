@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1765780909459,
+  "lastUpdate": 1765780954816,
   "repoUrl": "https://github.com/aucontraire/echomine",
   "entries": {
     "Benchmark": [
@@ -108,6 +108,114 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0818374147129465",
             "extra": "mean: 2.7903328597999972 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5363a3836b17d7ccc11a273a5237f7a02c04e707",
+          "message": "ci: bump actions/download-artifact from 4 to 7 (#14)\n\nBumps [actions/download-artifact](https://github.com/actions/download-artifact) from 4 to 7.\n- [Release notes](https://github.com/actions/download-artifact/releases)\n- [Commits](https://github.com/actions/download-artifact/compare/v4...v7)\n\n---\nupdated-dependencies:\n- dependency-name: actions/download-artifact\n  dependency-version: '7'\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2025-12-14T22:40:05-08:00",
+          "tree_id": "1313b070892536d8dcf6766209944fe4db22366c",
+          "url": "https://github.com/aucontraire/echomine/commit/5363a3836b17d7ccc11a273a5237f7a02c04e707"
+        },
+        "date": 1765780954468,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/performance/test_advanced_search_benchmark.py::TestPhraseSearchPerformance::test_phrase_search_latency",
+            "value": 12.495469995635382,
+            "unit": "iter/sec",
+            "range": "stddev: 0.005111668934515745",
+            "extra": "mean: 80.02900253846363 msec\nrounds: 13"
+          },
+          {
+            "name": "tests/performance/test_advanced_search_benchmark.py::TestMatchModePerformance::test_match_mode_all_latency",
+            "value": 12.662907914604649,
+            "unit": "iter/sec",
+            "range": "stddev: 0.005065867985639296",
+            "extra": "mean: 78.97080250000548 msec\nrounds: 14"
+          },
+          {
+            "name": "tests/performance/test_advanced_search_benchmark.py::TestExcludeKeywordsPerformance::test_exclude_keywords_latency",
+            "value": 12.656750819013578,
+            "unit": "iter/sec",
+            "range": "stddev: 0.005056215392877769",
+            "extra": "mean: 79.00921921428302 msec\nrounds: 14"
+          },
+          {
+            "name": "tests/performance/test_advanced_search_benchmark.py::TestRoleFilterPerformance::test_role_filter_latency",
+            "value": 12.760110289165354,
+            "unit": "iter/sec",
+            "range": "stddev: 0.004837648919019181",
+            "extra": "mean: 78.36922858332211 msec\nrounds: 12"
+          },
+          {
+            "name": "tests/performance/test_advanced_search_benchmark.py::TestSnippetExtractionPerformance::test_snippet_extraction_latency",
+            "value": 12.65615680421432,
+            "unit": "iter/sec",
+            "range": "stddev: 0.004935438837651613",
+            "extra": "mean: 79.0129274999986 msec\nrounds: 14"
+          },
+          {
+            "name": "tests/performance/test_advanced_search_benchmark.py::TestCombinedFeaturesPerformance::test_all_features_combined_latency",
+            "value": 12.750865851416211,
+            "unit": "iter/sec",
+            "range": "stddev: 0.004587791730170779",
+            "extra": "mean: 78.42604664285854 msec\nrounds: 14"
+          },
+          {
+            "name": "tests/performance/test_list_benchmark.py::TestListPerformance::test_list_10k_conversations_under_5_seconds",
+            "value": 1.009810880215,
+            "unit": "iter/sec",
+            "range": "stddev: 0.020487911603639414",
+            "extra": "mean: 990.2844380000033 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/performance/test_list_benchmark.py::TestLatencyBreakdown::test_json_parsing_latency",
+            "value": 3.325288555838282,
+            "unit": "iter/sec",
+            "range": "stddev: 0.011515396018892402",
+            "extra": "mean: 300.7257815999992 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/performance/test_list_benchmark.py::TestLatencyBreakdown::test_model_transformation_latency",
+            "value": 0.9778470080421582,
+            "unit": "iter/sec",
+            "range": "stddev: 0.020512921144005308",
+            "extra": "mean: 1.0226548649999927 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/performance/test_search_benchmark.py::TestSearchPerformance::test_search_10k_conversations_under_30_seconds",
+            "value": 0.37568973943403855,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06163386381418091",
+            "extra": "mean: 2.661770857800002 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/performance/test_search_benchmark.py::TestSearchPerformance::test_bm25_scoring_performance",
+            "value": 0.37265699587781026,
+            "unit": "iter/sec",
+            "range": "stddev: 0.047685547437104105",
+            "extra": "mean: 2.6834327841999994 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/performance/test_search_benchmark.py::TestSearchLatencyBreakdown::test_json_streaming_latency_for_search",
+            "value": 0.3828573693091858,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06165148507632132",
+            "extra": "mean: 2.6119387535999747 sec\nrounds: 5"
           }
         ]
       }
