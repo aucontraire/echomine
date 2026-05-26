@@ -29,6 +29,9 @@ venv/
 ENV/
 env/
 
+# Lock files (library, not application)
+uv.lock
+
 # Testing
 .pytest_cache/
 .coverage
