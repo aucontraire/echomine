@@ -310,7 +310,6 @@ class TestSearchCoverageGaps:
                         "ctx": {
                             "error": ValueError("min_messages cannot be greater than max_messages")
                         },
-                        "msg": "min_messages (100) cannot be greater than max_messages (10)",
                     }
                 ],
             )
@@ -365,7 +364,6 @@ class TestSearchCoverageGaps:
                         "type": "missing",
                         "loc": ("keywords",),
                         "input": {},
-                        "msg": "Field required",
                     }
                 ],
             )

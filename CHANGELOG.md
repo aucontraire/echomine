@@ -25,6 +25,88 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A
 
+## [1.4.0] - 2026-05-27
+
+### Added
+
+#### Content Fidelity & Asset Resolution
+
+- **Content Type Classification**: Provider-agnostic message categorization across both adapters
+  - 7-value vocabulary: `conversational`, `reasoning`, `tool_io`, `system`, `media`, `attachment`, `unknown`
+  - OpenAI: 13 raw content types mapped (text, multimodal_text, thoughts, code, image_asset_pointer, etc.)
+  - Claude: 6 block types mapped (text, thinking, tool_use, tool_result, voice_note, token_budget)
+  - Every message now carries `content_type` and `content_type_category` in metadata
+  - Library: `from echomine.models.content_types import classify_content_type, ContentTypeCategory`
+
+- **Category-Artifact Orthogonality**: Consistent rule for mixed-content messages
+  - Category reflects the message's conversational role, not what it carries
+  - Text + artifact (image, attachment, thinking) → `conversational`
+  - Pure artifact (image-only, attachment-only, thinking-only) → artifact's category (`media`, `attachment`, `reasoning`)
+  - Symmetric behavior across OpenAI and Claude adapters
+
+- **Asset Resolution**: Resolve OpenAI asset pointers to actual files in export bundles
+  - Library: `from echomine.utils.asset_resolver import resolve_asset, ResolvedAsset`
+  - Magic-byte detection for PNG, JPEG, WebP, GIF, WAV formats
+  - Extracts file ID from `sediment://` and similar URI schemes
+  - Returns typed `ResolvedAsset` with path, detected MIME type, and original extension
+
+- **OpenAI Adapter Enhancements**:
+  - Tool-authored message classification: messages with `author.role == "tool"` now classified as `tool_io` regardless of content_type (was incorrectly labeled `conversational` for text/multimodal_text tool results, affecting 2,097 of 3,018 tool messages in real-data testing)
+  - Multi-part text joining: messages with multiple text parts are joined with newlines (was only using first part)
+  - Reasoning metadata: `thoughts` and `reasoning_recap` content extracted into `metadata["thinking"]`
+  - Hidden message detection: `metadata["is_hidden"]` flag for system-generated messages
+  - Recipient tracking: `metadata["recipient"]` preserved from OpenAI export data
+  - Placeholder leak elimination: all non-conversational content types get `content=""` instead of placeholders (`f"[{content_type}]"`, `"[Image]"`)
+
+- **Claude Adapter Enhancements**:
+  - Attachment extraction: file attachments parsed into `metadata["attachments"]` with name, type, and content
+  - File reference extraction: `metadata["file_references"]` for attached files
+  - Thinking block extraction: reasoning content stored in `metadata["thinking"]`
+  - Voice note detection: voice_note blocks classified as `conversational`
+  - Message-level post-classification: pure thinking/attachment messages get correct category
+
+- **Test Factories**: Shared factory module for test data generation
+  - `tests/factories.py` with 6 factory functions for OpenAI and Claude test data
+  - Eliminates 200+ lines of repetitive JSON boilerplate across test files
+  - `make_openai_message()`, `make_openai_conversation()`, `make_openai_export()`
+  - `make_claude_message()`, `make_claude_export()`, `write_export()`
+
+### Changed
+
+- Messages from both adapters now include `content_type` and `content_type_category` in metadata (backward compatible — new keys added to existing metadata dict)
+- OpenAI multimodal text messages now join all text parts with newlines instead of spaces
+- Claude adapter returns 4-tuple from content block extraction (added thinking and voice_note outputs)
+
+### Upgrade Guide
+
+This release is **fully backward compatible**. No code changes required.
+
+**New metadata fields** (additive, never break existing code):
+- `msg.metadata["content_type"]` — raw provider-specific type (e.g., "text", "thinking", "code")
+- `msg.metadata["content_type_category"]` — standardized category (e.g., "conversational", "reasoning")
+- `msg.metadata["thinking"]` — extracted reasoning/thinking content dict (OpenAI thoughts, Claude thinking blocks)
+- `msg.metadata["is_hidden"]` — boolean flag for system-generated hidden messages (OpenAI)
+- `msg.metadata["attachments"]` — list of attachment dicts with name, type, content (Claude)
+- `msg.metadata["file_references"]` — list of file reference dicts (Claude)
+
+**Behavioral changes** (improved correctness, unlikely to affect consumers):
+- OpenAI multi-part text messages now use `"\n"` join instead of only first part — more content, not less
+- All non-conversational content types now have `content=""` instead of placeholders (`"[content_type]"`, `"[Image]"`) — cleaner data for downstream consumers
+
+### Documentation
+
+- Complete specification: `specs/005-content-fidelity/spec.md`
+- Implementation plan: `specs/005-content-fidelity/plan.md`
+- Task breakdown: `specs/005-content-fidelity/tasks.md`
+- Content fidelity design: `CONTENT_FIDELITY_AND_ASSETS.md`
+
+### Quality Metrics
+
+- Test coverage: 95.85% line, 94.21% branch (1435 passed, 7 skipped)
+- mypy --strict: 0 errors across 136 source and test files
+- ruff check: All passed
+- Cross-provider content fidelity integration tests validate symmetric behavior
+
 ## [1.3.0] - 2025-12-10
 
 ### Added
@@ -333,7 +415,8 @@ Each release includes:
 
 ---
 
-[Unreleased]: https://github.com/aucontraire/echomine/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/aucontraire/echomine/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/aucontraire/echomine/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/aucontraire/echomine/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/aucontraire/echomine/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/aucontraire/echomine/compare/v1.0.2...v1.1.0

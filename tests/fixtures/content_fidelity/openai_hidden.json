@@ -1,0 +1,47 @@
+[
+  {
+    "id": "conv-hidden",
+    "title": "Hidden Message Test",
+    "create_time": 1700000000.0,
+    "update_time": 1700001000.0,
+    "mapping": {
+      "node-hidden": {
+        "id": "node-hidden",
+        "parent": null,
+        "message": {
+          "id": "msg-hidden",
+          "author": {"role": "system"},
+          "create_time": 1700000001.0,
+          "content": {"content_type": "text", "parts": ["System context"]},
+          "metadata": {
+            "is_visually_hidden_from_conversation": true
+          }
+        }
+      },
+      "node-visible": {
+        "id": "node-visible",
+        "parent": "node-hidden",
+        "message": {
+          "id": "msg-visible",
+          "author": {"role": "user"},
+          "create_time": 1700000002.0,
+          "content": {"content_type": "text", "parts": ["Hello"]},
+          "metadata": {}
+        }
+      },
+      "node-flag-false": {
+        "id": "node-flag-false",
+        "parent": "node-visible",
+        "message": {
+          "id": "msg-flag-false",
+          "author": {"role": "system"},
+          "create_time": 1700000003.0,
+          "content": {"content_type": "text", "parts": ["Visible system"]},
+          "metadata": {
+            "is_visually_hidden_from_conversation": false
+          }
+        }
+      }
+    }
+  }
+]

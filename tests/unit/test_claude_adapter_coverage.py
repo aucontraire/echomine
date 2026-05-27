@@ -576,4 +576,5 @@ class TestPhraseMatchingMessageIds:
         assert "msg-003" not in result.matched_message_ids
 
         # Snippet should contain the phrase
+        assert result.snippet is not None
         assert "binary search" in result.snippet.lower()

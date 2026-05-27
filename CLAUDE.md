@@ -10,6 +10,7 @@
 - Python 3.12+ (existing stack, mypy --strict compliant) (002-advanced-search)
 - File system only (JSON exports, no database) (002-advanced-search)
 - Python 3.12+ (existing stack, mypy --strict compliant) + Pydantic v2.6+, ijson 3.2+, typer 0.9+, rich 13.0+, structlog 23.0+ (003-baseline-enhancements)
+- Python 3.12+ (existing stack) + Pydantic v2.6+, ijson 3.2+, typer 0.9+, rich 13.0+, structlog 23.0+ (005-content-fidelity)
 
 ### Core Stack
 - **Python 3.12+**: Required for modern type hints (PEP 695, improved generics)
@@ -616,9 +617,9 @@ logger.error(
 ---
 
 ## Recent Changes
+- 005-content-fidelity: Added Python 3.12+ (existing stack) + Pydantic v2.6+, ijson 3.2+, typer 0.9+, rich 13.0+, structlog 23.0+
 - 004-claude-adapter: Added Python 3.12+ (existing stack, mypy --strict compliant) + Pydantic v2.6+, ijson 3.2+, typer 0.9+, rich 13.0+, structlog 23.0+
 - 003-baseline-enhancements: Added Python 3.12+ (existing stack, mypy --strict compliant) + Pydantic v2.6+, ijson 3.2+, typer 0.9+, rich 13.0+, structlog 23.0+
-- 002-advanced-search: Added Python 3.12+ (existing stack, mypy --strict compliant)
 
 
 <!-- MANUAL ADDITIONS START -->

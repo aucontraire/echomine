@@ -1,0 +1,56 @@
+[
+  {
+    "uuid": "conv-thinking",
+    "name": "Thinking Test",
+    "created_at": "2025-10-01T18:00:00Z",
+    "updated_at": "2025-10-01T18:01:00Z",
+    "chat_messages": [
+      {
+        "uuid": "msg-thinking-block",
+        "text": "",
+        "sender": "assistant",
+        "created_at": "2025-10-01T18:00:01Z",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "Let me analyze this step by step...",
+            "summaries": ["Analyzed step by step"],
+            "cut_off": false,
+            "truncated": false
+          },
+          {
+            "type": "text",
+            "text": "Here is my answer."
+          }
+        ]
+      },
+      {
+        "uuid": "msg-thinking-only",
+        "text": "",
+        "sender": "assistant",
+        "created_at": "2025-10-01T18:00:02Z",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "Processing...",
+            "summaries": [],
+            "cut_off": true,
+            "truncated": true
+          }
+        ]
+      },
+      {
+        "uuid": "msg-token-budget",
+        "text": "",
+        "sender": "assistant",
+        "created_at": "2025-10-01T18:00:03Z",
+        "content": [
+          {
+            "type": "token_budget",
+            "budget": 4096
+          }
+        ]
+      }
+    ]
+  }
+]

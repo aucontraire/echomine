@@ -56,6 +56,7 @@ import ijson
 from pydantic import ValidationError as PydanticValidationError
 
 from echomine.exceptions import ParseError
+from echomine.models.content_types import OPENAI_CATEGORY_MAP, ContentTypeCategory
 from echomine.models.conversation import Conversation
 from echomine.models.image import ImageRef
 from echomine.models.message import Message
@@ -859,44 +860,38 @@ class OpenAIAdapter:
         raw_role = message_data["author"]["role"]
         role = self._normalize_role(raw_role)
 
-        # Extract content from parts array or handle special content types
-        # OpenAI content structure varies by type:
-        # - Text messages: content.parts is list[str]
-        # - Multimodal messages: content.parts is list[str | dict] with image_asset_pointer
-        # - Image messages: content is dict with content_type='image_asset_pointer'
-        # - Other types: may have different structures
         content_data = message_data.get("content", {})
-        images: list[ImageRef] = []  # Initialize images list
+        images: list[ImageRef] = []
 
         if isinstance(content_data, dict):
             content_type = content_data.get("content_type", "text")
+            category: ContentTypeCategory = OPENAI_CATEGORY_MAP.get(content_type, "unknown")
 
-            if content_type == "multimodal_text":
-                # Multimodal message - extract text and images from parts
+            if raw_role == "tool":
+                category = "tool_io"
+                content = ""
+            elif content_type == "multimodal_text":
                 content_parts = content_data.get("parts", [])
                 content, images = self._parse_multimodal_parts(content_parts)
             elif content_type == "text":
-                # Standard text message - extract from parts array
                 content_parts = content_data.get("parts", [])
-                content = (
-                    content_parts[0] if content_parts and isinstance(content_parts[0], str) else ""
-                )
-            elif content_type in ("image_asset_pointer", "image"):
-                # Image message - use placeholder text
-                content = "[Image]"
-            elif content_type == "code":
-                # Code message - extract from parts if available
+                content = "\n".join(p for p in content_parts if isinstance(p, str))
+            elif category == "media":
+                content = ""
+            elif category == "reasoning":
                 content_parts = content_data.get("parts", [])
-                content = (
-                    content_parts[0]
-                    if content_parts and isinstance(content_parts[0], str)
-                    else "[Code]"
-                )
+                reasoning_text = "\n".join(p for p in content_parts if isinstance(p, str))
+                content = ""
+                thinking_meta: dict[str, str] = {"content": reasoning_text}
+            elif category in ("tool_io", "system", "unknown"):
+                content = ""
+                if category == "unknown":
+                    logger.debug(f"Unknown OpenAI content type: {content_type}")
             else:
-                # Unknown content type - use placeholder
-                content = f"[{content_type}]"
+                content = ""
         else:
-            # Unexpected content structure - use empty string
+            content_type = "text"
+            category = "conversational"
             content = ""
 
         # Convert Unix timestamp to UTC datetime
@@ -913,18 +908,31 @@ class OpenAIAdapter:
         # None for root messages
         parent_id = node_data.get("parent")
 
-        # Build Message model (Pydantic validation automatic)
+        metadata: dict[str, Any] = {
+            "original_role": raw_role,
+            "update_time": message_data.get("update_time"),
+            "content_type": content_type,
+            "content_type_category": category,
+        }
+        if category == "reasoning":
+            metadata["thinking"] = thinking_meta
+        recipient = message_data.get("recipient")
+        if recipient is not None:
+            metadata["recipient"] = recipient
+        msg_metadata = message_data.get("metadata")
+        if isinstance(msg_metadata, dict) and msg_metadata.get(
+            "is_visually_hidden_from_conversation"
+        ):
+            metadata["is_visually_hidden"] = True
+
         return Message(
             id=message_data["id"],
             content=content,
             role=role,
             timestamp=timestamp,
             parent_id=parent_id,
-            images=images,  # Pass extracted images (empty list for non-multimodal)
-            metadata={
-                "original_role": raw_role,
-                "update_time": message_data.get("update_time"),
-            },
+            images=images,
+            metadata=metadata,
         )
 
     def _normalize_role(self, raw_role: str) -> Literal["user", "assistant", "system"]:
@@ -1001,13 +1009,14 @@ class OpenAIAdapter:
             elif isinstance(part, dict):
                 # Check if it's an image_asset_pointer
                 content_type = part.get("content_type")
-                if content_type == "image_asset_pointer":
+                if content_type in ("image_asset_pointer", "image"):
                     # Extract image data and create ImageRef
                     try:
                         asset_pointer = part.get("asset_pointer", "")
                         if asset_pointer:  # Only create ImageRef if asset_pointer exists
                             image_ref = ImageRef(
                                 asset_pointer=asset_pointer,
+                                content_type=content_type,
                                 size_bytes=part.get("size_bytes"),
                                 width=part.get("width"),
                                 height=part.get("height"),
@@ -1034,7 +1043,6 @@ class OpenAIAdapter:
                     logger.debug(f"Skipping non-image dict part: {content_type}")
             # Ignore other types (list, int, etc.)
 
-        # Concatenate text parts with spaces
-        concatenated_text = " ".join(text_parts)
+        concatenated_text = "\n".join(text_parts)
 
         return concatenated_text, images

@@ -1,0 +1,173 @@
+[
+  {
+    "id": "conv-content-types",
+    "title": "Content Type Test",
+    "create_time": 1700000000.0,
+    "update_time": 1700001000.0,
+    "mapping": {
+      "node-text": {
+        "id": "node-text",
+        "parent": null,
+        "message": {
+          "id": "msg-text",
+          "author": {"role": "user"},
+          "create_time": 1700000001.0,
+          "content": {"content_type": "text", "parts": ["Hello world"]}
+        }
+      },
+      "node-multimodal": {
+        "id": "node-multimodal",
+        "parent": "node-text",
+        "message": {
+          "id": "msg-multimodal",
+          "author": {"role": "user"},
+          "create_time": 1700000002.0,
+          "content": {
+            "content_type": "multimodal_text",
+            "parts": [
+              "Check this image",
+              {
+                "content_type": "image_asset_pointer",
+                "asset_pointer": "sediment://file_abc123",
+                "size_bytes": 1024,
+                "width": 100,
+                "height": 100
+              }
+            ]
+          }
+        }
+      },
+      "node-thoughts": {
+        "id": "node-thoughts",
+        "parent": "node-multimodal",
+        "message": {
+          "id": "msg-thoughts",
+          "author": {"role": "assistant"},
+          "create_time": 1700000003.0,
+          "content": {"content_type": "thoughts", "parts": ["Let me think about this..."]}
+        }
+      },
+      "node-reasoning-recap": {
+        "id": "node-reasoning-recap",
+        "parent": "node-thoughts",
+        "message": {
+          "id": "msg-reasoning-recap",
+          "author": {"role": "assistant"},
+          "create_time": 1700000004.0,
+          "content": {"content_type": "reasoning_recap", "parts": ["To summarize my reasoning..."]}
+        }
+      },
+      "node-code": {
+        "id": "node-code",
+        "parent": "node-reasoning-recap",
+        "message": {
+          "id": "msg-code",
+          "author": {"role": "assistant"},
+          "create_time": 1700000005.0,
+          "content": {"content_type": "code", "parts": ["print('hello')"]}
+        }
+      },
+      "node-exec-output": {
+        "id": "node-exec-output",
+        "parent": "node-code",
+        "message": {
+          "id": "msg-exec-output",
+          "author": {"role": "assistant"},
+          "create_time": 1700000006.0,
+          "content": {"content_type": "execution_output", "parts": ["hello"]}
+        }
+      },
+      "node-tether-quote": {
+        "id": "node-tether-quote",
+        "parent": "node-exec-output",
+        "message": {
+          "id": "msg-tether-quote",
+          "author": {"role": "assistant"},
+          "create_time": 1700000007.0,
+          "content": {"content_type": "tether_quote", "parts": ["According to the article..."]}
+        }
+      },
+      "node-tether-browsing": {
+        "id": "node-tether-browsing",
+        "parent": "node-tether-quote",
+        "message": {
+          "id": "msg-tether-browsing",
+          "author": {"role": "assistant"},
+          "create_time": 1700000008.0,
+          "content": {"content_type": "tether_browsing_display", "parts": ["Browsing results..."]}
+        }
+      },
+      "node-user-editable": {
+        "id": "node-user-editable",
+        "parent": "node-tether-browsing",
+        "message": {
+          "id": "msg-user-editable",
+          "author": {"role": "system"},
+          "create_time": 1700000009.0,
+          "content": {"content_type": "user_editable_context", "parts": ["Custom instructions text"]}
+        }
+      },
+      "node-app-pairing": {
+        "id": "node-app-pairing",
+        "parent": "node-user-editable",
+        "message": {
+          "id": "msg-app-pairing",
+          "author": {"role": "system"},
+          "create_time": 1700000010.0,
+          "content": {"content_type": "app_pairing_content", "parts": ["App pairing data"]}
+        }
+      },
+      "node-sys-error": {
+        "id": "node-sys-error",
+        "parent": "node-app-pairing",
+        "message": {
+          "id": "msg-sys-error",
+          "author": {"role": "system"},
+          "create_time": 1700000011.0,
+          "content": {"content_type": "system_error", "parts": ["An error occurred"]}
+        }
+      },
+      "node-image-asset": {
+        "id": "node-image-asset",
+        "parent": "node-sys-error",
+        "message": {
+          "id": "msg-image-asset",
+          "author": {"role": "assistant"},
+          "create_time": 1700000012.0,
+          "content": {"content_type": "image_asset_pointer", "parts": []}
+        }
+      },
+      "node-image": {
+        "id": "node-image",
+        "parent": "node-image-asset",
+        "message": {
+          "id": "msg-image",
+          "author": {"role": "assistant"},
+          "create_time": 1700000013.0,
+          "content": {"content_type": "image", "parts": []}
+        }
+      },
+      "node-unknown": {
+        "id": "node-unknown",
+        "parent": "node-image",
+        "message": {
+          "id": "msg-unknown",
+          "author": {"role": "assistant"},
+          "create_time": 1700000014.0,
+          "content": {"content_type": "brand_new_type", "parts": ["some data"]}
+        }
+      },
+      "node-recipient": {
+        "id": "node-recipient",
+        "parent": "node-unknown",
+        "message": {
+          "id": "msg-recipient",
+          "author": {"role": "assistant"},
+          "create_time": 1700000015.0,
+          "content": {"content_type": "code", "parts": ["import os"]},
+          "recipient": "python"
+        }
+      }
+    }
+  }
+]
