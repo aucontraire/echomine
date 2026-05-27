@@ -1526,3 +1526,50 @@ class TestClaudeAdapterIntegration:
         assert callable(adapter.search)
         assert callable(adapter.get_conversation_by_id)
         assert callable(adapter.get_message_by_id)
+
+
+class TestClaudeEdgeCaseCoverage:
+    """Tests for uncovered edge-case branches in Claude adapter."""
+
+    def test_unknown_sender_preserves_original(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    sender="moderator",
+                    content=[{"type": "text", "text": "Hello"}],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "unknown_sender.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["original_sender"] == "moderator"
+
+    def test_empty_voice_note_transcript(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    content=[
+                        {"type": "text", "text": "Before"},
+                        {"type": "voice_note", "transcript": ""},
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "empty_voice.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.content == "Before"
+
+    def test_empty_text_block_skipped(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    content=[
+                        {"type": "text", "text": ""},
+                        {"type": "text", "text": "Actual"},
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "empty_text.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.content == "Actual"

@@ -460,6 +460,42 @@ class TestOpenAIContentTypeClassification:
         assert m.metadata["content_type_category"] == "conversational"
         assert m.content == "Hello"
 
+    def test_non_dict_content_data(self, tmp_path: Path) -> None:
+        msg = make_openai_message()
+        msg["content"] = "plain string content"
+        data = make_openai_export([msg])
+        f = write_export(data, tmp_path / "non_dict.json")
+        m = next(iter(OpenAIAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type"] == "text"
+        assert m.metadata["content_type_category"] == "conversational"
+        assert m.content == ""
+
+    def test_malformed_message_skipped_gracefully(self, tmp_path: Path) -> None:
+        good_msg = make_openai_message(id="good-1", parts=["Hello"])
+        bad_msg = make_openai_message(id="bad-1")
+        bad_msg["author"] = {}
+        data = make_openai_export([good_msg, bad_msg])
+        f = write_export(data, tmp_path / "malformed.json")
+        convs = list(OpenAIAdapter().stream_conversations(f))
+        assert len(convs) == 1
+        assert len(convs[0].messages) == 1
+        assert convs[0].messages[0].content == "Hello"
+
+    def test_malformed_image_ref_skipped(self, tmp_path: Path) -> None:
+        msg = make_openai_message(
+            role="assistant",
+            content_type="multimodal_text",
+            parts=[
+                "Some text",
+                {"content_type": "image_asset_pointer", "asset_pointer": None},
+            ],
+        )
+        data = make_openai_export([msg])
+        f = write_export(data, tmp_path / "bad_image.json")
+        m = next(iter(OpenAIAdapter().stream_conversations(f))).messages[0]
+        assert m.content == "Some text"
+        assert len(m.images) == 0
+
 
 # ============================================================================
 # Test Multi-Part Text Joining (FR-005) — T008
