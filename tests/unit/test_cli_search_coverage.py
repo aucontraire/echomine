@@ -24,6 +24,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
+import typer
 from pydantic import ValidationError as PydanticValidationError
 
 from echomine.adapters.openai import OpenAIAdapter
@@ -176,11 +177,9 @@ class TestSearchQueryValidationError:
             except PydanticValidationError as e:
                 raise e
 
-        from click.exceptions import Exit
-
         with patch("echomine.cli.commands.search.SearchQuery", side_effect=raise_validation_error):
             # Act & Assert: Exits with code 2
-            with pytest.raises(Exit) as exc_info:
+            with pytest.raises(typer.Exit) as exc_info:
                 search_conversations(
                     file_path=export_file,
                     keywords=["test"],
@@ -344,11 +343,9 @@ class TestSearchErrorHandlers:
         mock_adapter = MagicMock(spec=OpenAIAdapter)
         mock_adapter.search.side_effect = FileNotFoundError("File deleted during search")
 
-        from click.exceptions import Exit
-
         with patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter):
             # Act & Assert: Exits with code 1
-            with pytest.raises(Exit) as exc_info:
+            with pytest.raises(typer.Exit) as exc_info:
                 search_conversations(
                     file_path=export_file,
                     keywords=["test"],
@@ -389,11 +386,9 @@ class TestSearchErrorHandlers:
         mock_adapter = MagicMock(spec=OpenAIAdapter)
         mock_adapter.search.side_effect = ValidationError("Invalid conversation schema")
 
-        from click.exceptions import Exit
-
         with patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter):
             # Act & Assert: Exits with code 1
-            with pytest.raises(Exit) as exc_info:
+            with pytest.raises(typer.Exit) as exc_info:
                 search_conversations(
                     file_path=export_file,
                     keywords=["test"],
@@ -434,11 +429,9 @@ class TestSearchErrorHandlers:
         mock_adapter = MagicMock(spec=OpenAIAdapter)
         mock_adapter.search.side_effect = KeyboardInterrupt()
 
-        from click.exceptions import Exit
-
         with patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter):
             # Act & Assert: Exits with code 130
-            with pytest.raises(Exit) as exc_info:
+            with pytest.raises(typer.Exit) as exc_info:
                 search_conversations(
                     file_path=export_file,
                     keywords=["test"],
@@ -479,11 +472,9 @@ class TestSearchErrorHandlers:
         mock_adapter = MagicMock(spec=OpenAIAdapter)
         mock_adapter.search.side_effect = RuntimeError("Unexpected database connection failure")
 
-        from click.exceptions import Exit
-
         with patch("echomine.cli.commands.search.get_adapter", return_value=mock_adapter):
             # Act & Assert: Exits with code 1
-            with pytest.raises(Exit) as exc_info:
+            with pytest.raises(typer.Exit) as exc_info:
                 search_conversations(
                     file_path=export_file,
                     keywords=["test"],
