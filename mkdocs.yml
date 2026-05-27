@@ -97,10 +97,13 @@ nav:
           - Conversation: api/models/conversation.md
           - Message: api/models/message.md
           - Search: api/models/search.md
+          - Content Types: api/models/content_types.md
       - Adapters:
           - OpenAI Adapter: api/adapters/openai.md
           - Claude Adapter: api/adapters/claude.md
           - Protocols: api/adapters/protocols.md
+      - Utilities:
+          - Asset Resolver: api/utils/asset_resolver.md
       - Search: api/search/ranking.md
       - CLI: api/cli/commands.md
   - Development:

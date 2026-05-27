@@ -1,0 +1,106 @@
+[
+  {
+    "uuid": "conv-attachments",
+    "name": "Attachment Test",
+    "created_at": "2025-10-01T18:00:00Z",
+    "updated_at": "2025-10-01T18:01:00Z",
+    "chat_messages": [
+      {
+        "uuid": "msg-with-attachments",
+        "text": "",
+        "sender": "human",
+        "created_at": "2025-10-01T18:00:01Z",
+        "content": [{"type": "text", "text": "Please review this document"}],
+        "attachments": [
+          {
+            "file_name": "report.pdf",
+            "file_type": "application/pdf",
+            "file_size": 102400,
+            "extracted_content": "This is the extracted text from the PDF document."
+          }
+        ]
+      },
+      {
+        "uuid": "msg-with-files-only",
+        "text": "",
+        "sender": "human",
+        "created_at": "2025-10-01T18:00:02Z",
+        "content": [{"type": "text", "text": "Here are my files"}],
+        "files": [
+          {
+            "file_uuid": "file-uuid-001",
+            "file_name": "data.csv"
+          },
+          {
+            "file_uuid": "file-uuid-002",
+            "file_name": "image.png"
+          }
+        ]
+      },
+      {
+        "uuid": "msg-with-both",
+        "text": "",
+        "sender": "human",
+        "created_at": "2025-10-01T18:00:03Z",
+        "content": [{"type": "text", "text": "Document and file together"}],
+        "attachments": [
+          {
+            "file_name": "notes.txt",
+            "file_type": "text/plain",
+            "file_size": 256,
+            "extracted_content": "Meeting notes from Tuesday."
+          }
+        ],
+        "files": [
+          {
+            "file_uuid": "file-uuid-003",
+            "file_name": "backup.zip"
+          }
+        ]
+      },
+      {
+        "uuid": "msg-empty-filename",
+        "text": "",
+        "sender": "human",
+        "created_at": "2025-10-01T18:00:04Z",
+        "content": [],
+        "files": [
+          {
+            "file_uuid": "file-uuid-004",
+            "file_name": ""
+          }
+        ]
+      },
+      {
+        "uuid": "msg-attachment-only",
+        "text": "",
+        "sender": "human",
+        "created_at": "2025-10-01T18:00:05Z",
+        "content": [],
+        "attachments": [
+          {
+            "file_name": "uploaded.pdf",
+            "file_type": "application/pdf",
+            "file_size": 51200,
+            "extracted_content": "Full extracted text from the uploaded PDF."
+          }
+        ]
+      },
+      {
+        "uuid": "msg-text-plus-attachment",
+        "text": "",
+        "sender": "human",
+        "created_at": "2025-10-01T18:00:06Z",
+        "content": [{"type": "text", "text": "Analyze this document for me"}],
+        "attachments": [
+          {
+            "file_name": "analysis.docx",
+            "file_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "file_size": 30000,
+            "extracted_content": "Quarterly analysis results..."
+          }
+        ]
+      }
+    ]
+  }
+]

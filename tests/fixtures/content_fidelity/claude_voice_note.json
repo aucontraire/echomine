@@ -1,0 +1,22 @@
+[
+  {
+    "uuid": "conv-voice",
+    "name": "Voice Note Test",
+    "created_at": "2025-10-01T18:00:00Z",
+    "updated_at": "2025-10-01T18:01:00Z",
+    "chat_messages": [
+      {
+        "uuid": "msg-voice-note",
+        "text": "",
+        "sender": "human",
+        "created_at": "2025-10-01T18:00:01Z",
+        "content": [
+          {
+            "type": "voice_note",
+            "transcript": "Can you help me with my Python code?"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -33,6 +33,7 @@ from echomine.adapters.claude import ClaudeAdapter
 from echomine.models.conversation import Conversation
 from echomine.models.message import Message
 from echomine.models.search import SearchQuery
+from tests.factories import make_claude_export, make_claude_message, write_export
 
 
 # ============================================================================
@@ -528,6 +529,340 @@ class TestMessageParsing:
         for conv in conversations:
             for msg in conv.messages:
                 assert msg.parent_id is None
+
+
+# ============================================================================
+# Test Content Type Classification (FR-001, FR-002) — T009
+# ============================================================================
+
+
+class TestClaudeBlockTypeClassification:
+    """Verify content_type and content_type_category metadata on Claude messages."""
+
+    def test_text_block_classified_as_conversational(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [make_claude_message(content=[{"type": "text", "text": "Hello"}])]
+        )
+        f = write_export(data, tmp_path / "ct.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type"] == "text"
+        assert m.metadata["content_type_category"] == "conversational"
+        assert m.content == "Hello"
+
+    def test_tool_use_classified_as_tool_io(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    sender="assistant",
+                    content=[
+                        {"type": "text", "text": "I'll use a tool"},
+                        {"type": "tool_use", "id": "toolu_123", "name": "calc", "input": {}},
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "tool.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type_category"] == "conversational"
+        assert m.content == "I'll use a tool"
+
+    def test_tool_result_only_classified_as_tool_io(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    content=[{"type": "tool_result", "tool_use_id": "toolu_123", "content": "42"}]
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "tr.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type"] == "tool_result"
+        assert m.metadata["content_type_category"] == "tool_io"
+        assert m.content == ""
+
+    def test_unknown_block_type_classified_as_unknown(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    sender="assistant", content=[{"type": "brand_new_block", "data": "something"}]
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "unk.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type"] == "brand_new_block"
+        assert m.metadata["content_type_category"] == "unknown"
+        assert m.content == ""
+
+    def test_multiple_text_blocks_stay_conversational(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    sender="assistant",
+                    content=[
+                        {"type": "text", "text": "Part one"},
+                        {"type": "text", "text": "Part two"},
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "multi.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type_category"] == "conversational"
+        assert m.content == "Part one\nPart two"
+
+    def test_empty_content_blocks_with_text_fallback(self, tmp_path: Path) -> None:
+        data = make_claude_export([make_claude_message(text="fallback text", content=[])])
+        f = write_export(data, tmp_path / "fb.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.content == "fallback text"
+        assert "content_type" in m.metadata
+        assert "content_type_category" in m.metadata
+
+
+# ============================================================================
+# Test Reasoning & Voice Block Recovery (FR-006, FR-008) — T018
+# ============================================================================
+
+
+class TestClaudeReasoningAndVoice:
+    """Verify thinking block metadata, voice note content, and unknown block logging."""
+
+    def test_thinking_block_populates_metadata(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    sender="assistant",
+                    content=[
+                        {
+                            "type": "thinking",
+                            "thinking": "Let me think...",
+                            "summaries": ["Thought about it"],
+                            "cut_off": False,
+                            "truncated": False,
+                        },
+                        {"type": "text", "text": "Here is the answer"},
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "think.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert "thinking" in m.metadata
+        assert m.metadata["thinking"]["content"] == "Let me think..."
+        assert m.metadata["thinking"]["summaries"] == ["Thought about it"]
+        assert m.metadata["thinking"]["cut_off"] is False
+        assert m.metadata["thinking"]["truncated"] is False
+
+    def test_text_plus_thinking_stays_conversational(self, tmp_path: Path) -> None:
+        """Category-artifact orthogonality: text+thinking -> conversational."""
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    sender="assistant",
+                    content=[
+                        {"type": "thinking", "thinking": "reasoning..."},
+                        {"type": "text", "text": "The answer is 42"},
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "think_text.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type_category"] == "conversational"
+        assert m.content == "The answer is 42"
+        assert "thinking" in m.metadata
+
+    def test_thinking_only_gets_reasoning_category(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    sender="assistant",
+                    content=[
+                        {
+                            "type": "thinking",
+                            "thinking": "Processing...",
+                            "summaries": [],
+                            "cut_off": True,
+                            "truncated": True,
+                        }
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "think_only.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type_category"] == "reasoning"
+        assert m.content == ""
+        assert m.metadata["thinking"]["cut_off"] is True
+
+    def test_voice_note_text_in_content(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    content=[{"type": "voice_note", "transcript": "Help me with Python code"}]
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "voice.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.content == "Help me with Python code"
+        assert m.metadata["content_type_category"] == "conversational"
+
+    def test_token_budget_skipped_and_logged(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    sender="assistant", content=[{"type": "token_budget", "budget": 4096}]
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "budget.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type_category"] == "system"
+        assert m.content == ""
+
+    def test_unknown_block_skipped_and_logged(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    sender="assistant", content=[{"type": "future_block", "data": "something"}]
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "unk_block.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type_category"] == "unknown"
+        assert m.content == ""
+
+
+# ============================================================================
+# Test Claude Attachments & File References (FR-010, FR-011) — T014
+# ============================================================================
+
+
+class TestClaudeAttachments:
+    """Verify attachment and file_ref extraction from Claude messages."""
+
+    def test_attachments_populated(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    content=[{"type": "text", "text": "Review this"}],
+                    attachments=[
+                        {
+                            "file_name": "report.pdf",
+                            "file_type": "application/pdf",
+                            "file_size": 102400,
+                            "extracted_content": "Extracted PDF text.",
+                        }
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "att.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert "attachments" in m.metadata
+        assert len(m.metadata["attachments"]) == 1
+        att = m.metadata["attachments"][0]
+        assert att["file_name"] == "report.pdf"
+        assert att["file_type"] == "application/pdf"
+        assert att["file_size"] == 102400
+        assert att["extracted_content"] == "Extracted PDF text."
+
+    def test_file_refs_populated(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    content=[{"type": "text", "text": "Here are files"}],
+                    files=[
+                        {"file_uuid": "uuid-001", "file_name": "data.csv"},
+                        {"file_uuid": "uuid-002", "file_name": "image.png"},
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "fref.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert "file_refs" in m.metadata
+        assert len(m.metadata["file_refs"]) == 2
+        assert m.metadata["file_refs"][0]["file_uuid"] == "uuid-001"
+        assert m.metadata["file_refs"][1]["file_name"] == "image.png"
+
+    def test_both_attachments_and_file_refs(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    content=[{"type": "text", "text": "Both here"}],
+                    attachments=[
+                        {
+                            "file_name": "notes.txt",
+                            "file_type": "text/plain",
+                            "file_size": 256,
+                            "extracted_content": "Notes content.",
+                        }
+                    ],
+                    files=[{"file_uuid": "uuid-003", "file_name": "backup.zip"}],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "both.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert len(m.metadata["attachments"]) == 1
+        assert len(m.metadata["file_refs"]) == 1
+
+    def test_empty_filename_preserved(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [make_claude_message(content=[], files=[{"file_uuid": "uuid-004", "file_name": ""}])]
+        )
+        f = write_export(data, tmp_path / "empty_fn.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["file_refs"][0]["file_name"] == ""
+
+    def test_attachment_only_gets_attachment_category(self, tmp_path: Path) -> None:
+        """Message with attachments but no text blocks -> category='attachment'."""
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    content=[],
+                    attachments=[
+                        {
+                            "file_name": "uploaded.pdf",
+                            "file_type": "application/pdf",
+                            "file_size": 51200,
+                            "extracted_content": "Full text from PDF.",
+                        }
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "att_only.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type_category"] == "attachment"
+        assert m.content == ""
+
+    def test_text_plus_attachment_stays_conversational(self, tmp_path: Path) -> None:
+        """Message with both text and attachments -> category='conversational'."""
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    content=[{"type": "text", "text": "Analyze this"}],
+                    attachments=[
+                        {
+                            "file_name": "doc.docx",
+                            "file_type": "application/docx",
+                            "file_size": 30000,
+                            "extracted_content": "Document content.",
+                        }
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "txt_att.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["content_type_category"] == "conversational"
+        assert m.content == "Analyze this"
+        assert len(m.metadata["attachments"]) == 1
 
 
 # ============================================================================
@@ -1191,3 +1526,50 @@ class TestClaudeAdapterIntegration:
         assert callable(adapter.search)
         assert callable(adapter.get_conversation_by_id)
         assert callable(adapter.get_message_by_id)
+
+
+class TestClaudeEdgeCaseCoverage:
+    """Tests for uncovered edge-case branches in Claude adapter."""
+
+    def test_unknown_sender_preserves_original(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    sender="moderator",
+                    content=[{"type": "text", "text": "Hello"}],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "unknown_sender.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.metadata["original_sender"] == "moderator"
+
+    def test_empty_voice_note_transcript(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    content=[
+                        {"type": "text", "text": "Before"},
+                        {"type": "voice_note", "transcript": ""},
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "empty_voice.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.content == "Before"
+
+    def test_empty_text_block_skipped(self, tmp_path: Path) -> None:
+        data = make_claude_export(
+            [
+                make_claude_message(
+                    content=[
+                        {"type": "text", "text": ""},
+                        {"type": "text", "text": "Actual"},
+                    ],
+                )
+            ]
+        )
+        f = write_export(data, tmp_path / "empty_text.json")
+        m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
+        assert m.content == "Actual"

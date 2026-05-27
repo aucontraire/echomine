@@ -18,6 +18,8 @@ Echomine is a Python library and CLI tool for parsing, searching, and exporting 
 
 - **Memory Efficient**: Stream-based parsing handles 1GB+ files with constant memory usage
 - **Advanced Search**: BM25 relevance ranking with exact phrase matching, boolean logic, role filtering, and keyword exclusion
+- **Content Fidelity**: Provider-agnostic content type classification with 7-category vocabulary across OpenAI and Claude
+- **Asset Resolution**: Resolve image and file asset pointers to actual files in export bundles with magic-byte detection
 - **Message Snippets**: Automatic preview generation for search results with match context
 - **Statistics & Analytics**: Calculate export statistics, conversation metrics, and temporal patterns
 - **Rich CLI Output**: Color-coded terminal formatting, tables, progress bars, and syntax highlighting
@@ -110,6 +112,25 @@ print(f"Average messages: {stats.average_messages:.1f}")
 conversation = adapter.get_conversation_by_id(export_file, "conv-abc123")
 if conversation:
     print(f"Found: {conversation.title}")
+
+# 6. Access content type metadata (v1.4.0+)
+for conversation in adapter.stream_conversations(export_file):
+    for msg in conversation.messages:
+        category = msg.metadata.get("content_type_category", "unknown")
+        if category == "reasoning":
+            thinking = msg.metadata.get("thinking", {})
+            print(f"  Thinking: {thinking.get('content', '')[:80]}...")
+        elif category == "tool_io":
+            print(f"  Tool call in: {conversation.title}")
+
+# 7. Resolve asset files from OpenAI export bundles (v1.4.0+)
+from echomine.utils.asset_resolver import resolve_asset
+
+for msg in conversation.messages:
+    for img in msg.images:
+        asset = resolve_asset(export_file.parent, img.asset_pointer)
+        if asset:
+            print(f"  Image: {asset.path} ({asset.detected_type})")
 ```
 
 ### CLI Usage (Built on Library)

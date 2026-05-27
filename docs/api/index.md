@@ -15,6 +15,7 @@ Data models built with Pydantic v2 for strict validation and type safety:
 - **[Conversation](models/conversation.md)**: Represents a complete conversation with messages
 - **[Message](models/message.md)**: Individual message in a conversation
 - **[Search](models/search.md)**: Search query and result models
+- **[Content Types](models/content_types.md)**: Provider-agnostic content type classification (v1.4.0+)
 
 ### Adapters
 
@@ -23,6 +24,12 @@ Provider-specific implementations for parsing conversation exports:
 - **[OpenAI Adapter](adapters/openai.md)**: ChatGPT conversation export parser
 - **[Claude Adapter](adapters/claude.md)**: Anthropic Claude conversation export parser
 - **[Protocols](adapters/protocols.md)**: ConversationProvider protocol definition
+
+### Utilities
+
+Shared utilities for asset resolution and content processing:
+
+- **[Asset Resolver](utils/asset_resolver.md)**: Resolve asset pointers to files in export bundles (v1.4.0+)
 
 ### Search
 

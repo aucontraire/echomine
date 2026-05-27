@@ -1,0 +1,53 @@
+[
+  {
+    "id": "conv-multipart",
+    "title": "Multi-Part Text Test",
+    "create_time": 1700000000.0,
+    "update_time": 1700001000.0,
+    "mapping": {
+      "node-single": {
+        "id": "node-single",
+        "parent": null,
+        "message": {
+          "id": "msg-single",
+          "author": {"role": "user"},
+          "create_time": 1700000001.0,
+          "content": {"content_type": "text", "parts": ["Single part message"]}
+        }
+      },
+      "node-three-parts": {
+        "id": "node-three-parts",
+        "parent": "node-single",
+        "message": {
+          "id": "msg-three-parts",
+          "author": {"role": "assistant"},
+          "create_time": 1700000002.0,
+          "content": {"content_type": "text", "parts": ["First part", "Second part", "Third part"]}
+        }
+      },
+      "node-mixed-types": {
+        "id": "node-mixed-types",
+        "parent": "node-three-parts",
+        "message": {
+          "id": "msg-mixed-types",
+          "author": {"role": "user"},
+          "create_time": 1700000003.0,
+          "content": {
+            "content_type": "text",
+            "parts": ["Text before", {"some_key": "non-string-part"}, "Text after"]
+          }
+        }
+      },
+      "node-empty-parts": {
+        "id": "node-empty-parts",
+        "parent": "node-mixed-types",
+        "message": {
+          "id": "msg-empty-parts",
+          "author": {"role": "assistant"},
+          "create_time": 1700000004.0,
+          "content": {"content_type": "text", "parts": []}
+        }
+      }
+    }
+  }
+]

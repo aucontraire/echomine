@@ -52,6 +52,7 @@ import ijson
 from pydantic import ValidationError as PydanticValidationError
 
 from echomine.exceptions import ParseError
+from echomine.models.content_types import CLAUDE_CATEGORY_MAP, ContentTypeCategory
 from echomine.models.conversation import Conversation
 from echomine.models.message import Message
 from echomine.models.protocols import OnSkipCallback, ProgressCallback
@@ -183,42 +184,56 @@ class ClaudeAdapter:
             ts_str = ts_str[:-1] + "+00:00"
         return datetime.fromisoformat(ts_str)
 
-    def _extract_content_from_blocks(self, content_blocks: list[dict[str, Any]]) -> str:
-        """Extract text from content blocks, skipping tool blocks.
-
-        Claude content blocks can be:
-        - type="text": Regular text content (INCLUDE)
-        - type="tool_use": Tool invocation (SKIP per FR-015a)
-        - type="tool_result": Tool execution result (SKIP per FR-015a)
-
-        Multiple text blocks are concatenated with newline separator.
-
-        Args:
-            content_blocks: List of content block dicts from Claude message
+    def _extract_content_from_blocks(
+        self, content_blocks: list[dict[str, Any]]
+    ) -> tuple[str, str, ContentTypeCategory, dict[str, Any] | None]:
+        """Extract text from content blocks, tracking block types for classification.
 
         Returns:
-            Concatenated text from all text-type blocks, empty string if no text blocks
-
-        Example:
-            ```python
-            blocks = [
-                {"type": "text", "text": "Hello"},
-                {"type": "tool_use", "id": "toolu_123", "name": "calc", "input": {}},
-                {"type": "text", "text": "World"}
-            ]
-            # Returns: "Hello\\nWorld"
-            ```
+            Tuple of (content_text, primary_content_type, category, thinking_metadata)
         """
         text_parts: list[str] = []
+        block_types_seen: list[str] = []
+        thinking_meta: dict[str, Any] | None = None
+
         for block in content_blocks:
             block_type = block.get("type", "")
+            block_types_seen.append(block_type)
+
             if block_type == "text":
                 text_content = block.get("text", "")
-                if text_content:  # Only add non-empty text
+                if text_content:
                     text_parts.append(text_content)
-            # Skip tool_use and tool_result blocks (FR-015a)
+            elif block_type == "thinking":
+                thinking_meta = {
+                    "content": block.get("thinking", ""),
+                    "summaries": block.get("summaries", []),
+                    "cut_off": block.get("cut_off", False),
+                    "truncated": block.get("truncated", False),
+                }
+            elif block_type == "voice_note":
+                transcript = block.get("transcript", "")
+                if transcript:
+                    text_parts.append(transcript)
+            elif block_type in ("tool_use", "tool_result"):
+                pass
+            elif block_type == "token_budget":
+                logger.debug("Skipping token_budget block")
+            else:
+                logger.debug(f"Unknown Claude block type: {block_type}")
 
-        return "\n".join(text_parts)
+        content = "\n".join(text_parts)
+        has_text = len(text_parts) > 0
+        primary_type = block_types_seen[0] if block_types_seen else "text"
+
+        if has_text:
+            category: ContentTypeCategory = "conversational"
+            ct = "text"
+        else:
+            ct = primary_type
+            category = CLAUDE_CATEGORY_MAP.get(ct, "unknown")
+
+        return content, ct, category, thinking_meta
 
     def _parse_message(
         self, raw_message: dict[str, Any], conversation_created_at: datetime
@@ -253,45 +268,85 @@ class ClaudeAdapter:
             PydanticValidationError: If message violates Message schema
             KeyError: If required field missing
         """
-        # Extract fields
         message_id = raw_message.get("uuid", "")
         text_field = raw_message.get("text", "")
         content_blocks = raw_message.get("content", [])
         sender = raw_message.get("sender", "assistant")
         created_at_str = raw_message.get("created_at", "")
 
-        # Extract content from content blocks (FR-012, FR-015)
-        content = self._extract_content_from_blocks(content_blocks)
+        content, content_type, category, thinking_meta = self._extract_content_from_blocks(
+            content_blocks
+        )
 
-        # Fallback to text field if content is empty (FR-015b)
         if not content:
             content = text_field
 
-        # Parse timestamp with fallback to conversation created_at (FR-019)
         try:
             timestamp = (
                 self._parse_timestamp(created_at_str) if created_at_str else conversation_created_at
             )
         except ValueError:
-            # If timestamp parsing fails, use conversation created_at
             timestamp = conversation_created_at
 
-        # Normalize role (FR-013)
         role_mapping = {
             "human": "user",
             "assistant": "assistant",
         }
-        role = role_mapping.get(sender, "assistant")  # Safe fallback
+        role = role_mapping.get(sender, "assistant")
 
-        # Claude messages don't have parent_id in the flat array structure
-        # All messages are at root level (no threading in Claude exports - FR-020)
+        metadata: dict[str, Any] = {
+            "content_type": content_type,
+            "content_type_category": category,
+        }
+        if thinking_meta is not None:
+            metadata["thinking"] = thinking_meta
+        if sender not in role_mapping:
+            metadata["original_sender"] = sender
+
+        raw_attachments = raw_message.get("attachments")
+        if raw_attachments and isinstance(raw_attachments, list):
+            metadata["attachments"] = [
+                {
+                    "file_name": att.get("file_name", ""),
+                    "file_type": att.get("file_type", ""),
+                    "file_size": att.get("file_size", 0),
+                    "extracted_content": att.get("extracted_content", ""),
+                }
+                for att in raw_attachments
+                if isinstance(att, dict)
+            ]
+
+        raw_files = raw_message.get("files")
+        if raw_files and isinstance(raw_files, list):
+            metadata["file_refs"] = [
+                {
+                    "file_uuid": fref.get("file_uuid", ""),
+                    "file_name": fref.get("file_name", ""),
+                }
+                for fref in raw_files
+                if isinstance(fref, dict)
+            ]
+
+        has_text_blocks = any(
+            b.get("type") == "text" and b.get("text", "")
+            for b in content_blocks
+            if isinstance(b, dict)
+        )
+        if (
+            not has_text_blocks
+            and "attachments" in metadata
+            and any(a.get("extracted_content") for a in metadata["attachments"])
+        ):
+            metadata["content_type_category"] = "attachment"
+            content = ""
+
         return Message(
             id=message_id,
             content=content,
-            role=role,  # type: ignore[arg-type]  # Literal validated by Pydantic
+            role=role,  # type: ignore[arg-type]
             timestamp=timestamp,
-            parent_id=None,  # Flat structure, no threading
-            metadata={"original_sender": sender} if sender not in role_mapping else {},
+            parent_id=None,
+            metadata=metadata,
         )
 
     def _parse_conversation(self, raw: dict[str, Any]) -> Conversation:

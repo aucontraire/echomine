@@ -42,7 +42,7 @@ class ImageRef(BaseModel):
         min_length=1,
         description="Provider-specific image URI (e.g., 'sediment://file_xxx')",
     )
-    content_type: Literal["image_asset_pointer"] = Field(
+    content_type: Literal["image_asset_pointer", "image"] = Field(
         default="image_asset_pointer",
         description="Type discriminator for image references",
     )

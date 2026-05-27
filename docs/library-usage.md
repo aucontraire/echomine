@@ -222,6 +222,133 @@ if conversation:
         print(f"Average gap: {conv_stats.average_gap_seconds:.1f} seconds")
 ```
 
+## Content Fidelity (v1.4.0+)
+
+Version 1.4.0 adds provider-agnostic content type classification and asset resolution, giving consumers rich metadata about each message's role and any artifacts it carries.
+
+### Content Type Categories
+
+Every message now includes `content_type` (raw provider value) and `content_type_category` (standardized) in its metadata:
+
+```python
+from echomine import OpenAIAdapter, ClaudeAdapter
+from pathlib import Path
+
+adapter = OpenAIAdapter()  # or ClaudeAdapter()
+
+for conversation in adapter.stream_conversations(Path("export.json")):
+    for msg in conversation.messages:
+        raw_type = msg.metadata.get("content_type", "text")
+        category = msg.metadata.get("content_type_category", "unknown")
+        print(f"  [{category}] {msg.role}: {msg.content[:60]}...")
+```
+
+The 7-value category vocabulary is consistent across all providers:
+
+| Category | Meaning | OpenAI Examples | Claude Examples |
+|---|---|---|---|
+| `conversational` | Regular chat messages | text, multimodal_text | text, voice_note |
+| `reasoning` | Model thinking/chain-of-thought | thoughts, reasoning_recap | thinking |
+| `tool_io` | Tool calls and results (includes all `author.role == "tool"` messages) | code, execution_output, tether_quote | tool_use, tool_result |
+| `system` | System-level messages | user_editable_context, system_error | token_budget |
+| `media` | Standalone media content | image_asset_pointer, image | — |
+| `attachment` | Standalone file attachments | — | (attachment-only messages) |
+| `unknown` | Unmapped content types | (new/unrecognized types) | (new/unrecognized types) |
+
+### Category-Artifact Orthogonality
+
+The category reflects the message's conversational role, not what it carries. Artifacts (images, attachments, reasoning) are orthogonal metadata:
+
+```python
+for msg in conversation.messages:
+    category = msg.metadata.get("content_type_category")
+
+    # Text + image → conversational (has images in msg.images)
+    # Image-only → media
+    # Text + thinking → conversational (thinking in metadata["thinking"])
+    # Thinking-only → reasoning
+    # Text + attachment → conversational (attachments in metadata)
+    # Attachment-only → attachment
+
+    if category == "conversational" and msg.images:
+        print(f"  Message with inline images: {len(msg.images)}")
+    elif category == "media":
+        print(f"  Standalone image message")
+```
+
+### Thinking Metadata
+
+Both adapters extract model reasoning into `metadata["thinking"]` as a dict with a `content` key:
+
+```python
+for msg in conversation.messages:
+    thinking = msg.metadata.get("thinking")
+    if thinking:
+        print(f"  Model was thinking: {thinking['content'][:100]}...")
+```
+
+### Claude-Specific Metadata
+
+The Claude adapter extracts additional structured metadata:
+
+```python
+adapter = ClaudeAdapter()
+
+for conversation in adapter.stream_conversations(Path("claude_export.json")):
+    for msg in conversation.messages:
+        # Attachments (file uploads with extracted content)
+        attachments = msg.metadata.get("attachments", [])
+        for att in attachments:
+            print(f"  Attachment: {att['file_name']} ({att['file_type']})")
+
+        # File references
+        file_refs = msg.metadata.get("file_references", [])
+        for ref in file_refs:
+            print(f"  File: {ref['file_name']}")
+```
+
+### Asset Resolution (OpenAI)
+
+Resolve asset pointers from OpenAI exports to actual files on disk:
+
+```python
+from echomine.utils.asset_resolver import resolve_asset, ResolvedAsset
+
+export_dir = Path("export_bundle/")  # Directory with export files
+
+for msg in conversation.messages:
+    for img in msg.images:
+        asset = resolve_asset(export_dir, img.asset_pointer)
+        if asset:
+            print(f"  Found: {asset.path}")
+            print(f"  Type: {asset.detected_type}")  # e.g., "image/png"
+            print(f"  Extension: {asset.original_extension}")
+```
+
+Supported formats via magic-byte detection: PNG, JPEG, WebP, GIF, WAV.
+
+### Content Type Classification API
+
+For direct classification without an adapter:
+
+```python
+from echomine.models.content_types import classify_content_type
+
+# OpenAI content types
+classify_content_type("text", "openai")           # → "conversational"
+classify_content_type("thoughts", "openai")        # → "reasoning"
+classify_content_type("code", "openai")            # → "tool_io"
+classify_content_type("image_asset_pointer", "openai")  # → "media"
+
+# Claude block types
+classify_content_type("text", "claude")            # → "conversational"
+classify_content_type("thinking", "claude")        # → "reasoning"
+classify_content_type("tool_use", "claude")        # → "tool_io"
+
+# Unknown types return "unknown"
+classify_content_type("new_type", "openai")        # → "unknown"
+```
+
 ## Advanced Search Features (v1.1.0+)
 
 Version 1.1.0 introduces five powerful search enhancements for the library API:
