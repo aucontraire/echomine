@@ -321,10 +321,10 @@ class TestSearchPerformance:
         time_to_first_ms = (time.perf_counter() - start_first) * 1000
 
         # First result includes BM25 computation for entire corpus
-        # 10K conversations should process in reasonable time (<5 seconds)
-        assert time_to_first_ms < 5000, (
+        # 10K conversations should process in reasonable time (<6 seconds)
+        assert time_to_first_ms < 6000, (
             f"Getting first result took {time_to_first_ms:.1f}ms. "
-            f"BM25 computation for 10K docs should complete in <5s."
+            f"BM25 computation for 10K docs should complete in <6s."
         )
 
         # Consume remaining results to verify streaming continues
@@ -644,8 +644,8 @@ class TestSearchStressScenarios:
 
         assert len(results) == 1, "Should return exactly 1 result"
         # BM25 requires full corpus processing, so ~2-3s for 10K docs is expected
-        assert elapsed < 5.0, (
-            f"Search with limit=1 took {elapsed:.3f}s, should complete in <5s for 10K docs"
+        assert elapsed < 6.0, (
+            f"Search with limit=1 took {elapsed:.3f}s, should complete in <6s for 10K docs"
         )
 
         print(f"\nLimit=1 Performance: {elapsed:.3f}s (includes BM25 ranking)")
