@@ -106,6 +106,10 @@ class Message(BaseModel):
         default=None,
         description="Parent message ID for threading (None for root, per FR-276)",
     )
+    model: str | None = Field(
+        default=None,
+        description="LLM model identifier that produced this message (None for user messages or when not available)",
+    )
 
     # Image Attachments (Phase 6: Export with Images, FR-XXX)
     images: list[ImageRef] = Field(

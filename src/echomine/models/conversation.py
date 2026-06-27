@@ -108,6 +108,10 @@ class Conversation(BaseModel):
         min_length=1,
         description="All messages in conversation (non-empty)",
     )
+    models_used: list[str] = Field(
+        default_factory=list,
+        description="Distinct, ordered list of model identifiers seen across assistant messages (empty when unavailable)",
+    )
 
     # Optional Provider-Specific Metadata (per FR-236, FR-237, FR-275)
     metadata: dict[str, Any] = Field(

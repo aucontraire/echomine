@@ -349,6 +349,43 @@ classify_content_type("tool_use", "claude")        # → "tool_io"
 classify_content_type("new_type", "openai")        # → "unknown"
 ```
 
+## Model Provenance (v1.5.0+)
+
+Echomine surfaces the LLM model identifier on messages and conversations, enabling downstream consumers to answer "which model wrote this response?"
+
+### Per-Message Model
+
+```python
+for conv in adapter.stream_conversations(export_file):
+    for msg in conv.messages:
+        if msg.model:
+            print(f"  {msg.role}: {msg.model}")
+        # user messages and Claude messages → None
+```
+
+**ChatGPT**: reads `metadata.model_slug` per-message (e.g., `gpt-5`, `o3`, `gpt-5-1-thinking`). Falls back to `default_model_slug` for assistant messages without a per-message slug.
+
+**Claude**: always `None` — Anthropic's export does not include model information.
+
+### Conversation-Level Summary
+
+```python
+for conv in adapter.stream_conversations(export_file):
+    if conv.models_used:
+        print(f"{conv.title}: {', '.join(conv.models_used)}")
+    # e.g., "My Chat: gpt-5, o3"
+```
+
+`models_used` is a distinct, ordered list of model identifiers seen across assistant messages. Empty when no message carries model info (all Claude conversations, or ChatGPT conversations with no model metadata).
+
+### Provider Comparison
+
+| Field | ChatGPT | Claude |
+|---|---|---|
+| `Message.model` | Per-message slug (e.g., `gpt-5`) | `None` |
+| `Conversation.models_used` | Ordered distinct list | `[]` (empty) |
+| Fallback | `default_model_slug` for assistant messages | N/A |
+
 ## Advanced Search Features (v1.1.0+)
 
 Version 1.1.0 introduces five powerful search enhancements for the library API:

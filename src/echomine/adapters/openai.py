@@ -714,7 +714,11 @@ class OpenAIAdapter:
         """
         # Extract messages from mapping structure
         # Memory: O(N) - creates list of N messages
-        messages = self._extract_messages_from_mapping(raw_data.get("mapping", {}))
+        default_model_slug = raw_data.get("default_model_slug")
+        messages = self._extract_messages_from_mapping(
+            raw_data.get("mapping", {}),
+            default_model_slug=default_model_slug,
+        )
 
         # Validate required fields exist before attempting conversion
         # Missing fields will cause KeyError, which we catch and re-raise as PydanticValidationError
@@ -769,21 +773,32 @@ class OpenAIAdapter:
             datetime.fromtimestamp(float(update_time), tz=UTC) if update_time is not None else None
         )
 
-        # Build Conversation model (Pydantic validation automatic)
-        # Raises PydanticValidationError if required fields missing
+        seen: set[str] = set()
+        models_used: list[str] = []
+        for msg in messages:
+            if msg.model is not None and msg.model not in seen:
+                seen.add(msg.model)
+                models_used.append(msg.model)
+
         return Conversation(
             id=conversation_id,
             title=title,
             created_at=created_at,
             updated_at=updated_at,
             messages=messages,
+            models_used=models_used,
             metadata={
                 "moderation_results": raw_data.get("moderation_results", []),
                 "current_node": raw_data.get("current_node"),
             },
         )
 
-    def _extract_messages_from_mapping(self, mapping: dict[str, Any]) -> list[Message]:
+    def _extract_messages_from_mapping(
+        self,
+        mapping: dict[str, Any],
+        *,
+        default_model_slug: str | None = None,
+    ) -> list[Message]:
         """Extract messages from OpenAI mapping tree structure.
 
         OpenAI stores messages in a dict-based tree where:
@@ -818,7 +833,11 @@ class OpenAIAdapter:
             # Parse message from node
             # Memory: O(1) per message
             try:
-                message = self._parse_message(message_data, node_data)
+                message = self._parse_message(
+                    message_data,
+                    node_data,
+                    default_model_slug=default_model_slug,
+                )
                 messages.append(message)
             except (KeyError, ValueError, PydanticValidationError) as e:
                 # Graceful degradation: skip malformed messages
@@ -832,7 +851,13 @@ class OpenAIAdapter:
 
         return messages
 
-    def _parse_message(self, message_data: dict[str, Any], node_data: dict[str, Any]) -> Message:
+    def _parse_message(
+        self,
+        message_data: dict[str, Any],
+        node_data: dict[str, Any],
+        *,
+        default_model_slug: str | None = None,
+    ) -> Message:
         """Parse OpenAI message dict to Message model.
 
         Handles nested OpenAI structure:
@@ -925,6 +950,12 @@ class OpenAIAdapter:
         ):
             metadata["is_visually_hidden"] = True
 
+        model: str | None = None
+        if isinstance(msg_metadata, dict):
+            model = msg_metadata.get("model_slug")
+        if model is None and role == "assistant" and default_model_slug is not None:
+            model = default_model_slug
+
         return Message(
             id=message_data["id"],
             content=content,
@@ -933,6 +964,7 @@ class OpenAIAdapter:
             parent_id=parent_id,
             images=images,
             metadata=metadata,
+            model=model,
         )
 
     def _normalize_role(self, raw_role: str) -> Literal["user", "assistant", "system"]:
