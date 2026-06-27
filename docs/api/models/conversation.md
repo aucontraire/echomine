@@ -121,6 +121,7 @@ valid = Conversation(
 ### Optional Fields
 
 - **updated_at** (`datetime | None`): Last update timestamp (UTC, timezone-aware), `None` if never updated
+- **models_used** (`list[str]`): Distinct, ordered list of LLM model identifiers seen across assistant messages. Empty when unavailable (Claude, or ChatGPT without model metadata). *(v1.5.0+)*
 - **metadata** (`dict[str, Any]`): Provider-specific metadata (default: empty dict)
 
 ### Computed Properties

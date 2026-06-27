@@ -19,6 +19,7 @@ Echomine is a Python library and CLI tool for parsing, searching, and exporting 
 - **Memory Efficient**: Stream-based parsing handles 1GB+ files with constant memory usage
 - **Advanced Search**: BM25 relevance ranking with exact phrase matching, boolean logic, role filtering, and keyword exclusion
 - **Content Fidelity**: Provider-agnostic content type classification with 7-category vocabulary across OpenAI and Claude
+- **Model Provenance**: Surface LLM model identifiers per-message and per-conversation from export metadata
 - **Asset Resolution**: Resolve image and file asset pointers to actual files in export bundles with magic-byte detection
 - **Message Snippets**: Automatic preview generation for search results with match context
 - **Statistics & Analytics**: Calculate export statistics, conversation metrics, and temporal patterns

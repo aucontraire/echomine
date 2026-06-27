@@ -149,6 +149,7 @@ valid = Message(
 ### Optional Fields
 
 - **parent_id** (`str | None`): ID of parent message, `None` for root messages
+- **model** (`str | None`): LLM model identifier that produced this message (e.g., `gpt-5`, `o3`). `None` for user messages, Claude messages, and exports without model info. *(v1.5.0+)*
 - **metadata** (`dict[str, Any]`): Message-specific metadata (default: empty dict)
 
 ## Role Normalization

@@ -726,3 +726,105 @@ class TestDallEMetadataPreservation:
         assert images[0].metadata["gen_id"] == "gen_abc123"
         assert images[0].metadata["prompt"] == "a cat in space"
         assert images[0].metadata["seed"] == 42
+
+
+class TestOpenAIModelField:
+    """Model slug surfaced on Message.model and Conversation.models_used."""
+
+    def test_per_message_model_slug(self, tmp_path: Path) -> None:
+        msg = make_openai_message(
+            id="m1",
+            role="assistant",
+            metadata={"model_slug": "gpt-5"},
+        )
+        export = make_openai_export([msg])
+        f = write_export(export, tmp_path / "export.json")
+        adapter = OpenAIAdapter()
+        conv = next(adapter.stream_conversations(f))
+        assert conv.messages[0].model == "gpt-5"
+
+    def test_user_message_no_model(self, tmp_path: Path) -> None:
+        msg = make_openai_message(id="m1", role="user")
+        export = make_openai_export([msg])
+        f = write_export(export, tmp_path / "export.json")
+        adapter = OpenAIAdapter()
+        conv = next(adapter.stream_conversations(f))
+        assert conv.messages[0].model is None
+
+    def test_default_model_slug_fallback(self, tmp_path: Path) -> None:
+        msg = make_openai_message(id="m1", role="assistant")
+        conv_data = make_openai_conversation([msg])
+        conv_data["default_model_slug"] = "gpt-4o"
+        f = write_export([conv_data], tmp_path / "export.json")
+        adapter = OpenAIAdapter()
+        conv = next(adapter.stream_conversations(f))
+        assert conv.messages[0].model == "gpt-4o"
+
+    def test_per_message_overrides_default(self, tmp_path: Path) -> None:
+        msg = make_openai_message(
+            id="m1",
+            role="assistant",
+            metadata={"model_slug": "o3"},
+        )
+        conv_data = make_openai_conversation([msg])
+        conv_data["default_model_slug"] = "gpt-4o"
+        f = write_export([conv_data], tmp_path / "export.json")
+        adapter = OpenAIAdapter()
+        conv = next(adapter.stream_conversations(f))
+        assert conv.messages[0].model == "o3"
+
+    def test_models_used_deduplication(self, tmp_path: Path) -> None:
+        msgs = [
+            make_openai_message(id="m1", role="user"),
+            make_openai_message(
+                id="m2",
+                role="assistant",
+                metadata={"model_slug": "gpt-5"},
+            ),
+            make_openai_message(id="m3", role="user", create_time=1700000002.0),
+            make_openai_message(
+                id="m4",
+                role="assistant",
+                metadata={"model_slug": "gpt-5"},
+                create_time=1700000003.0,
+            ),
+        ]
+        export = make_openai_export(msgs)
+        f = write_export(export, tmp_path / "export.json")
+        adapter = OpenAIAdapter()
+        conv = next(adapter.stream_conversations(f))
+        assert conv.models_used == ["gpt-5"]
+
+    def test_models_used_preserves_order(self, tmp_path: Path) -> None:
+        msgs = [
+            make_openai_message(
+                id="m1",
+                role="assistant",
+                metadata={"model_slug": "gpt-5"},
+            ),
+            make_openai_message(
+                id="m2",
+                role="assistant",
+                metadata={"model_slug": "o3"},
+                create_time=1700000002.0,
+            ),
+            make_openai_message(
+                id="m3",
+                role="assistant",
+                metadata={"model_slug": "gpt-5"},
+                create_time=1700000003.0,
+            ),
+        ]
+        export = make_openai_export(msgs)
+        f = write_export(export, tmp_path / "export.json")
+        adapter = OpenAIAdapter()
+        conv = next(adapter.stream_conversations(f))
+        assert conv.models_used == ["gpt-5", "o3"]
+
+    def test_models_used_empty_when_no_model(self, tmp_path: Path) -> None:
+        msg = make_openai_message(id="m1", role="user")
+        export = make_openai_export([msg])
+        f = write_export(export, tmp_path / "export.json")
+        adapter = OpenAIAdapter()
+        conv = next(adapter.stream_conversations(f))
+        assert conv.models_used == []

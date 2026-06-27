@@ -1573,3 +1573,19 @@ class TestClaudeEdgeCaseCoverage:
         f = write_export(data, tmp_path / "empty_text.json")
         m = next(iter(ClaudeAdapter().stream_conversations(f))).messages[0]
         assert m.content == "Actual"
+
+
+class TestClaudeModelField:
+    """Claude export has no model info — Message.model is None, models_used is empty."""
+
+    def test_message_model_is_none(self, tmp_path: Path) -> None:
+        data = make_claude_export([make_claude_message()])
+        f = write_export(data, tmp_path / "export.json")
+        conv = next(ClaudeAdapter().stream_conversations(f))
+        assert conv.messages[0].model is None
+
+    def test_models_used_is_empty(self, tmp_path: Path) -> None:
+        data = make_claude_export([make_claude_message()])
+        f = write_export(data, tmp_path / "export.json")
+        conv = next(ClaudeAdapter().stream_conversations(f))
+        assert conv.models_used == []

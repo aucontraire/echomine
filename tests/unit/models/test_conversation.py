@@ -662,3 +662,65 @@ def test_immutable_message_still_validates_on_creation() -> None:
             timestamp=datetime.now(UTC),
             parent_id=None,
         )
+
+
+class TestModelField:
+    """Message.model and Conversation.models_used fields."""
+
+    def test_message_model_defaults_to_none(self) -> None:
+        from echomine import Message
+
+        msg = Message(
+            id="m1",
+            content="Hello",
+            role="user",
+            timestamp=datetime.now(UTC),
+        )
+        assert msg.model is None
+
+    def test_message_model_set(self) -> None:
+        from echomine import Message
+
+        msg = Message(
+            id="m1",
+            content="Hi",
+            role="assistant",
+            timestamp=datetime.now(UTC),
+            model="gpt-5",
+        )
+        assert msg.model == "gpt-5"
+
+    def test_conversation_models_used_defaults_empty(self) -> None:
+        from echomine import Conversation, Message
+
+        msg = Message(
+            id="m1",
+            content="Hello",
+            role="user",
+            timestamp=datetime.now(UTC),
+        )
+        conv = Conversation(
+            id="c1",
+            title="Test",
+            created_at=datetime.now(UTC),
+            messages=[msg],
+        )
+        assert conv.models_used == []
+
+    def test_conversation_models_used_set(self) -> None:
+        from echomine import Conversation, Message
+
+        msg = Message(
+            id="m1",
+            content="Hello",
+            role="user",
+            timestamp=datetime.now(UTC),
+        )
+        conv = Conversation(
+            id="c1",
+            title="Test",
+            created_at=datetime.now(UTC),
+            messages=[msg],
+            models_used=["gpt-5", "o3"],
+        )
+        assert conv.models_used == ["gpt-5", "o3"]
